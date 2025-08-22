@@ -29,7 +29,7 @@ export const Suggestion = Mark.create<SuggestionOptions>({
   addOptions() {
     return {
       HTMLAttributes: {
-        class: 'suggestion',
+        class: 'suggestion text-gray-400',
       },
     };
   },

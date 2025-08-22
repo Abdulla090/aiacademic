@@ -12,8 +12,15 @@ suggestion {
 
 /* Ensure suggestion mark works in all contexts */
 .ProseMirror suggestion,
-suggestion {
+suggestion,
+.suggestion {
   color: #9ca3af; /* gray-400 */
+}
+
+/* Additional styles for better visibility */
+.ProseMirror suggestion,
+.suggestion {
+  background-color: rgba(156, 163, 175, 0.1);
 }
 
 /* Ensure the editor fills its container */

@@ -60,8 +60,8 @@ export const WritingSupervisor = () => {
               placeholder="بابەتەکەت بنووسە..."
               className="input-academic sorani-text"
             />
-            <div className="prose dark:prose-invert max-w-full border border-border rounded-lg p-6 h-[70vh] bg-white dark:bg-gray-900">
-                <EditorContent editor={editor} className="h-full" />
+            <div className="prose dark:prose-invert max-w-full border border-border rounded-lg p-6 min-h-[80vh] bg-white dark:bg-gray-900">
+                <EditorContent editor={editor} className="h-full min-h-[70vh] text-lg leading-relaxed p-4" />
             </div>
             <div className="flex items-center gap-4">
                 <Button onClick={fetchSuggestion} disabled={loading}>
