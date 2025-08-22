@@ -38,6 +38,7 @@ const Index = () => {
     description: string;
     descriptionKurdish: string;
     icon: any;
+    image?: string;
     category: string;
     categoryKurdish: string;
     isComingSoon?: boolean;
@@ -51,6 +52,7 @@ const Index = () => {
       description: "Generate well-structured academic articles with citation support (APA, MLA, IEEE)",
       descriptionKurdish: "دروستکردنی بابەتی ئەکادیمی بە پێکهاتەیەکی باش لەگەڵ پاڵپشتی سەرچاوەکان",
       icon: PenTool,
+      image: "/card-images/article.png",
       category: "writing",
       categoryKurdish: "نووسین",
       path: "/article-writer"
@@ -61,6 +63,7 @@ const Index = () => {
       description: "Interactive system that guides you through creating comprehensive research reports",
       descriptionKurdish: "سیستەمێکی کارلێکەرانە کە ڕێنمایت دەکات بۆ دروستکردنی ڕاپۆرتی تەواو",
       icon: FileText,
+      image: "/card-images/report.png",
       category: "writing",
       categoryKurdish: "نووسین",
       path: "/report-generator"
@@ -71,6 +74,7 @@ const Index = () => {
       description: "Advanced grammar and style correction for Kurdish Sorani academic writing",
       descriptionKurdish: "ڕاستکردنەوەی ڕێزمان و ستایلی پێشکەوتوو بۆ نووسینی ئەکادیمی بە سۆرانی",
       icon: CheckSquare,
+      image: "/card-images/grammar-fix.jpeg",
       category: "editing",
       categoryKurdish: "دەستکاری",
       path: "/grammar-checker"
@@ -131,6 +135,7 @@ const Index = () => {
       description: "Create academic presentations with structured formatting",
       descriptionKurdish: "دروستکردنی پێشکەشکردنی ئەکادیمی بە پێکهاتەیەکی ڕێکخراو",
       icon: Presentation,
+      image: "/card-images/presentation.jpeg",
       category: "presentation",
       categoryKurdish: "پێشکەشکردن",
       path: "/presentation-generator"
@@ -254,6 +259,7 @@ const Index = () => {
                 description={tool.description}
                 descriptionKurdish={tool.descriptionKurdish}
                 icon={tool.icon}
+                image={tool.image}
                 category={tool.category}
                 categoryKurdish={tool.categoryKurdish}
                 isComingSoon={tool.isComingSoon}

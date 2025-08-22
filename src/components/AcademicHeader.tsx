@@ -1,25 +1,39 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Search, 
-  Bell, 
-  Settings, 
-  User, 
+import {
+  Search,
+  Bell,
+  Settings,
+  User,
   GraduationCap,
   Menu,
   Sun,
   Moon
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 
 export const AcademicHeader = () => {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(true);
 
   const toggleTheme = () => {
-    setIsDark(!isDark);
-    document.documentElement.classList.toggle('dark');
+    const newTheme = !isDark;
+    setIsDark(newTheme);
+    document.documentElement.classList.toggle('dark', newTheme);
+    localStorage.setItem('theme', newTheme ? 'dark' : 'light');
   };
+
+  // Set initial theme on component mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    // Default to dark theme if no saved preference
+    const initialTheme = savedTheme ? savedTheme === 'dark' : true;
+    
+    setIsDark(initialTheme);
+    if (initialTheme) {
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
