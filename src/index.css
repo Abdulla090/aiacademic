@@ -1,0 +1,229 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Kurdish Sorani Academic Design System */
+
+suggestion {
+  color: #9ca3af; /* gray-400 */
+}
+
+/* Ensure suggestion mark works in all contexts */
+.ProseMirror suggestion,
+suggestion {
+  color: #9ca3af; /* gray-400 */
+}
+
+/* Ensure the editor fills its container */
+.ProseMirror {
+  min-height: 100%;
+  height: 100%;
+}
+
+@layer base {
+  :root {
+    /* Background System */
+    --background: 240 15% 98%;
+    --background-secondary: 240 20% 95%;
+    --background-tertiary: 240 25% 92%;
+    --foreground: 240 15% 8%;
+    --foreground-secondary: 240 10% 25%;
+
+    /* Academic Brand Colors */
+    --primary: 240 85% 58%;
+    --primary-light: 240 85% 68%;
+    --primary-dark: 240 85% 48%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Academic Secondary */
+    --secondary: 280 50% 65%;
+    --secondary-light: 280 60% 75%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Academic Accent */
+    --accent: 200 85% 55%;
+    --accent-light: 200 85% 65%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Card System */
+    --card: 0 0% 100%;
+    --card-secondary: 240 20% 99%;
+    --card-foreground: 240 15% 8%;
+    --card-border: 240 20% 88%;
+
+    /* Interactive Elements */
+    --muted: 240 15% 96%;
+    --muted-foreground: 240 10% 45%;
+    --border: 240 20% 90%;
+    --input: 240 20% 95%;
+    --ring: 240 85% 58%;
+
+    /* Status Colors */
+    --success: 142 85% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 45 90% 55%;
+    --warning-foreground: 0 0% 100%;
+    --destructive: 0 85% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Academic Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-light)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--secondary-light)));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent-light)));
+    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--background-secondary)));
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-academic: 0 8px 30px -8px hsl(var(--primary) / 0.15);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 240 15% 8%;
+    --background-secondary: 240 15% 12%;
+    --background-tertiary: 240 15% 16%;
+    --foreground: 240 15% 92%;
+    --foreground-secondary: 240 10% 75%;
+
+    --primary: 240 85% 68%;
+    --primary-light: 240 85% 78%;
+    --primary-dark: 240 85% 58%;
+    --primary-foreground: 240 15% 8%;
+
+    --secondary: 280 50% 75%;
+    --secondary-light: 280 60% 85%;
+    --secondary-foreground: 240 15% 8%;
+
+    --accent: 200 85% 65%;
+    --accent-light: 200 85% 75%;
+    --accent-foreground: 240 15% 8%;
+
+    --card: 240 15% 12%;
+    --card-secondary: 240 15% 10%;
+    --card-foreground: 240 15% 92%;
+    --card-border: 240 20% 25%;
+
+    --muted: 240 15% 16%;
+    --muted-foreground: 240 10% 55%;
+    --border: 240 20% 20%;
+    --input: 240 20% 16%;
+    --ring: 240 85% 68%;
+
+    --success: 142 85% 55%;
+    --success-foreground: 240 15% 8%;
+    --warning: 45 90% 65%;
+    --warning-foreground: 240 15% 8%;
+    --destructive: 0 85% 68%;
+    --destructive-foreground: 240 15% 8%;
+
+    --sidebar-background: 240 15% 10%;
+    --sidebar-foreground: 240 15% 85%;
+    --sidebar-primary: 240 85% 68%;
+    --sidebar-primary-foreground: 240 15% 8%;
+    --sidebar-accent: 240 15% 16%;
+    --sidebar-accent-foreground: 240 15% 85%;
+    --sidebar-border: 240 20% 20%;
+    --sidebar-ring: 240 85% 68%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sorani;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  }
+
+  /* Kurdish Sorani Text Support */
+  .sorani-text {
+    font-family: 'Noto Sans Arabic', 'Inter', system-ui, sans-serif;
+    direction: rtl;
+    text-align: right;
+    line-height: 1.8;
+  }
+
+  .latin-text {
+    font-family: 'Inter', system-ui, sans-serif;
+    direction: ltr;
+    text-align: left;
+  }
+}
+
+@layer components {
+  /* Academic Card Variants */
+  .card-academic {
+    @apply bg-card border border-card-border rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+
+  .card-academic-primary {
+    @apply card-academic bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20;
+  }
+
+  .card-academic-secondary {
+    @apply card-academic bg-gradient-to-br from-secondary/5 to-secondary/10 border-secondary/20;
+  }
+
+  /* Academic Buttons */
+  .btn-academic-primary {
+    @apply bg-gradient-to-r from-primary to-primary-light text-primary-foreground rounded-xl px-6 py-3 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300;
+  }
+
+  .btn-academic-secondary {
+    @apply bg-gradient-to-r from-secondary to-secondary-light text-secondary-foreground rounded-xl px-6 py-3 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300;
+  }
+
+  .btn-academic-outline {
+    @apply border-2 border-primary text-primary bg-transparent rounded-xl px-6 py-3 font-medium hover:bg-primary hover:text-primary-foreground transition-all duration-300;
+  }
+
+  /* Academic Input */
+  .input-academic {
+    @apply bg-input border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300;
+  }
+
+  /* Academic Gradients */
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-secondary {
+    background: var(--gradient-secondary);
+  }
+
+  .gradient-accent {
+    background: var(--gradient-accent);
+  }
+
+  .gradient-subtle {
+    background: var(--gradient-subtle);
+  }
+}
