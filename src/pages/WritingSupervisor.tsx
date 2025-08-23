@@ -1,8 +1,10 @@
 import { AcademicHeader } from "@/components/AcademicHeader";
 import { WritingSupervisor as WritingSupervisorComponent } from '@/components/WritingSupervisor';
+import { useTranslation } from 'react-i18next';
 import { PenTool } from "lucide-react";
 
 const WritingSupervisor = () => {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <AcademicHeader />
@@ -16,26 +18,23 @@ const WritingSupervisor = () => {
                 <div className="p-3 bg-gradient-primary rounded-xl text-primary-foreground">
                   <PenTool className="h-8 w-8" />
                 </div>
-                <h1 className="text-4xl font-bold text-foreground sorani-text">سەرپەرشتیاری نووسینی زیرەک</h1>
+                <h1 className="text-4xl font-bold text-foreground">{t('writingSupervisor')}</h1>
               </div>
-              <p className="text-xl text-muted-foreground mb-6 sorani-text leading-relaxed">
-                پێشنیار و تێبینی ڕاستەوخۆ وەربگرە لەکاتی نووسیندا.
-              </p>
-              <p className="text-lg text-foreground-secondary mb-8 latin-text">
-                Get real-time feedback and suggestions as you write.
+              <p className="text-xl text-muted-foreground mb-6 leading-relaxed">
+                {t('writingSupervisorDescription')}
               </p>
               <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">پێشنیارەکان</p>
-                  <p className="font-semibold">ڕاستەوخۆ</p>
+                  <p className="text-sm text-muted-foreground">{t('suggestions')}</p>
+                  <p className="font-semibold">{t('realTime')}</p>
                 </div>
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">ڕێزمان</p>
-                  <p className="font-semibold">ڕاستکردنەوە</p>
+                  <p className="text-sm text-muted-foreground">{t('grammar')}</p>
+                  <p className="font-semibold">{t('correction')}</p>
                 </div>
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">ستایل</p>
-                  <p className="font-semibold">پێشنیارکردن</p>
+                  <p className="text-sm text-muted-foreground">{t('style')}</p>
+                  <p className="font-semibold">{t('suggestion')}</p>
                 </div>
               </div>
             </div>

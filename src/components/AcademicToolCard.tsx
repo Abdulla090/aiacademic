@@ -3,16 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LucideIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 interface AcademicToolCardProps {
   title: string;
-  titleKurdish: string;
   description: string;
-  descriptionKurdish: string;
   icon: LucideIcon;
   image?: string;
   category: string;
-  categoryKurdish: string;
   isComingSoon?: boolean;
   path?: string;
   onClick?: () => void;
@@ -20,17 +18,15 @@ interface AcademicToolCardProps {
 
 export const AcademicToolCard = ({
   title,
-  titleKurdish,
   description,
-  descriptionKurdish,
   icon: Icon,
   image,
   category,
-  categoryKurdish,
   isComingSoon = false,
   path,
   onClick
 }: AcademicToolCardProps) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   
   const handleClick = () => {
@@ -48,22 +44,22 @@ export const AcademicToolCard = ({
       <div className="p-6">
         {image ? (
           <>
-            <div className="mb-4 rounded-lg overflow-hidden">
+            <div className="mb-4 rounded-lg overflow-hidden aspect-video">
               <img
                 src={image}
-                alt={titleKurdish}
-                className="w-full h-48 object-cover"
+                alt={t(title)}
+                className="w-full h-full object-cover"
               />
             </div>
             <div className="space-y-2 mb-4">
               <Badge variant="secondary" className="mb-2 text-xs">
-                {categoryKurdish}
+                {t(category)}
               </Badge>
               <h3 className="text-lg font-semibold text-card-foreground mb-1">
-                {titleKurdish}
+                {t(title)}
               </h3>
               <p className="text-sm text-card-foreground sorani-text leading-relaxed">
-                {descriptionKurdish}
+                {t(description)}
               </p>
             </div>
           </>
@@ -76,29 +72,29 @@ export const AcademicToolCard = ({
                 </div>
                 <div>
                   <Badge variant="secondary" className="mb-2 text-xs">
-                    {categoryKurdish}
+                    {t(category)}
                   </Badge>
                   <h3 className="text-lg font-semibold text-card-foreground mb-1">
-                    {titleKurdish}
+                    {t(title)}
                   </h3>
                   <p className="text-sm text-muted-foreground latin-text">
-                    {title}
+                    {t(title)}
                   </p>
                 </div>
               </div>
               {isComingSoon && (
                 <Badge variant="outline" className="text-xs">
-                  بەزووی
+                  {t('comingSoon')}
                 </Badge>
               )}
             </div>
             
             <div className="space-y-2 mb-4">
               <p className="text-sm text-card-foreground sorani-text leading-relaxed">
-                {descriptionKurdish}
+                {t(description)}
               </p>
               <p className="text-xs text-muted-foreground latin-text">
-                {description}
+                {t(description)}
               </p>
             </div>
           </>
@@ -108,7 +104,7 @@ export const AcademicToolCard = ({
           className={`w-full ${isComingSoon ? 'btn-academic-outline opacity-50' : 'btn-academic-primary'}`}
           disabled={isComingSoon}
         >
-          {isComingSoon ? 'بەزووی دێت' : 'کردنەوە'}
+          {isComingSoon ? t('comingSoon') : t('open')}
         </Button>
       </div>
     </Card>

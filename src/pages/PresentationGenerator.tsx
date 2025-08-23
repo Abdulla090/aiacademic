@@ -1,8 +1,10 @@
 import { AcademicHeader } from "@/components/AcademicHeader";
 import { PresentationGenerator as PresentationGeneratorComponent } from '@/components/PresentationGenerator';
+import { useTranslation } from 'react-i18next';
 import { Presentation } from "lucide-react";
 
 const PresentationGenerator = () => {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <AcademicHeader />
@@ -16,25 +18,22 @@ const PresentationGenerator = () => {
                 <div className="p-3 bg-gradient-primary rounded-xl text-primary-foreground">
                   <Presentation className="h-8 w-8" />
                 </div>
-                <h1 className="text-4xl font-bold text-foreground sorani-text">دروستکەری پێشکەشکردن</h1>
+                <h1 className="text-4xl font-bold text-foreground">{t('presentationGenerator')}</h1>
               </div>
-              <p className="text-xl text-muted-foreground mb-6 sorani-text leading-relaxed">
-                دروستکردنی پێشکەشکردنی ئەکادیمی بە پێکهاتەیەکی ڕێکخراو
-              </p>
-              <p className="text-lg text-foreground-secondary mb-8 latin-text">
-                Create academic presentations with structured formatting
+              <p className="text-xl text-muted-foreground mb-6 leading-relaxed">
+                {t('presentationGeneratorDescription')}
               </p>
               <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">ڕێکخستن</p>
-                  <p className="font-semibold">پێکهاتەی ڕێکخراو</p>
+                  <p className="text-sm text-muted-foreground">{t('layout')}</p>
+                  <p className="font-semibold">{t('structuredFormatting')}</p>
                 </div>
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">دیزاین</p>
-                  <p className="font-semibold">شێوازی زیپ</p>
+                  <p className="text-sm text-muted-foreground">{t('design')}</p>
+                  <p className="font-semibold">{t('professionalTemplates')}</p>
                 </div>
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">دابەزاندن</p>
+                  <p className="text-sm text-muted-foreground">{t('download')}</p>
                   <p className="font-semibold">PDF, PPTX</p>
                 </div>
               </div>

@@ -6,36 +6,34 @@ import {
   Clock, 
   TrendingUp 
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export const AcademicStats = () => {
+  const { t } = useTranslation();
   const stats = [
     {
-      title: "پڕۆژەکانی ئەنجامدراو",
-      titleEn: "Completed Projects",
+      title: "completedProjects",
       value: "24",
       icon: CheckCircle,
       progress: 85,
       color: "text-success"
     },
     {
-      title: "بەڵگەکانی نووسراو",
-      titleEn: "Documents Created", 
+      title: "documentsCreated",
       value: "156",
       icon: FileText,
       progress: 72,
       color: "text-primary"
     },
     {
-      title: "کاتی خوێندن",
-      titleEn: "Study Hours",
+      title: "studyHours",
       value: "342",
       icon: Clock,
       progress: 90,
       color: "text-accent"
     },
     {
-      title: "پێشکەوتنی مانگانە",
-      titleEn: "Monthly Progress",
+      title: "monthlyProgress",
       value: "94%",
       icon: TrendingUp,
       progress: 94,
@@ -64,11 +62,8 @@ export const AcademicStats = () => {
           </div>
           
           <div className="space-y-2">
-            <div className="text-sm font-medium text-foreground sorani-text">
-              {stat.title}
-            </div>
-            <div className="text-xs text-muted-foreground latin-text">
-              {stat.titleEn}
+            <div className="text-sm font-medium text-foreground">
+              {t(stat.title)}
             </div>
             <Progress 
               value={stat.progress} 

@@ -1,9 +1,11 @@
 import { AcademicHeader } from "@/components/AcademicHeader";
 import { ReportGenerator as ReportGeneratorComponent } from "@/components/ReportGenerator";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FileText } from "lucide-react";
 
 const ReportGenerator = () => {
+  const { t } = useTranslation();
   const [currentTool, setCurrentTool] = useState<string | null>(null);
 
   return (
@@ -19,26 +21,23 @@ const ReportGenerator = () => {
                 <div className="p-3 bg-gradient-primary rounded-xl text-primary-foreground">
                   <FileText className="h-8 w-8" />
                 </div>
-                <h1 className="text-4xl font-bold text-foreground sorani-text">دروستکەری ڕاپۆرت</h1>
+                <h1 className="text-4xl font-bold text-foreground">{t('reportGenerator')}</h1>
               </div>
-              <p className="text-xl text-muted-foreground mb-6 sorani-text leading-relaxed">
-                سیستەمێکی کارلێکەرانە کە ڕێنمایت دەکات بۆ دروستکردنی ڕاپۆرتی تەواو
-              </p>
-              <p className="text-lg text-foreground-secondary mb-8 latin-text">
-                Interactive system that guides you through creating comprehensive research reports
+              <p className="text-xl text-muted-foreground mb-6 leading-relaxed">
+                {t('reportGeneratorDescription')}
               </p>
               <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">ڕێنماییەکان</p>
-                  <p className="font-semibold">گام بە گام</p>
+                  <p className="text-sm text-muted-foreground">{t('stepByStep')}</p>
+                  <p className="font-semibold">{t('guidance')}</p>
                 </div>
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">فۆرمات</p>
-                  <p className="font-semibold">ڕێکخستنی ڕاست</p>
+                  <p className="text-sm text-muted-foreground">{t('format')}</p>
+                  <p className="font-semibold">{t('correctFormatting')}</p>
                 </div>
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">سەرچاوەکان</p>
-                  <p className="font-semibold">زیادکردنی خودکار</p>
+                  <p className="text-sm text-muted-foreground">{t('references')}</p>
+                  <p className="font-semibold">{t('autoAdd')}</p>
                 </div>
               </div>
             </div>

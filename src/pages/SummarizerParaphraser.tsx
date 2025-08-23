@@ -1,9 +1,11 @@
 import { AcademicHeader } from "@/components/AcademicHeader";
 import { SummarizerParaphraser as SummarizerParaphraserComponent } from "@/components/SummarizerParaphraser";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { BookOpen } from "lucide-react";
 
 const SummarizerParaphraser = () => {
+  const { t } = useTranslation();
   const [currentTool, setCurrentTool] = useState<string | null>(null);
 
   return (
@@ -19,25 +21,22 @@ const SummarizerParaphraser = () => {
                 <div className="p-3 bg-gradient-primary rounded-xl text-primary-foreground">
                   <BookOpen className="h-8 w-8" />
                 </div>
-                <h1 className="text-4xl font-bold text-foreground sorani-text">کورتکەرەوە و نووسینەوە</h1>
+                <h1 className="text-4xl font-bold text-foreground">{t('summarizerParaphraser')}</h1>
               </div>
-              <p className="text-xl text-muted-foreground mb-6 sorani-text leading-relaxed">
-                کورتکردنەوە و نووسینەوەی ئاستی ئەکادیمی بە پاراستنی واتا
-              </p>
-              <p className="text-lg text-foreground-secondary mb-8 latin-text">
-                Academic-level summaries and paraphrasing while preserving meaning
+              <p className="text-xl text-muted-foreground mb-6 leading-relaxed">
+                {t('summarizerParaphraserDescription')}
               </p>
               <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">کورتکردنەوە</p>
-                  <p className="font-semibold">ئاستی ئەکادیمی</p>
+                  <p className="text-sm text-muted-foreground">{t('summarization')}</p>
+                  <p className="font-semibold">{t('academicLevel')}</p>
                 </div>
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">نووسینەوە</p>
-                  <p className="font-semibold">پاراستنی واتا</p>
+                  <p className="text-sm text-muted-foreground">{t('paraphrasing')}</p>
+                  <p className="font-semibold">{t('meaningPreservation')}</p>
                 </div>
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">فۆرمات</p>
+                  <p className="text-sm text-muted-foreground">{t('format')}</p>
                   <p className="font-semibold">TXT, PDF, DOCX</p>
                 </div>
               </div>

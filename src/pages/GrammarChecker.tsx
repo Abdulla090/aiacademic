@@ -1,9 +1,11 @@
 import { AcademicHeader } from "@/components/AcademicHeader";
 import { GrammarChecker as GrammarCheckerComponent } from "@/components/GrammarChecker";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { CheckSquare } from "lucide-react";
 
 const GrammarChecker = () => {
+  const { t } = useTranslation();
   const [currentTool, setCurrentTool] = useState<string | null>(null);
 
   return (
@@ -19,26 +21,23 @@ const GrammarChecker = () => {
                 <div className="p-3 bg-gradient-primary rounded-xl text-primary-foreground">
                   <CheckSquare className="h-8 w-8" />
                 </div>
-                <h1 className="text-4xl font-bold text-foreground sorani-text">پشکنەری ڕێزمان</h1>
+                <h1 className="text-4xl font-bold text-foreground">{t('grammarChecker')}</h1>
               </div>
-              <p className="text-xl text-muted-foreground mb-6 sorani-text leading-relaxed">
-                ڕاستکردنەوەی ڕێزمان و ستایلی پێشکەوتوو بۆ نووسینی ئەکادیمی بە سۆرانی
-              </p>
-              <p className="text-lg text-foreground-secondary mb-8 latin-text">
-                Advanced grammar and style correction for Kurdish Sorani academic writing
+              <p className="text-xl text-muted-foreground mb-6 leading-relaxed">
+                {t('grammarCheckerDescription')}
               </p>
               <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">ڕێزمان</p>
-                  <p className="font-semibold">ڕاستکردنەوەی تەواو</p>
+                  <p className="text-sm text-muted-foreground">{t('grammar')}</p>
+                  <p className="font-semibold">{t('completeCorrection')}</p>
                 </div>
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">ستایل</p>
-                  <p className="font-semibold">پێشنیارەکان</p>
+                  <p className="text-sm text-muted-foreground">{t('style')}</p>
+                  <p className="font-semibold">{t('suggestions')}</p>
                 </div>
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">ئامارەکان</p>
-                  <p className="font-semibold">پشکنینی پەره</p>
+                  <p className="text-sm text-muted-foreground">{t('statistics')}</p>
+                  <p className="font-semibold">{t('wordAnalysis')}</p>
                 </div>
               </div>
             </div>

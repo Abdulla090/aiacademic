@@ -120,31 +120,31 @@ class GeminiService {
     };
 
     const prompt = `
-    ببە بە نووسەرێکی پسپۆڕی ئەکادیمی کە بابەتی زانستی بە زمانی کوردی سۆرانی دەنووسێت.
+    Become an expert academic writer who writes scientific articles in English.
 
-    بابەت: ${request.topic}
-    درێژی: ${lengthMap[request.length]}
-    ستایلی سەرچاوە: ${request.citationStyle}
-    ${request.includeReferences ? 'زیادکردنی سەرچاوەکان: بەڵێ' : 'زیادکردنی سەرچاوەکان: نەخێر'}
+    Topic: ${request.topic}
+    Length: ${lengthMap[request.length]}
+    Citation Style: ${request.citationStyle}
+    ${request.includeReferences ? 'Add References: Yes' : 'Add References: No'}
 
-    نووسینەکە دەبێت ئەم پێکهاتەیە هەبێت:
-    1. ناونیشان (Title) - ناونیشانێکی گونجاو و ڕوون
-    2. پیشەکی (Abstract) - کورتەیەکی 150-250 وشەیی کە بابەتەکە ڕوون دەکاتەوە
-    3. چەند بەشێک (Sections) - بەشەکانی سەرەکی بابەتەکە (پێویستە لانی کەم 3 بەش هەبێت)
-    4. دەرئەنجام (Conclusion) - کۆتایی هاتنەوە و پێشنیارەکان
-    ${request.includeReferences ? '5. سەرچاوەکان (References) - لیستی سەرچاوەکان بە ستایلی ' + request.citationStyle : ''}
+    The article must have the following structure:
+    1. Title - A suitable and clear title
+    2. Abstract - A 150-250 word summary that explains the topic
+    3. Sections - The main sections of the article (must have at least 3 sections)
+    4. Conclusion - Conclusion and recommendations
+    ${request.includeReferences ? '5. References - List of references in ' + request.citationStyle + ' style' : ''}
 
-    ڕێنماییەکان:
-    - زمان: کوردی سۆرانی
-    - ستایل: ئەکادیمی و پڕۆفیشناڵ
-    - ڕێزمان: ڕاست و ڕوون
-    - بابەتەکە دەبێت وەک ئەدەبی ئەکادیمی ڕاستەقینە بێت، نەک وەڵامێکی چات
-    - دڵنیابە کە بابەتەکە پێکهاتەی ئەکادیمی هەبێت و زانیاری ڕاستەقینە لەخۆبگرێت
-    - هەر بەشێک دەبێت لانی کەم 200 وشە بێت
-    - بەکارهێنانی ڕستە و وشەیەکی زانستی
-    - بەکارهێنانی هاوکێشەکان بۆ گرێدانی بەشەکان
+    Instructions:
+    - Language: English
+    - Style: Academic and professional
+    - Grammar: Correct and clear
+    - The article should be like a real academic paper, not a chat response
+    - Make sure the article has an academic structure and contains real information
+    - Each section should be at least 200 words
+    - Use scientific sentences and words
+    - Use conjunctions to connect the sections
 
-    تکایە بابەتەکە بە تەواوی بە کوردی سۆرانی بنووسە.
+    Please write the article entirely in English.
     `;
 
     const response = await this.makeRequest(prompt);
@@ -155,7 +155,7 @@ class GeminiService {
     const prompt = `
     Create a detailed, logical, and well-structured academic report outline for the topic: "${topic}".
 
-    The outline should be tailored to the specific topic, not a generic template. It must include a clear title and a series of relevant sections that flow logically from one to the next.
+    The outline should be in English. It must include a clear title and a series of relevant sections that flow logically from one to the next.
 
     IMPORTANT: Respond ONLY with a valid JSON object. Do not include any other text, explanations, or markdown formatting like \`\`\`json. The entire response must be a single JSON object.
 
@@ -198,24 +198,32 @@ class GeminiService {
       : '';
 
     const prompt = `
-    ڕاپۆرتی تویژینەوە: ${outline.title}
-    بەشی ئێستا: ${sectionName}
+    Academic Report: ${outline.title}
+    Current Section: ${sectionName}
     
     ${contextText}
 
-    بۆ بەشی "${sectionName}" ناوەڕۆکێکی تەواو و ئەکادیمی بنووسە کە:
-    - پەیوەندی بە بەشەکانی دیکەوە هەبێت
-    - زانیاری پەیوەست و گرنگ تێدا بێت
-    - زمانی ئەکادیمی و ڕوون بەکاربهێنێت
-    - بە کوردی سۆرانی نووسرابێت
+    For the section "${sectionName}", write a complete and academic content that has the style of an academic report, not a research paper. The content should be an analysis and summary of information on the topic.
 
-    درێژی: نزیکەی 300-500 وشە
+    The content must:
+    - Be clear and organized.
+    - Contain accurate and correct information.
+    - Use academic and formal language.
+    - Be written in English.
+    - Be related to the other sections of the report.
+
+    Length: Approximately 300-500 words.
     
-    ناوەڕۆکەکە دەبێت وەک بەشێکی ڕاپۆرتی ڕاستەقینەی تویژینەوە بێت، نەک وەڵامێکی چات. دڵنیابە کە زانیاری ڕاستەقینە و پەیوەندیدار لەخۆدەگرێت.
+    Please write the content as part of an academic report, not as a chat response. Focus on analyzing and presenting information, not on presenting hypotheses and new research methodologies.
     `;
 
     const response = await this.makeRequest(prompt);
-    return response.text;
+    if (typeof response.text === 'string') {
+      return response.text;
+    }
+    // If the response is not a string, return an empty string and log an error.
+    console.error("AI response for section was not a string:", response);
+    return "";
   }
 
   async checkGrammar(text: string): Promise<GrammarCorrection> {

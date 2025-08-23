@@ -1,9 +1,11 @@
 import { AcademicHeader } from "@/components/AcademicHeader";
 import { TaskPlanner as TaskPlannerComponent } from "@/components/TaskPlanner";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Calendar } from "lucide-react";
 
 const TaskPlanner = () => {
+  const { t } = useTranslation();
   const [currentTool, setCurrentTool] = useState<string | null>(null);
 
   return (
@@ -19,26 +21,23 @@ const TaskPlanner = () => {
                 <div className="p-3 bg-gradient-primary rounded-xl text-primary-foreground">
                   <Calendar className="h-8 w-8" />
                 </div>
-                <h1 className="text-4xl font-bold text-foreground sorani-text">پلانەری ئەرک و تویژینەوە</h1>
+                <h1 className="text-4xl font-bold text-foreground">{t('taskPlanner')}</h1>
               </div>
-              <p className="text-xl text-muted-foreground mb-6 sorani-text leading-relaxed">
-                پلانەری خێڵی کاتی بۆ ئەرکەکان و پڕۆژەی تویژینەوە
-              </p>
-              <p className="text-lg text-foreground-secondary mb-8 latin-text">
-                Timeline-based planner for assignments and research projects
+              <p className="text-xl text-muted-foreground mb-6 leading-relaxed">
+                {t('taskPlannerDescription')}
               </p>
               <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">خێڵی کاتی</p>
-                  <p className="font-semibold">ڕێنماییەکان</p>
+                  <p className="text-sm text-muted-foreground">{t('timeline')}</p>
+                  <p className="font-semibold">{t('guidance')}</p>
                 </div>
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">ئاگادارکردنەوە</p>
-                  <p className="font-semibold">بیرخەرەوە</p>
+                  <p className="text-sm text-muted-foreground">{t('notifications')}</p>
+                  <p className="font-semibold">{t('reminders')}</p>
                 </div>
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">ڕاپۆرت</p>
-                  <p className="font-semibold">پڕۆگرێس</p>
+                  <p className="text-sm text-muted-foreground">{t('report')}</p>
+                  <p className="font-semibold">{t('progress')}</p>
                 </div>
               </div>
             </div>

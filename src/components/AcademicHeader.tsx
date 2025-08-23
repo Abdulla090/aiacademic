@@ -12,8 +12,11 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
+import { LanguageSwitcher } from "./LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 export const AcademicHeader = () => {
+  const { t } = useTranslation();
   const [isDark, setIsDark] = useState(true);
 
   const toggleTheme = () => {
@@ -46,10 +49,10 @@ export const AcademicHeader = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold text-foreground">
-                کارەبا - أکادیمی
+                {t('appName')}
               </h1>
-              <p className="text-xs text-muted-foreground latin-text">
-                Academic Assistant
+              <p className="text-xs text-muted-foreground">
+                {t('appSubtitle')}
               </p>
             </div>
           </div>
@@ -59,7 +62,7 @@ export const AcademicHeader = () => {
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
-                placeholder="گەڕان بۆ ئامرازەکان..."
+                placeholder={t('searchPlaceholder')}
                 className="input-academic pl-10 w-full"
               />
             </div>
@@ -67,6 +70,7 @@ export const AcademicHeader = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
+            <LanguageSwitcher />
             <Button
               variant="ghost"
               size="icon"

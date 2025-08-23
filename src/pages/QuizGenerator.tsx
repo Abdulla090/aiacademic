@@ -1,8 +1,10 @@
 import { AcademicHeader } from "@/components/AcademicHeader";
 import { QuizGenerator as QuizGeneratorComponent } from '@/components/QuizGenerator';
+import { useTranslation } from 'react-i18next';
 import { FileText } from "lucide-react";
 
 const QuizGenerator = () => {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <AcademicHeader />
@@ -16,26 +18,23 @@ const QuizGenerator = () => {
                 <div className="p-3 bg-gradient-primary rounded-xl text-primary-foreground">
                   <FileText className="h-8 w-8" />
                 </div>
-                <h1 className="text-4xl font-bold text-foreground sorani-text">دروستکەری کویز</h1>
+                <h1 className="text-4xl font-bold text-foreground">{t('quizGenerator')}</h1>
               </div>
-              <p className="text-xl text-muted-foreground mb-6 sorani-text leading-relaxed">
-                دروستکردنی کویز لە تێبینی و کتێبەکانتەوە
-              </p>
-              <p className="text-lg text-foreground-secondary mb-8 latin-text">
-                Generate quizzes from your notes and textbooks
+              <p className="text-xl text-muted-foreground mb-6 leading-relaxed">
+                {t('quizGeneratorDescription')}
               </p>
               <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">فۆرماتەکان</p>
+                  <p className="text-sm text-muted-foreground">{t('formats')}</p>
                   <p className="font-semibold">TXT, PDF, DOCX, MD</p>
                 </div>
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">ئۆتۆماتیکی</p>
-                  <p className="font-semibold">دروستکردنی خودکار</p>
+                  <p className="text-sm text-muted-foreground">{t('automatic')}</p>
+                  <p className="font-semibold">{t('autoGeneration')}</p>
                 </div>
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">جۆرەکان</p>
-                  <p className="font-semibold">هەڵبژاردن، کورتەکردنەوە</p>
+                  <p className="text-sm text-muted-foreground">{t('types')}</p>
+                  <p className="font-semibold">{t('multipleChoiceShortAnswer')}</p>
                 </div>
               </div>
             </div>

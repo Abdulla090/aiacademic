@@ -20,6 +20,7 @@ import {
   Search
 } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ArticleWriter } from "@/components/ArticleWriter";
 import { GrammarChecker } from "@/components/GrammarChecker";
 import { ReportGenerator } from "@/components/ReportGenerator";
@@ -28,148 +29,117 @@ import { SummarizerParaphraser } from "@/components/SummarizerParaphraser";
 import { MindMapGenerator } from "@/components/MindMapGenerator";
 
 const Index = () => {
+  const { t } = useTranslation();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [currentTool, setCurrentTool] = useState<string | null>(null);
 
   interface AcademicTool {
     title: string;
-    titleKurdish: string;
     description: string;
-    descriptionKurdish: string;
     icon: any;
     image?: string;
     category: string;
-    categoryKurdish: string;
     isComingSoon?: boolean;
     path?: string;
   }
 
   const academicTools: AcademicTool[] = [
     {
-      title: "Article Writer",
-      titleKurdish: "نووسەری بابەت",
-      description: "Generate well-structured academic articles with citation support (APA, MLA, IEEE)",
-      descriptionKurdish: "دروستکردنی بابەتی ئەکادیمی بە پێکهاتەیەکی باش لەگەڵ پاڵپشتی سەرچاوەکان",
+      title: "articleWriter",
+      description: "articleWriterDescription",
       icon: PenTool,
       image: "/card-images/article.png",
       category: "writing",
-      categoryKurdish: "نووسین",
       path: "/article-writer"
     },
     {
-      title: "Report Generator",
-      titleKurdish: "دروستکەری ڕاپۆرت",
-      description: "Interactive system that guides you through creating comprehensive research reports",
-      descriptionKurdish: "سیستەمێکی کارلێکەرانە کە ڕێنمایت دەکات بۆ دروستکردنی ڕاپۆرتی تەواو",
+      title: "reportGenerator",
+      description: "reportGeneratorDescription",
       icon: FileText,
-      image: "/card-images/report.png",
+      image: "/card-images/new-report.png",
       category: "writing",
-      categoryKurdish: "نووسین",
       path: "/report-generator"
     },
     {
-      title: "Grammar Checker",
-      titleKurdish: "پشکنەری ڕێزمان",
-      description: "Advanced grammar and style correction for Kurdish Sorani academic writing",
-      descriptionKurdish: "ڕاستکردنەوەی ڕێزمان و ستایلی پێشکەوتوو بۆ نووسینی ئەکادیمی بە سۆرانی",
+      title: "grammarChecker",
+      description: "grammarCheckerDescription",
       icon: CheckSquare,
       image: "/card-images/grammar-fix.jpeg",
       category: "editing",
-      categoryKurdish: "دەستکاری",
       path: "/grammar-checker"
     },
     {
-      title: "Mind Map Generator",
-      titleKurdish: "دروستکەری نەخشەی مێشک",
-      description: "Transform your ideas into dynamic Kurdish mind maps for brainstorming",
-      descriptionKurdish: "گۆڕینی بیرۆکەکانت بۆ نەخشەی مێشکی کوردی بۆ وەرگرتنی بیرۆکە",
+      title: "mindMapGenerator",
+      description: "mindMapGeneratorDescription",
       icon: Brain,
+      image: "/card-images/mindmap.png",
       category: "planning",
-      categoryKurdish: "پلاندانان",
       path: "/mind-map-generator"
     },
     {
-      title: "Summarizer & Paraphraser",
-      titleKurdish: "کورتکەرەوە و نووسینەوە",
-      description: "Academic-level summaries and paraphrasing while preserving meaning",
-      descriptionKurdish: "کورتکردنەوە و نووسینەوەی ئاستی ئەکادیمی بە پاراستنی واتا",
+      title: "summarizerParaphraser",
+      description: "summarizerParaphraserDescription",
       icon: BookOpen,
+      image: "/card-images/summarizer.png",
       category: "editing",
-      categoryKurdish: "دەستکاری",
       path: "/summarizer-paraphraser"
     },
     {
-      title: "Plagiarism Checker",
-      titleKurdish: "پشکنەری دزینی نووسراو",
-      description: "Identify duplicated text and suggest original alternatives in Kurdish",
-      descriptionKurdish: "ناسینەوەی نووسینی دووبارەبووەوە و پێشنیارکردنی جیاوازی ڕەسەن",
+      title: "plagiarismChecker",
+      description: "plagiarismCheckerDescription",
       icon: Shield,
       category: "verification",
-      categoryKurdish: "پشتڕاستکردنەوە",
       isComingSoon: true
     },
     {
-      title: "Flashcard Generator",
-      titleKurdish: "دروستکەری کارتی خوێندن",
-      description: "Create study flashcards from your notes and textbooks",
-      descriptionKurdish: "دروستکردنی کارتی خوێندن لە تێبینی و کتێبەکانتەوە",
+      title: "flashcardGenerator",
+      description: "flashcardGeneratorDescription",
       icon: CreditCard,
+      image: "/card-images/flashcard.png",
       category: "study",
-      categoryKurdish: "خوێندن",
       path: "/flashcard-generator"
     },
     {
-      title: "Quiz Generator",
-      titleKurdish: "دروستکەری کویز",
-      description: "Generate quizzes from your notes and textbooks",
-      descriptionKurdish: "دروستکردنی کویز لە تێبینی و کتێبەکانتەوە",
+      title: "quizGenerator",
+      description: "quizGeneratorDescription",
       icon: FileText,
+      image: "/card-images/quiz.png",
       category: "study",
-      categoryKurdish: "خوێندن",
       path: "/quiz-generator"
     },
     {
-      title: "Presentation Generator",
-      titleKurdish: "دروستکەری پێشکەشکردن",
-      description: "Create academic presentations with structured formatting",
-      descriptionKurdish: "دروستکردنی پێشکەشکردنی ئەکادیمی بە پێکهاتەیەکی ڕێکخراو",
+      title: "presentationGenerator",
+      description: "presentationGeneratorDescription",
       icon: Presentation,
       image: "/card-images/presentation.jpeg",
       category: "presentation",
-      categoryKurdish: "پێشکەشکردن",
       path: "/presentation-generator"
     },
     {
-      title: "Task & Research Planner",
-      titleKurdish: "پلانەری ئەرک و تویژینەوە",
-      description: "Timeline-based planner for assignments and research projects",
-      descriptionKurdish: "پلانەری خێڵی کاتی بۆ ئەرکەکان و پڕۆژەی تویژینەوە",
+      title: "taskPlanner",
+      description: "taskPlannerDescription",
       icon: Calendar,
       category: "planning",
-      categoryKurdish: "پلاندانان",
       path: "/task-planner"
     },
     {
-      title: "AI Writing Supervisor",
-      titleKurdish: "سەرپەرشتیاری نووسینی زیرەک",
-      description: "Get real-time feedback and suggestions as you write.",
-      descriptionKurdish: "پێشنیار و تێبینی ڕاستەوخۆ وەربگرە لەکاتی نووسیندا.",
+      title: "writingSupervisor",
+      description: "writingSupervisorDescription",
       icon: PenTool,
       category: "writing",
-      categoryKurdish: "نووسین",
       path: "/writing-supervisor"
     }
   ];
 
   const categories = [
-    { key: 'all', label: 'هەموو', labelEn: 'All' },
-    { key: 'writing', label: 'نووسین', labelEn: 'Writing' },
-    { key: 'editing', label: 'دەستکاری', labelEn: 'Editing' },
-    { key: 'planning', label: 'پلاندانان', labelEn: 'Planning' },
-    { key: 'study', label: 'خوێندن', labelEn: 'Study' },
-    { key: 'presentation', label: 'پێشکەشکردن', labelEn: 'Presentation' },
-    { key: 'verification', label: 'پشتڕاستکردنەوە', labelEn: 'Verification' }
+    { key: 'all', label: 'categoryAll' },
+    { key: 'writing', label: 'categoryWriting' },
+    { key: 'editing', label: 'categoryEditing' },
+    { key: 'planning', label: 'categoryPlanning' },
+    { key: 'study', label: 'categoryStudy' },
+    { key: 'presentation', label: 'categoryPresentation' },
+    { key: 'verification', label: 'categoryVerification' }
   ];
 
   const filteredTools = selectedCategory === 'all' 
@@ -183,14 +153,14 @@ const Index = () => {
       <main className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-4 sorani-text">
-            بەخێربێیت بۆ کارەبای ئەکادیمی
+          <h1 className="text-4xl font-bold text-foreground mb-4">
+            {t('welcomeTitle')}
           </h1>
-          <p className="text-xl text-muted-foreground mb-2 latin-text">
-            Welcome to Academic Assistant
+          <p className="text-xl text-muted-foreground mb-2">
+            {t('welcomeSubtitle')}
           </p>
-          <p className="text-lg text-foreground-secondary max-w-3xl mx-auto sorani-text leading-relaxed">
-            ئامرازێکی تەواو بۆ پاڵپشتیکردنی خوێندکارانی زانکۆ و ئامادەیی بۆ نووسین، تویژینەوە و خوێندنی باشتر
+          <p className="text-lg text-foreground-secondary max-w-3xl mx-auto leading-relaxed">
+            {t('welcomeDescription')}
           </p>
         </div>
 
@@ -210,7 +180,7 @@ const Index = () => {
                   onClick={() => setSelectedCategory(category.key)}
                   className="text-sm"
                 >
-                  {category.label}
+                  {t(category.label)}
                 </Button>
               ))}
             </div>
@@ -238,7 +208,7 @@ const Index = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input 
-                  placeholder="گەڕان لە ئامرازەکاندا..."
+                  placeholder={t('searchPlaceholder')}
                   className="input-academic pl-10 w-64"
                 />
               </div>
@@ -254,14 +224,11 @@ const Index = () => {
             {filteredTools.map((tool, index) => (
               <AcademicToolCard
                 key={index}
-                title={tool.title}
-                titleKurdish={tool.titleKurdish}
-                description={tool.description}
-                descriptionKurdish={tool.descriptionKurdish}
+                title={t(tool.title)}
+                description={t(tool.description)}
                 icon={tool.icon}
                 image={tool.image}
-                category={tool.category}
-                categoryKurdish={tool.categoryKurdish}
+                category={t(tool.category)}
                 isComingSoon={tool.isComingSoon}
                 path={tool.path}
                 onClick={() => {
@@ -276,21 +243,21 @@ const Index = () => {
 
         {/* Quick Actions */}
         <div className="mt-12 card-academic p-8 text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-4 sorani-text">
-            دەست بکە بە کارکردن
+          <h2 className="text-2xl font-bold text-foreground mb-4">
+            {t('quickActionsTitle')}
           </h2>
-          <p className="text-muted-foreground mb-6 sorani-text">
-            باشترین ئامرازەکان بۆ سەرکەوتنی ئەکادیمیت
+          <p className="text-muted-foreground mb-6">
+            {t('quickActionsSubtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button className="btn-academic-primary">
-              نووسینی بابەتێکی نوێ
+              {t('newArticle')}
             </Button>
             <Button className="btn-academic-secondary">
-              دروستکردنی ڕاپۆرت
+              {t('createReport')}
             </Button>
             <Button className="btn-academic-outline">
-              پشکنینی ڕێزمان
+              {t('checkGrammar')}
             </Button>
           </div>
         </div>

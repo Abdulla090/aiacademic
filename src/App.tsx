@@ -15,10 +15,23 @@ import FlashcardGenerator from "./pages/FlashcardGenerator";
 import QuizGenerator from "./pages/QuizGenerator";
 import PresentationGenerator from "./pages/PresentationGenerator";
 import WritingSupervisor from "./pages/WritingSupervisor";
+import withLoading from "./hocs/withLoading";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const App = () => {
+  const ArticleWriterWithLoading = withLoading(ArticleWriter);
+  const GrammarCheckerWithLoading = withLoading(GrammarChecker);
+  const ReportGeneratorWithLoading = withLoading(ReportGenerator);
+  const TaskPlannerWithLoading = withLoading(TaskPlanner);
+  const SummarizerParaphraserWithLoading = withLoading(SummarizerParaphraser);
+  const MindMapGeneratorWithLoading = withLoading(MindMapGenerator);
+  const FlashcardGeneratorWithLoading = withLoading(FlashcardGenerator);
+  const QuizGeneratorWithLoading = withLoading(QuizGenerator);
+  const PresentationGeneratorWithLoading = withLoading(PresentationGenerator);
+  const WritingSupervisorWithLoading = withLoading(WritingSupervisor);
+
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -26,22 +39,23 @@ const App = () => (
       <BrowserRouter future={{ v7_relativeSplatPath: true }}>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/article-writer" element={<ArticleWriter />} />
-          <Route path="/grammar-checker" element={<GrammarChecker />} />
-          <Route path="/report-generator" element={<ReportGenerator />} />
-          <Route path="/task-planner" element={<TaskPlanner />} />
-          <Route path="/summarizer-paraphraser" element={<SummarizerParaphraser />} />
-          <Route path="/mind-map-generator" element={<MindMapGenerator />} />
-          <Route path="/flashcard-generator" element={<FlashcardGenerator />} />
-          <Route path="/quiz-generator" element={<QuizGenerator />} />
-          <Route path="/presentation-generator" element={<PresentationGenerator />} />
-          <Route path="/writing-supervisor" element={<WritingSupervisor />} />
+          <Route path="/article-writer" element={<ArticleWriterWithLoading />} />
+          <Route path="/grammar-checker" element={<GrammarCheckerWithLoading />} />
+          <Route path="/report-generator" element={<ReportGeneratorWithLoading />} />
+          <Route path="/task-planner" element={<TaskPlannerWithLoading />} />
+          <Route path="/summarizer-paraphraser" element={<SummarizerParaphraserWithLoading />} />
+          <Route path="/mind-map-generator" element={<MindMapGeneratorWithLoading />} />
+          <Route path="/flashcard-generator" element={<FlashcardGeneratorWithLoading />} />
+          <Route path="/quiz-generator" element={<QuizGeneratorWithLoading />} />
+          <Route path="/presentation-generator" element={<PresentationGeneratorWithLoading />} />
+          <Route path="/writing-supervisor" element={<WritingSupervisorWithLoading />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;

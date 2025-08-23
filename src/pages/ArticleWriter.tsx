@@ -1,9 +1,11 @@
 import { AcademicHeader } from "@/components/AcademicHeader";
 import { ArticleWriter as ArticleWriterComponent } from "@/components/ArticleWriter";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { PenTool } from "lucide-react";
 
 const ArticleWriter = () => {
+  const { t } = useTranslation();
   const [currentTool, setCurrentTool] = useState<string | null>(null);
 
   useEffect(() => {
@@ -23,26 +25,23 @@ const ArticleWriter = () => {
                 <div className="p-3 bg-gradient-primary rounded-xl text-primary-foreground">
                   <PenTool className="h-8 w-8" />
                 </div>
-                <h1 className="text-4xl font-bold text-foreground sorani-text">نووسەری بابەت</h1>
+                <h1 className="text-4xl font-bold text-foreground">{t('articleWriter')}</h1>
               </div>
-              <p className="text-xl text-muted-foreground mb-6 sorani-text leading-relaxed">
-                دروستکردنی بابەتی ئەکادیمی بە پێکهاتەیەکی باش لەگەڵ پاڵپشتی سەرچاوەکان
-              </p>
-              <p className="text-lg text-foreground-secondary mb-8 latin-text">
-                Generate well-structured academic articles with citation support (APA, MLA, IEEE)
+              <p className="text-xl text-muted-foreground mb-6 leading-relaxed">
+                {t('articleWriterDescription')}
               </p>
               <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">ستایلەکانی سەرچاوە</p>
+                  <p className="text-sm text-muted-foreground">{t('citationStyles')}</p>
                   <p className="font-semibold">APA, MLA, IEEE</p>
                 </div>
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">درێژی بابەت</p>
-                  <p className="font-semibold">کورت، ناوەند، درێژ</p>
+                  <p className="text-sm text-muted-foreground">{t('articleLength')}</p>
+                  <p className="font-semibold">{t('lengthOptions')}</p>
                 </div>
                 <div className="bg-card p-4 rounded-lg shadow-sm border">
-                  <p className="text-sm text-muted-foreground sorani-text">سەرچاوەکان</p>
-                  <p className="font-semibold">زیادکردنی خودکار</p>
+                  <p className="text-sm text-muted-foreground">{t('references')}</p>
+                  <p className="font-semibold">{t('autoAdd')}</p>
                 </div>
               </div>
             <div className="flex-1 flex justify-center">
