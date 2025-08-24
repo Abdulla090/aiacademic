@@ -8,4 +8,5 @@ if (localStorage.getItem('theme') === 'dark' || !localStorage.getItem('theme')) 
   document.documentElement.classList.add('dark');
 }
 
+
 createRoot(document.getElementById("root")!).render(<App />);

@@ -1,5 +1,5 @@
-import { AcademicHeader } from "@/components/AcademicHeader";
 import { ArticleWriter as ArticleWriterComponent } from "@/components/ArticleWriter";
+import { MobileSidebarTrigger } from "@/components/MobileSidebarTrigger";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { PenTool } from "lucide-react";
@@ -14,7 +14,6 @@ const ArticleWriter = () => {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      <AcademicHeader />
       
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-primary/10 to-secondary/10 py-12">
@@ -59,6 +58,9 @@ const ArticleWriter = () => {
 </div>
          
 <main className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <MobileSidebarTrigger />
+        </div>
         <ArticleWriterComponent />
       </main>
     </div>

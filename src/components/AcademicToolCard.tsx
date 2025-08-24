@@ -101,10 +101,13 @@ export const AcademicToolCard = ({
         )}
 
         <Button
-          className={`w-full ${isComingSoon ? 'btn-academic-outline opacity-50' : 'btn-academic-primary'}`}
+          className={`w-full ${isComingSoon ? 'btn-academic-outline opacity-50' : 'btn-academic-primary'} relative overflow-hidden`}
           disabled={isComingSoon}
         >
-          {isComingSoon ? t('comingSoon') : t('open')}
+          <span className="relative z-10">{isComingSoon ? t('comingSoon') : t('open')}</span>
+          {!isComingSoon && (
+            <span className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl"></span>
+          )}
         </Button>
       </div>
     </Card>

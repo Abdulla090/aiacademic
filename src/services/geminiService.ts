@@ -60,7 +60,7 @@ export interface PresentationSlide {
   title: string;
   content: string;
   layout: 'title' | 'text' | 'image-right' | 'image-left';
-  imageUrl?: string;
+  imageSearchTerm?: string;
 }
 
 export interface WritingSuggestion {
@@ -72,13 +72,19 @@ export interface NextSentence {
     sentence: string;
 }
 
+export interface CitationRequest {
+  content: string; // The text content from the file or website
+  style: 'APA' | 'MLA' | 'Chicago' | 'IEEE';
+}
+
 class GeminiService {
   private apiKey = 'AIzaSyBsMPe_MEasu7x3u9EK85ULYDHZ3oykklM';
   private baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
 
-  private async makeRequest(prompt: string): Promise<GeminiResponse> {
+  private async makeRequest(prompt: string, model = 'gemini-2.0-flash-exp'): Promise<GeminiResponse> {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
     try {
-      const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
+      const response = await fetch(`${url}?key=${this.apiKey}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -488,11 +494,26 @@ class GeminiService {
     }
   }
 
-  async generatePresentation(text: string): Promise<PresentationSlide[]> {
+  async generatePresentation(
+    text: string,
+    slideCount: number,
+    style: string,
+    core: string
+  ): Promise<PresentationSlide[]> {
     const prompt = `
-    Based on the following text, generate a presentation with multiple slides. Each slide should have a title, content, and a suggested layout from the following options: 'title', 'text', 'image-right', 'image-left'. For image layouts, provide a relevant placeholder image URL from picsum.photos.
+    As an expert presentation designer, create a visually stunning and professional presentation based on the following text.
 
     Text: "${text}"
+    Number of Slides: ${slideCount}
+    Presentation Style: ${style}
+    Core Focus: ${core}
+
+    Instructions:
+    - Generate a complete presentation with a title slide, content slides, and a concluding slide.
+    - For each slide, provide a title, content, and a layout ('title', 'text', 'image-right', 'image-left').
+    - The design should be clean, modern, and professional. Use strong typography and a clear hierarchy.
+    - For slides with images, provide a relevant and concise "imageSearchTerm" (e.g., "data analysis", "team collaboration"). Do NOT provide a full URL.
+    - Ensure the content is well-structured, concise, and easy to understand.
 
     IMPORTANT: Respond ONLY with a valid JSON array of objects. Do not include any other text, explanations, or markdown formatting like \`\`\`json. The entire response must be a single JSON array.
 
@@ -512,12 +533,12 @@ class GeminiService {
         "title": "Visual for Key Point 2",
         "content": "Content related to the image.",
         "layout": "image-right",
-        "imageUrl": "https://picsum.photos/800/600"
+        "imageSearchTerm": "business meeting"
       }
     ]
     `;
 
-    const response = await this.makeRequest(prompt);
+    const response = await this.makeRequest(prompt, 'gemini-2.5-flash');
     try {
       const jsonMatch = response.text.match(/(\[[\s\S]*\])/);
       if (jsonMatch && jsonMatch[0]) {
@@ -594,6 +615,25 @@ class GeminiService {
       console.error("Failed to parse next sentence JSON:", error, "Raw response:", response.text);
       throw error;
     }
+  }
+
+  async generateCitation(request: CitationRequest): Promise<string> {
+    const prompt = `
+    You are an expert academic librarian skilled in generating citations in various styles.
+    Generate a citation for the following content in ${request.style} style.
+    
+    Content:
+    "${request.content}"
+    
+    Instructions:
+    - Provide only the citation text.
+    - Do not include any explanations or extra text.
+    - Ensure the citation is correctly formatted according to ${request.style} guidelines.
+    - If the content is insufficient to create a full citation, do your best with the available information.
+    `;
+
+    const response = await this.makeRequest(prompt);
+    return response.text.trim();
   }
 }
 

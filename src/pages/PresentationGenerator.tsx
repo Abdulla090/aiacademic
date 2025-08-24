@@ -1,5 +1,5 @@
-import { AcademicHeader } from "@/components/AcademicHeader";
 import { PresentationGenerator as PresentationGeneratorComponent } from '@/components/PresentationGenerator';
+import { MobileSidebarTrigger } from "@/components/MobileSidebarTrigger";
 import { useTranslation } from 'react-i18next';
 import { Presentation } from "lucide-react";
 
@@ -7,7 +7,6 @@ const PresentationGenerator = () => {
   const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      <AcademicHeader />
       
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-primary/10 to-secondary/10 py-12">
@@ -52,6 +51,9 @@ const PresentationGenerator = () => {
       </div>
       
       <main className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <MobileSidebarTrigger />
+        </div>
         <PresentationGeneratorComponent />
       </main>
     </div>

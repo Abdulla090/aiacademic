@@ -201,15 +201,55 @@ suggestion,
 
   /* Academic Buttons */
   .btn-academic-primary {
-    @apply bg-gradient-to-r from-primary to-primary-light text-primary-foreground rounded-xl px-6 py-3 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300;
+    @apply bg-gradient-to-r from-primary to-primary-light text-primary-foreground rounded-xl px-6 py-3 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1), 0 8px 15px -3px hsl(var(--primary) / 0.2);
+    transform: translateY(0);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .btn-academic-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1), 0 12px 20px -4px hsl(var(--primary) / 0.3);
+  }
+  
+  .btn-academic-primary:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05), 0 4px 8px -2px hsl(var(--primary) / 0.15);
   }
 
   .btn-academic-secondary {
-    @apply bg-gradient-to-r from-secondary to-secondary-light text-secondary-foreground rounded-xl px-6 py-3 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300;
+    @apply bg-gradient-to-r from-secondary to-secondary-light text-secondary-foreground rounded-xl px-6 py-3 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1), 0 8px 15px -3px hsl(var(--secondary) / 0.2);
+    transform: translateY(0);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .btn-academic-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1), 0 12px 20px -4px hsl(var(--secondary) / 0.3);
+  }
+  
+  .btn-academic-secondary:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05), 0 4px 8px -2px hsl(var(--secondary) / 0.15);
   }
 
   .btn-academic-outline {
-    @apply border-2 border-primary text-primary bg-transparent rounded-xl px-6 py-3 font-medium hover:bg-primary hover:text-primary-foreground transition-all duration-300;
+    @apply border-2 border-primary text-primary bg-transparent rounded-xl px-6 py-3 font-medium transition-all duration-300 relative overflow-hidden;
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+    transform: translateY(0);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .btn-academic-outline:hover {
+    @apply bg-primary text-primary-foreground;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  }
+  
+  .btn-academic-outline:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px -1px rgba(0, 0, 0, 0.05);
   }
 
   /* Academic Input */

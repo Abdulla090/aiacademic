@@ -1,4 +1,3 @@
-import { AcademicHeader } from "@/components/AcademicHeader";
 import { AcademicStats } from "@/components/AcademicStats";
 import { AcademicToolCard } from "@/components/AcademicToolCard";
 import { Button } from "@/components/ui/button";
@@ -17,8 +16,12 @@ import {
   Filter,
   Grid3X3,
   List,
-  Search
+  Search,
+  FileUp,
+  Image,
+  Minimize
 } from "lucide-react";
+import { MobileSidebarTrigger } from "@/components/MobileSidebarTrigger";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArticleWriter } from "@/components/ArticleWriter";
@@ -129,6 +132,34 @@ const Index = () => {
       icon: PenTool,
       category: "writing",
       path: "/writing-supervisor"
+    },
+    {
+      title: "fileConverter",
+      description: "fileConverterDescription",
+      icon: FileUp,
+      category: "tools",
+      path: "/file-converter"
+    },
+    {
+      title: "imageConverter",
+      description: "imageConverterDescription",
+      icon: Image,
+      category: "tools",
+      path: "/image-converter"
+    },
+    {
+      title: "compressor",
+      description: "compressorDescription",
+      icon: Minimize,
+      category: "tools",
+      path: "/compressor"
+    },
+    {
+      title: "citationGenerator",
+      description: "citationGeneratorDescription",
+      icon: BookOpen,
+      category: "tools",
+      path: "/citation-generator"
     }
   ];
 
@@ -139,7 +170,8 @@ const Index = () => {
     { key: 'planning', label: 'categoryPlanning' },
     { key: 'study', label: 'categoryStudy' },
     { key: 'presentation', label: 'categoryPresentation' },
-    { key: 'verification', label: 'categoryVerification' }
+    { key: 'verification', label: 'categoryVerification' },
+    { key: 'tools', label: 'tools' }
   ];
 
   const filteredTools = selectedCategory === 'all' 
@@ -148,9 +180,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      <AcademicHeader />
       
       <main className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <MobileSidebarTrigger />
+        </div>
         {/* Welcome Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-foreground mb-4">
@@ -178,7 +212,7 @@ const Index = () => {
                   variant={selectedCategory === category.key ? "default" : "outline"}
                   size="sm"
                   onClick={() => setSelectedCategory(category.key)}
-                  className="text-sm"
+                  className={`text-sm ${selectedCategory === category.key ? 'btn-academic-primary' : 'btn-academic-outline'}`}
                 >
                   {t(category.label)}
                 </Button>
@@ -191,7 +225,7 @@ const Index = () => {
                   variant={viewMode === 'grid' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('grid')}
-                  className="h-8 w-8 p-0"
+                  className={`h-8 w-8 p-0 ${viewMode === 'grid' ? 'btn-academic-primary' : 'btn-academic-outline'}`}
                 >
                   <Grid3X3 className="h-4 w-4" />
                 </Button>
@@ -199,7 +233,7 @@ const Index = () => {
                   variant={viewMode === 'list' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setViewMode('list')}
-                  className="h-8 w-8 p-0"
+                  className={`h-8 w-8 p-0 ${viewMode === 'list' ? 'btn-academic-primary' : 'btn-academic-outline'}`}
                 >
                   <List className="h-4 w-4" />
                 </Button>
@@ -250,14 +284,17 @@ const Index = () => {
             {t('quickActionsSubtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button className="btn-academic-primary">
-              {t('newArticle')}
+            <Button className="btn-academic-primary relative overflow-hidden">
+              <span className="relative z-10">{t('newArticle')}</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl"></span>
             </Button>
-            <Button className="btn-academic-secondary">
-              {t('createReport')}
+            <Button className="btn-academic-secondary relative overflow-hidden">
+              <span className="relative z-10">{t('createReport')}</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl"></span>
             </Button>
-            <Button className="btn-academic-outline">
-              {t('checkGrammar')}
+            <Button className="btn-academic-outline relative overflow-hidden">
+              <span className="relative z-10">{t('checkGrammar')}</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl"></span>
             </Button>
           </div>
         </div>

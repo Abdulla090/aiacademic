@@ -4,16 +4,22 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Upload, RefreshCw } from 'lucide-react';
 import { geminiService, type PresentationSlide } from '@/services/geminiService';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { readFileContent } from '@/lib/fileReader';
 import Reveal from 'reveal.js';
 import 'reveal.js/dist/reveal.css';
-import 'reveal.js/dist/theme/black.css';
+import 'reveal.js/dist/theme/white.css';
 
 export const PresentationGenerator = () => {
   const [text, setText] = useState('');
   const [slides, setSlides] = useState<PresentationSlide[]>([]);
   const [loading, setLoading] = useState(false);
+  const [slideCount, setSlideCount] = useState(7);
+  const [style, setStyle] = useState('academic');
+  const [core, setCore] = useState('introduction');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const deckDivRef = useRef<HTMLDivElement>(null);
   const deckRef = useRef<Reveal.Api | null>(null);
@@ -49,7 +55,7 @@ export const PresentationGenerator = () => {
     }
     setLoading(true);
     try {
-      const result = await geminiService.generatePresentation(contentText);
+      const result = await geminiService.generatePresentation(contentText, slideCount, style, core);
       setSlides(result);
       toast({
         title: 'سەرکەوتوو بوو',
@@ -95,28 +101,61 @@ export const PresentationGenerator = () => {
               <span className="sorani-text">دروستکەری پێشکەشکردن</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             <Textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="دەقی پێشکەشکردنەکەت لێرە بنووسە یان فایلێک باربکە..."
               className="input-academic sorani-text h-32"
             />
-            <div className="flex items-center gap-4">
-                <Button onClick={handleGenerate} disabled={loading} className="btn-academic-primary">
-                    {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'دروستکردنی پێشکەشکردن'}
-                </Button>
-                <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="btn-academic-secondary">
-                    <Upload className="h-4 w-4 mr-2" />
-                    بارکردنی فایل
-                </Button>
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className="hidden"
-                    accept=".txt,.md,.pdf,.docx"
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="slide-count">ژمارەی سلایدەکان: {slideCount}</Label>
+                <Slider
+                  id="slide-count"
+                  min={3}
+                  max={13}
+                  step={1}
+                  value={[slideCount]}
+                  onValueChange={(value) => setSlideCount(value[0])}
                 />
+              </div>
+              <Select onValueChange={setStyle} defaultValue={style}>
+                <SelectTrigger>
+                  <SelectValue placeholder="شێواز" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="academic">ئەکادیمی</SelectItem>
+                  <SelectItem value="professional">پیشەگەرانە</SelectItem>
+                  <SelectItem value="creative">داهێنەرانە</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select onValueChange={setCore} defaultValue={core}>
+                <SelectTrigger>
+                  <SelectValue placeholder="ناوەڕۆکی سەرەکی" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="introduction">پێشەکی</SelectItem>
+                  <SelectItem value="explanation">شیکردنەوە</SelectItem>
+                  <SelectItem value="methodology">میتۆدۆلۆژی</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-4">
+              <Button onClick={handleGenerate} disabled={loading} className="btn-academic-primary">
+                {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'دروستکردنی پێشکەشکردن'}
+              </Button>
+              <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="btn-academic-secondary">
+                <Upload className="h-4 w-4 mr-2" />
+                بارکردنی فایل
+              </Button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+                accept=".txt,.md,.pdf,.docx"
+              />
             </div>
           </CardContent>
         </Card>
@@ -127,37 +166,39 @@ export const PresentationGenerator = () => {
               <div className="slides">
                 {slides.map((slide, index) => (
                   <section key={index} data-layout={slide.layout}>
-                    {slide.layout === 'title' ? (
-                      <div>
-                        <h1>{slide.title}</h1>
-                        <p>{slide.content}</p>
-                      </div>
-                    ) : slide.layout === 'image-right' ? (
-                      <div className="flex items-center">
-                        <div className="w-1/2">
-                          <h2>{slide.title}</h2>
-                          <p>{slide.content}</p>
+                    <div className="h-full w-full flex flex-col justify-center items-center text-center p-8">
+                      {slide.layout === 'title' ? (
+                        <>
+                          <h1 className="text-5xl font-bold mb-4">{slide.title}</h1>
+                          <p className="text-xl">{slide.content}</p>
+                        </>
+                      ) : slide.layout === 'image-right' ? (
+                        <div className="flex items-center w-full">
+                          <div className="w-1/2 pr-8">
+                            <h2 className="text-4xl font-semibold mb-4">{slide.title}</h2>
+                            <p>{slide.content}</p>
+                          </div>
+                          <div className="w-1/2">
+                            <img src={`https://source.unsplash.com/800x600/?${slide.imageSearchTerm}`} alt={slide.title} className="rounded-lg shadow-lg" />
+                          </div>
                         </div>
-                        <div className="w-1/2">
-                          <img src={slide.imageUrl} alt={slide.title} />
+                      ) : slide.layout === 'image-left' ? (
+                        <div className="flex items-center w-full">
+                          <div className="w-1/2">
+                            <img src={`https://source.unsplash.com/800x600/?${slide.imageSearchTerm}`} alt={slide.title} className="rounded-lg shadow-lg" />
+                          </div>
+                          <div className="w-1/2 pl-8">
+                            <h2 className="text-4xl font-semibold mb-4">{slide.title}</h2>
+                            <p>{slide.content}</p>
+                          </div>
                         </div>
-                      </div>
-                    ) : slide.layout === 'image-left' ? (
-                      <div className="flex items-center">
-                        <div className="w-1/2">
-                          <img src={slide.imageUrl} alt={slide.title} />
-                        </div>
-                        <div className="w-1/2">
-                          <h2>{slide.title}</h2>
-                          <p>{slide.content}</p>
-                        </div>
-                      </div>
-                    ) : (
-                      <div>
-                        <h2>{slide.title}</h2>
-                        <p>{slide.content}</p>
-                      </div>
-                    )}
+                      ) : (
+                        <>
+                          <h2 className="text-4xl font-semibold mb-4">{slide.title}</h2>
+                          <p className="max-w-4xl">{slide.content}</p>
+                        </>
+                      )}
+                    </div>
                   </section>
                 ))}
               </div>
