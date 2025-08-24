@@ -1,4 +1,4 @@
-import { CitationGenerator as CitationGeneratorComponent } from '@/components/CitationGenerator';
+import { CitationGenerator as CitationGeneratorComponent } from '../components/CitationGenerator';
 import { MobileSidebarTrigger } from "@/components/MobileSidebarTrigger";
 import { useTranslation } from 'react-i18next';
 import { BookOpen } from "lucide-react";
