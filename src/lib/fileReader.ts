@@ -1,8 +1,8 @@
 import * as pdfjs from 'pdfjs-dist';
 import mammoth from 'mammoth';
 
-// Configure the worker
-pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.mjs', import.meta.url).toString();
+// Set up the worker for pdfjs
+pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.mjs`;
 
 export const readFileContent = async (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -22,7 +22,7 @@ export const readFileContent = async (file: File): Promise<string> => {
           for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
             const text = await page.getTextContent();
-            textContent += text.items.map(item => ('str' in item ? item.str : '')).join(' ');
+            textContent += text.items.map(item => (item as any).str).join(' ');
           }
           resolve(textContent);
         } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
@@ -34,7 +34,8 @@ export const readFileContent = async (file: File): Promise<string> => {
           resolve(textDecoder.decode(arrayBuffer));
         }
       } catch (error) {
-        reject(error);
+        console.error('Error parsing file:', error);
+        reject(new Error('Failed to parse file. The format may not be supported.'));
       }
     };
 

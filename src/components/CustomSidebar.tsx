@@ -101,7 +101,7 @@ export function CustomSidebar() {
   }, []);
 
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon">
         <SidebarHeader className="border-b border-sidebar-border">
           <div className="flex items-center gap-3 p-4">
             <div className="p-2 bg-gradient-primary rounded-lg text-primary-foreground">

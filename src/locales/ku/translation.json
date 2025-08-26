@@ -88,6 +88,8 @@
   "realTime": "ڕاستەوخۆ",
   "correction": "ڕاستکردنەوە",
   "suggestion": "پێشنیار",
+  "pageNotFound": "ئۆپس! پەڕەکە نەدۆزرایەوە",
+  "returnToHome": "گەڕانەوە بۆ ماڵەوە",
   "navigation": "ڕێنیشاندەر",
   "tools": "ئامرازەکان",
   "settings": "ڕێکخستنەکان",
@@ -118,5 +120,9 @@
   "compressor": "پەستانەوەی فایل و وێنە",
   "compressorDescription": "قەبارەی فایل و وێنەکانت کەم بکەرەوە بەبێ لەدەستدانی کوالێتی.",
   "citationGenerator": "دروستکەری بەڵگەنامە",
-  "citationGeneratorDescription": "بەڵگەنامەکان لە شێوازە جیاوازەکان (APA، MLA، Chicago) لە فایلە بارکراوەکان یان لینکەکانی ماڵپەڕ دروست بکە."
+  "citationGeneratorDescription": "بەڵگەنامەکان لە شێوازە جیاوازەکان (APA، MLA، Chicago) لە فایلە بارکراوەکان یان لینکەکانی ماڵپەڕ دروست بکە.",
+  "knowledgeGraphGeneratorTitle": "دروستکەری نەخشەی زانین",
+  "knowledgeGraphGeneratorDescription": "پەیوەندییەکانی نێوان چەمک و بیرۆکەکان لە دەقەکەتدا وێنا بکە.",
+  "chatWithFile": "چات لەگەڵ فایل",
+  "chatWithFileDescription": "چات لەگەڵ بەڵگەنامەکانت (PDF, DOCX, هتد) و وەڵام وەربگرە لەگەڵ سەرچاوەکان."
 }

@@ -19,9 +19,12 @@ import {
   Search,
   FileUp,
   Image,
-  Minimize
+  Minimize,
+  Network,
+  MessageSquare
 } from "lucide-react";
 import { MobileSidebarTrigger } from "@/components/MobileSidebarTrigger";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArticleWriter } from "@/components/ArticleWriter";
@@ -160,6 +163,20 @@ const Index = () => {
       icon: BookOpen,
       category: "tools",
       path: "/citation-generator"
+    },
+    {
+      title: "knowledgeGraphGenerator",
+      description: "knowledgeGraphGeneratorDescription",
+      icon: Network,
+      category: "tools",
+      path: "/knowledge-graph"
+    },
+    {
+      title: "chatWithFile",
+      description: "chatWithFileDescription",
+      icon: MessageSquare,
+      category: "tools",
+      path: "/chat-with-file"
     }
   ];
 
@@ -183,7 +200,10 @@ const Index = () => {
       
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <MobileSidebarTrigger />
+          <div className="flex items-center gap-2">
+            <SidebarTrigger />
+            <MobileSidebarTrigger />
+          </div>
         </div>
         {/* Welcome Section */}
         <div className="text-center mb-12">

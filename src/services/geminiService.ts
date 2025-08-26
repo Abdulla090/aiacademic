@@ -635,6 +635,29 @@ class GeminiService {
     const response = await this.makeRequest(prompt);
     return response.text.trim();
   }
+
+  async chatWithFile(fileContent: string, message: string): Promise<string> {
+    const prompt = `
+    You are an intelligent assistant that can answer questions based on the provided file content.
+    The user has uploaded a file and is asking a question about it.
+
+    File Content:
+    """
+    ${fileContent}
+    """
+
+    User's Question: "${message}"
+
+    Instructions:
+    - Answer the user's question based *only* on the information in the file content.
+    - If the answer is in the file, provide the answer and a reference to the page or section where the information can be found (if possible).
+    - If the answer is not in the file, say that you cannot find the answer in the provided document.
+    - Be concise and clear in your response.
+    `;
+
+    const response = await this.makeRequest(prompt);
+    return response.text.trim();
+  }
 }
 
 export const geminiService = new GeminiService();

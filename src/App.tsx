@@ -19,8 +19,10 @@ import MindMapGenerator from "./pages/MindMapGenerator";
 import FlashcardGenerator from "./pages/FlashcardGenerator";
 import QuizGenerator from "./pages/QuizGenerator";
 import PresentationGenerator from "./pages/PresentationGenerator";
+import KnowledgeGraphPage from "./pages/KnowledgeGraphPage";
 import WritingSupervisor from "./pages/WritingSupervisor";
 import withLoading from "./hocs/withLoading";
+import ChatWithFile from "./pages/ChatWithFile";
 import About from "./pages/About";
 import { CustomSidebar } from "./components/CustomSidebar";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "./components/ui/sidebar";
@@ -45,9 +47,11 @@ const AppContent = () => {
   const ImageConverterWithLoading = withLoading(ImageConverter);
   const CompressorWithLoading = withLoading(Compressor);
   const CitationGeneratorWithLoading = withLoading(CitationGenerator);
+  const KnowledgeGraphPageWithLoading = withLoading(KnowledgeGraphPage);
+  const ChatWithFileWithLoading = withLoading(ChatWithFile);
  
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={true}>
       {showSidebar && <CustomSidebar />}
       <SidebarInset>
         <Routes>
@@ -67,7 +71,9 @@ const AppContent = () => {
           <Route path="/quiz-generator" element={<QuizGeneratorWithLoading />} />
           <Route path="/presentation-generator" element={<PresentationGeneratorWithLoading />} />
           <Route path="/writing-supervisor" element={<WritingSupervisorWithLoading />} />
+          <Route path="/knowledge-graph" element={<KnowledgeGraphPageWithLoading />} />
           <Route path="/about" element={<About />} />
+          <Route path="/chat-with-file" element={<ChatWithFileWithLoading />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

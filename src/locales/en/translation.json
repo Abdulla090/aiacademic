@@ -98,6 +98,7 @@
   "help": "Help",
   "about": "About",
   "logout": "Logout",
+  "home": "Home",
   "aboutSubtitle": "Learn more about our mission and vision",
   "ourMission": "Our Mission",
   "aboutMission": "Our mission is to provide free, high-quality academic tools to students and researchers around the world. We believe that education should be accessible to everyone, regardless of their background or financial situation.",
@@ -119,5 +120,9 @@
   "compressor": "File & Image Compressor",
   "compressorDescription": "Reduce the size of your files and images without losing quality.",
   "citationGenerator": "Citation Generator",
-  "citationGeneratorDescription": "Generate citations in different styles (APA, MLA, Chicago) from uploaded files or website links."
+  "citationGeneratorDescription": "Generate citations in different styles (APA, MLA, Chicago) from uploaded files or website links.",
+  "knowledgeGraphGeneratorTitle": "Knowledge Graph Generator",
+  "knowledgeGraphGeneratorDescription": "Visualize connections between concepts and ideas from your text.",
+  "chatWithFile": "Chat with File",
+  "chatWithFileDescription": "Chat with your documents (PDF, DOCX, etc.) and get answers with references."
 }

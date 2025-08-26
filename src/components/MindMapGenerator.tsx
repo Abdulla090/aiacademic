@@ -60,7 +60,29 @@ const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
 
 
 const CustomNode = ({ data }: any) => {
-    const shapeStyle: React.CSSProperties = {
+    const colors = [
+        '#60a5fa', // blue-400
+        '#8b5cf6', // violet-500
+        '#ef4444', // red-500
+        '#f97316', // orange-500
+        '#10b981', // emerald-500
+        '#eab308', // yellow-500
+        '#06b6d4', // cyan-500
+        '#ec4899', // pink-500
+    ];
+
+    const getColor = (nodeId: string) => {
+        let hash = 0;
+        for (let i = 0; i < nodeId.length; i++) {
+            hash = nodeId.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const index = Math.abs(hash % colors.length);
+        return colors[index];
+    };
+
+    const nodeColor = getColor(data.label);
+
+    const nodeStyle: React.CSSProperties = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -70,23 +92,14 @@ const CustomNode = ({ data }: any) => {
         minHeight: '50px',
         minWidth: '100px',
         textAlign: 'center',
+        borderRadius: '8px', // Rounded corners for all nodes
+        background: nodeColor,
+        boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+        border: '1px solid rgba(255,255,255,0.3)',
     };
 
-    if (data.shape === 'square') {
-        shapeStyle.borderRadius = '0';
-        shapeStyle.background = 'linear-gradient(to right, #ef4444, #f87171)';
-    } else if (data.shape === 'diamond') {
-        shapeStyle.width = '120px';
-        shapeStyle.height = '120px';
-        shapeStyle.clipPath = 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)';
-        shapeStyle.background = 'linear-gradient(to right, #8b5cf6, #a78bfa)';
-    } else { // circle
-        shapeStyle.borderRadius = '50%';
-        shapeStyle.background = 'linear-gradient(to right, #3b82f6, #60a5fa)';
-    }
-
     return (
-        <div style={shapeStyle}>
+        <div style={nodeStyle}>
             {data.label}
         </div>
     );
@@ -96,35 +109,27 @@ const nodeTypes = {
     custom: CustomNode,
 };
 
-const MindMapInternal = () => {
+interface MindMapInternalProps {
+  initialNodes: any[];
+  initialEdges: any[];
+}
+
+const MindMapInternal: React.FC<MindMapInternalProps> = ({ initialNodes, initialEdges }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const [topic, setTopic] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [layoutDirection, setLayoutDirection] = useState('TB');
+
+  useEffect(() => {
+    if (initialNodes.length > 0) {
+      const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(initialNodes, initialEdges, layoutDirection);
+      setNodes(layoutedNodes);
+      setEdges(layoutedEdges);
+    }
+  }, [initialNodes, initialEdges, layoutDirection, setNodes, setEdges]);
 
   const onConnect = useCallback((params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
   
-  const handleGenerate = async () => {
-    if (!topic.trim()) {
-      toast({ title: 'Error', description: 'Please enter a topic.', variant: 'destructive' });
-      return;
-    }
-    setLoading(true);
-    try {
-      const mindMapData = await geminiService.generateMindMap(topic);
-      const { nodes: layoutedNodes, edges: layoutedEdges } = transformToFlow(mindMapData);
-      setNodes(layoutedNodes);
-      setEdges(layoutedEdges);
-      toast({ title: 'Success', description: 'Mind map generated.' });
-    } catch (error) {
-      toast({ title: 'Error', description: 'Failed to generate mind map.', variant: 'destructive' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const toggleFullscreen = () => {
     const elem = document.querySelector('.react-flow-wrapper');
     if (!elem) return;
@@ -140,44 +145,13 @@ const MindMapInternal = () => {
     }
   };
 
-  const transformToFlow = (node: MindMapNode, parentId?: string): { nodes: any[], edges: any[] } => {
-    const nodesArr: any[] = [];
-    const edgesArr: any[] = [];
-
-    const traverse = (n: MindMapNode, pId?: string) => {
-      nodesArr.push({
-        id: n.id,
-        data: { label: n.text, shape: n.shape || 'circle' },
-        type: 'custom',
-        position: { x: 0, y: 0 } // Position will be calculated by dagre
-      });
-      if (pId) {
-        edgesArr.push({ id: `e${pId}-${n.id}`, source: pId, target: n.id });
-      }
-      n.children.forEach(child => traverse(child, n.id));
-    };
-
-    traverse(node, parentId);
-    
-    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(nodesArr, edgesArr);
-
-    return { nodes: layoutedNodes, edges: layoutedEdges };
+  const handleLayoutChange = (direction: string) => {
+    setLayoutDirection(direction);
   };
-
 
   return (
     <div className="h-[70vh] w-full">
        <div className="flex gap-2 mb-4">
-        <Input 
-          value={topic}
-          onChange={(e) => setTopic(e.target.value)}
-          placeholder="Enter a topic..."
-          className="input-academic"
-        />
-        <Button onClick={handleGenerate} disabled={loading}>
-          {loading ? <RefreshCw className="animate-spin" /> : <Brain />}
-          Generate
-        </Button>
         <Button onClick={toggleFullscreen} variant="outline">
           {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
         </Button>
@@ -185,12 +159,8 @@ const MindMapInternal = () => {
           <label className="text-sm font-medium">Layout</label>
           <div className="grid grid-cols-2 gap-2">
             <div
-              className={`border-2 p-2 rounded-lg cursor-pointer ${getLayoutedElements(nodes, edges, 'TB') ? 'border-primary' : 'border-border'}`}
-              onClick={() => {
-                  const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(nodes, edges, 'TB');
-                  setNodes([...layoutedNodes]);
-                  setEdges([...layoutedEdges]);
-              }}
+              className={`border-2 p-2 rounded-lg cursor-pointer ${layoutDirection === 'TB' ? 'border-primary' : 'border-border'}`}
+              onClick={() => handleLayoutChange('TB')}
             >
               <svg width="100%" height="60" viewBox="0 0 100 60">
                 <circle cx="50" cy="10" r="8" fill="#3b82f6" />
@@ -202,12 +172,8 @@ const MindMapInternal = () => {
               <p className="text-center text-xs mt-1">Vertical</p>
             </div>
             <div
-              className={`border-2 p-2 rounded-lg cursor-pointer ${getLayoutedElements(nodes, edges, 'LR') ? 'border-primary' : 'border-border'}`}
-              onClick={() => {
-                  const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(nodes, edges, 'LR');
-                  setNodes([...layoutedNodes]);
-                  setEdges([...layoutedEdges]);
-              }}
+              className={`border-2 p-2 rounded-lg cursor-pointer ${layoutDirection === 'LR' ? 'border-primary' : 'border-border'}`}
+              onClick={() => handleLayoutChange('LR')}
             >
               <svg width="100%" height="60" viewBox="0 0 100 60">
                 <circle cx="10" cy="30" r="8" fill="#3b82f6" />
@@ -240,7 +206,12 @@ const MindMapInternal = () => {
   );
 };
 
-export const MindMapGenerator = () => {
+interface MindMapGeneratorProps {
+  nodes: any[];
+  edges: any[];
+}
+
+export const MindMapGenerator: React.FC<MindMapGeneratorProps> = ({ nodes, edges }) => {
     return (
         <div className="container mx-auto px-4 py-8 max-w-6xl">
             <Card className="card-academic">
@@ -249,7 +220,7 @@ export const MindMapGenerator = () => {
                 </CardHeader>
                 <CardContent>
                     <ReactFlowProvider>
-                        <MindMapInternal />
+                        <MindMapInternal initialNodes={nodes} initialEdges={edges} />
                     </ReactFlowProvider>
                 </CardContent>
             </Card>

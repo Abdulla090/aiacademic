@@ -209,7 +209,7 @@ suggestion,
   
   .btn-academic-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1), 0 12px 20px -4px hsl(var(--primary) / 0.3);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1), 0 0 25px -5px hsl(var(--primary) / 0.5);
   }
   
   .btn-academic-primary:active {
@@ -226,7 +226,7 @@ suggestion,
   
   .btn-academic-secondary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1), 0 12px 20px -4px hsl(var(--secondary) / 0.3);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1), 0 0 25px -5px hsl(var(--secondary) / 0.5);
   }
   
   .btn-academic-secondary:active {
@@ -242,14 +242,123 @@ suggestion,
   }
   
   .btn-academic-outline:hover {
-    @apply bg-primary text-primary-foreground;
+    @apply bg-primary/90 text-primary-foreground;
     transform: translateY(-2px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1), 0 0 15px -5px hsl(var(--primary) / 0.4);
   }
   
   .btn-academic-outline:active {
     transform: translateY(1px);
     box-shadow: 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  }
+
+  /* 3D Button Styles */
+  .btn-3d-primary {
+    @apply relative rounded-xl px-6 py-3 font-medium text-primary-foreground transition-all duration-200 ease-out overflow-hidden;
+    background-color: hsl(var(--primary));
+    border-bottom: 4px solid hsl(var(--primary-dark));
+    box-shadow: 0 4px 0 hsl(var(--primary-dark));
+    transform: translateY(0);
+  }
+
+  .btn-3d-primary::before {
+    content: '';
+    position: absolute;
+    inset: -2px; /* Slightly larger than the button */
+    background: conic-gradient(from 0deg at 50% 50%, transparent 0%, transparent 10%, hsl(var(--primary-light)) 20%, transparent 30%, transparent 100%);
+    background-size: 300% 300%; /* Make background much larger */
+    animation: moveLight 4s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    pointer-events: none;
+    border-radius: inherit; /* Inherit border-radius from parent */
+    z-index: -1; /* Place behind the button content */
+  }
+
+  .btn-3d-primary:hover::before {
+    opacity: 1;
+  }
+
+  .btn-3d-primary:hover {
+    background-color: hsl(var(--primary-light));
+    transform: translateY(-1px);
+    box-shadow: 0 5px 0 hsl(var(--primary-dark));
+  }
+
+  .btn-3d-primary:active {
+    transform: translateY(3px);
+    border-bottom-width: 1px;
+    box-shadow: 0 1px 0 hsl(var(--primary-dark));
+  }
+
+  .btn-3d-outline {
+    @apply relative rounded-xl px-6 py-3 font-medium text-primary transition-all duration-200 ease-out overflow-hidden;
+    background-color: transparent;
+    border: 2px solid hsl(var(--primary));
+    border-bottom: 4px solid hsl(var(--primary-dark));
+    box-shadow: 0 4px 0 hsl(var(--primary-dark));
+    transform: translateY(0);
+  }
+
+  .btn-3d-outline::before {
+    content: '';
+    position: absolute;
+    inset: -2px; /* Slightly larger than the button */
+    background: conic-gradient(from 0deg at 50% 50%, transparent 0%, transparent 10%, hsl(var(--primary)) 20%, transparent 30%, transparent 100%);
+    background-size: 300% 300%; /* Make background much larger */
+    animation: moveLight 4s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    pointer-events: none;
+    border-radius: inherit; /* Inherit border-radius from parent */
+    z-index: -1; /* Place behind the button content */
+  }
+
+  .btn-3d-outline:hover::before {
+    opacity: 1;
+  }
+
+  .btn-3d-outline:hover {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    transform: translateY(-1px);
+    box-shadow: 0 5px 0 hsl(var(--primary-dark));
+  }
+
+  .btn-3d-outline:active {
+    transform: translateY(3px);
+    border-bottom-width: 1px;
+    box-shadow: 0 1px 0 hsl(var(--primary-dark));
+  }
+
+  @keyframes moveLight {
+    0% {
+      background-position: 0% 0%;
+    }
+    12.5% {
+      background-position: 50% 0%;
+    }
+    25% {
+      background-position: 100% 0%;
+    }
+    37.5% {
+      background-position: 100% 50%;
+    }
+    50% {
+      background-position: 100% 100%;
+    }
+    62.5% {
+      background-position: 50% 100%;
+    }
+    75% {
+      background-position: 0% 100%;
+    }
+    87.5% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 0% 0%;
+    }
   }
 
   /* Academic Input */
