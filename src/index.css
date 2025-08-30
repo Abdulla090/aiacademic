@@ -183,8 +183,137 @@ suggestion,
     direction: ltr;
     text-align: left;
   }
-}
-
+  
+  /* PDF Viewer Styles */
+  .pdf-document-container {
+    width: 100%;
+  }
+  
+  .pdf-page-wrapper {
+    position: relative;
+    display: block;
+    margin-bottom: 24px;
+    page-break-after: always;
+    page-break-inside: avoid;
+    clear: both;
+  }
+  
+  .pdf-page {
+    position: relative !important;
+    display: block !important;
+    margin: 0 auto !important;
+  }
+  
+  /* React PDF Page Container */
+  .react-pdf__Page {
+    position: relative !important;
+    display: block !important;
+    margin: 0 auto !important;
+    max-width: 100% !important;
+    background-color: white !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* Canvas layer - the actual PDF rendering */
+  .react-pdf__Page__canvas {
+    position: relative !important;
+    display: block !important;
+    margin: 0 auto !important;
+    max-width: 100% !important;
+    height: auto !important;
+    z-index: 1 !important;
+  }
+  
+  /* Text layer for selection */
+  .react-pdf__Page__textContent {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    line-height: 1 !important;
+    z-index: 2 !important;
+    user-select: text !important;
+    cursor: text !important;
+  }
+  
+  .react-pdf__Page__textContent span {
+    position: absolute !important;
+    white-space: pre !important;
+    transform-origin: left bottom !important;
+    opacity: 0 !important;
+    color: transparent !important;
+  }
+  
+  /* Make text selectable */
+  .react-pdf__Page__textContent.textLayer {
+    opacity: 1 !important;
+  }
+  
+  .react-pdf__Page__textContent.textLayer span {
+    color: transparent !important;
+    opacity: 1 !important;
+  }
+  
+  /* Annotation layer */
+  .react-pdf__Page__annotations {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 3 !important;
+  }
+  
+  .react-pdf__Page__annotations.annotationLayer {
+    opacity: 1 !important;
+  }
+  
+  /* Loading state */
+  .react-pdf__Page__loading {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: rgba(255, 255, 255, 0.8) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  /* Text selection styling */
+  .react-pdf__Page__textContent ::selection {
+    background: rgba(0, 123, 255, 0.3) !important;
+  }
+  
+  .react-pdf__Page__textContent ::-moz-selection {
+    background: rgba(0, 123, 255, 0.3) !important;
+  }
+  
+  /* Ensure each page is isolated */
+  .react-pdf__Document {
+    position: relative !important;
+    width: 100% !important;
+  }
+  
+  .react-pdf__Page + .react-pdf__Page {
+    margin-top: 24px !important;
+  }
+  
+  /* Fix overlapping issues */
+  .react-pdf__Page__svg {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 1 !important;
+  }
+  
+  }
 @layer components {
   /* Academic Card Variants */
   .card-academic {
@@ -382,4 +511,25 @@ suggestion,
   .gradient-subtle {
     background: var(--gradient-subtle);
   }
+.pdf-document-viewer .react-pdf__Page__textContent {
+  color: #000 !important; /* Ensure text is black */
+  opacity: 1 !important; /* Ensure text is fully opaque */
+  z-index: 2 !important; /* Ensure text is above other elements */
+  background-color: transparent !important; /* Ensure text layer background is transparent */
+  width: 100% !important; /* Ensure text layer takes full width */
+  left: 0 !important; /* Ensure text layer starts from the left edge */
+  top: 0 !important; /* Ensure text layer starts from the top edge */
+  transform-origin: 0% 0% !important; /* Ensure transform origin is top-left */
+  text-align: left !important; /* Ensure text is left-aligned */
+  word-wrap: break-word !important; /* Ensure long words break and wrap */
+  white-space: normal !important; /* Allow text to wrap naturally */
+  box-sizing: border-box !important; /* Include padding and border in the element's total width and height */
+  user-select: text !important; /* Ensure text is selectable */
+  position: absolute !important; /* Ensure it overlays correctly */
+}
+
+.pdf-document-viewer .react-pdf__Page__canvas {
+  background-color: #fff !important; /* Ensure canvas background is white */
+}
+
 }

@@ -1,3 +1,1 @@
-export const notoNaskhArabic = `
-AAEAAAARAQAABAAQRFNJRwAAAAAAA... (long base64 string)
-`;
+export const notoNaskhArabic = 'AAEAAAARAQAABAAQRFNJRwAAAAAAA... (long base64 string)';

@@ -7,8 +7,13 @@ import { CheckSquare, Copy, RefreshCw, CheckCircle, Download, Save, History, X, 
 import { geminiService, type GrammarCorrection } from '@/services/geminiService';
 import { useToast } from '@/components/ui/use-toast';
 import { jsPDF } from "jspdf";
+import { notoNaskhArabic } from '@/lib/fonts';
 
-export const GrammarChecker = () => {
+interface GrammarCheckerProps {
+  language: string;
+}
+
+export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
   const [text, setText] = useState('');
   const [correction, setCorrection] = useState<GrammarCorrection | null>(null);
   const [correctionHistory, setCorrectionHistory] = useState<GrammarCorrection[]>([]);
@@ -65,7 +70,7 @@ export const GrammarChecker = () => {
 
     setLoading(true);
     try {
-      const result = await geminiService.checkGrammar(text);
+      const result = await geminiService.checkGrammar(text, language);
       setCorrection(result);
       
       // Add to history (limit to 10 items)
@@ -115,51 +120,75 @@ export const GrammarChecker = () => {
     }
   };
   
-  const handleDownload = (text: string, format: 'text' | 'pdf' = 'text') => {
-    if (format === 'pdf') {
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      let yPosition = 20;
-      
-      // Add title
-      doc.setFontSize(18);
-      doc.setFont(undefined, 'bold');
-      const titleLines = doc.splitTextToSize('نووسینی ڕاستکراوە', pageWidth - 20);
-      doc.text(titleLines, pageWidth / 2, yPosition, { align: 'center' });
-      yPosition += (titleLines.length * 10) + 10;
-      
-      // Add content
-      doc.setFontSize(12);
-      doc.setFont(undefined, 'normal');
-      const splitText = doc.splitTextToSize(text, pageWidth - 20);
-      
-      // Add content page by page
-      for (let i = 0; i < splitText.length; i++) {
-        // Check if we need a new page
-        if (yPosition > pageHeight - 20) {
-          doc.addPage();
-          yPosition = 20;
+  const handleDownload = async (text: string, format: 'text' | 'pdf' = 'text') => {
+    try {
+      if (format === 'pdf') {
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        let yPosition = 20;
+        
+        // Add Arabic/Kurdish font support
+        doc.addFileToVFS('NotoNaskhArabic-Regular.ttf', notoNaskhArabic);
+        doc.addFont('NotoNaskhArabic-Regular.ttf', 'NotoNaskhArabic', 'normal');
+        doc.setFont('NotoNaskhArabic');
+
+        // Add title
+        doc.setFontSize(18);
+        doc.setFont('NotoNaskhArabic');
+        const titleLines = doc.splitTextToSize('نووسینی ڕاستکراوە', pageWidth - 20);
+        doc.text(titleLines, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += (titleLines.length * 10) + 10;
+        
+        // Add content
+        doc.setFontSize(12);
+        const splitText = doc.splitTextToSize(text || '', pageWidth - 20);
+        
+        // Add content page by page
+        for (let i = 0; i < splitText.length; i++) {
+          // Check if we need a new page
+          if (yPosition > pageHeight - 20) {
+            doc.addPage();
+            yPosition = 20;
+            // Reset font for new page
+            doc.setFont('NotoNaskhArabic');
+          }
+          
+          doc.text(splitText[i], 10, yPosition);
+          yPosition += 7;
         }
         
-        doc.text(splitText[i], 10, yPosition);
-        yPosition += 7;
+        // Save the PDF
+        doc.save('نووسینی ڕاستکراوە.pdf');
+        toast({
+          title: 'دابەزاندن',
+          description: 'فایل PDF دابەزێنرا'
+        });
+        return;
       }
       
-      // Save the PDF
-      doc.save('نووسینی ڕاستکراوە.pdf');
-      return;
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'نووسینی ڕاستکراوە.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'دابەزاندن',
+        description: 'فایل دابەزێنرا'
+      });
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({
+        title: 'هەڵە',
+        description: 'نەتوانرا فایلەکە دابەزێنرێت',
+        variant: 'destructive'
+      });
     }
-    
-    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'نووسینی ڕاستکراوە.txt';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   const hasCorrections = correction && correction.original !== correction.corrected;
@@ -356,9 +385,14 @@ export const GrammarChecker = () => {
                             const pageWidth = doc.internal.pageSize.getWidth();
                             let yPosition = 20;
                             
+                            // Add Arabic/Kurdish font support
+                            doc.addFileToVFS('NotoNaskhArabic-Regular.ttf', notoNaskhArabic);
+                            doc.addFont('NotoNaskhArabic-Regular.ttf', 'NotoNaskhArabic', 'normal');
+                            doc.setFont('NotoNaskhArabic');
+
                             // Add title
                             doc.setFontSize(18);
-                            doc.setFont(undefined, 'bold');
+                            doc.setFont('NotoNaskhArabic');
                             doc.text('مێژووی گۆڕانکارییەکان', pageWidth / 2, yPosition, { align: 'center' });
                             yPosition += 20;
                             
@@ -368,17 +402,18 @@ export const GrammarChecker = () => {
                               if (yPosition > doc.internal.pageSize.getHeight() - 40) {
                                 doc.addPage();
                                 yPosition = 20;
+                                // Reset font for new page
+                                doc.setFont('NotoNaskhArabic');
                               }
                               
                               // Add item title
                               doc.setFontSize(14);
-                              doc.setFont(undefined, 'bold');
+                              doc.setFont('NotoNaskhArabic');
                               doc.text(`گۆڕانکاریی #${correctionHistory.length - index}`, 10, yPosition);
                               yPosition += 10;
                               
                               // Add original text
                               doc.setFontSize(12);
-                              doc.setFont(undefined, 'normal');
                               doc.text('سەرەتایی:', 10, yPosition);
                               yPosition += 7;
                               
@@ -387,6 +422,8 @@ export const GrammarChecker = () => {
                                 if (yPosition > doc.internal.pageSize.getHeight() - 20) {
                                   doc.addPage();
                                   yPosition = 20;
+                                  // Reset font for new page
+                                  doc.setFont('NotoNaskhArabic');
                                 }
                                 doc.text(originalLines[i], 15, yPosition);
                                 yPosition += 7;
@@ -395,16 +432,18 @@ export const GrammarChecker = () => {
                               yPosition += 5;
                               
                               // Add corrected text
-                              doc.setFont(undefined, 'bold');
+                              doc.setFont('NotoNaskhArabic');
                               doc.text('ڕاستکراوە:', 10, yPosition);
                               yPosition += 7;
                               
-                              doc.setFont(undefined, 'normal');
+                              doc.setFont('NotoNaskhArabic');
                               const correctedLines = doc.splitTextToSize(item.corrected, pageWidth - 20);
                               for (let i = 0; i < correctedLines.length; i++) {
                                 if (yPosition > doc.internal.pageSize.getHeight() - 20) {
                                   doc.addPage();
                                   yPosition = 20;
+                                  // Reset font for new page
+                                  doc.setFont('NotoNaskhArabic');
                                 }
                                 doc.text(correctedLines[i], 15, yPosition);
                                 yPosition += 7;
@@ -642,25 +681,31 @@ export const GrammarChecker = () => {
                             const pageWidth = doc.internal.pageSize.getWidth();
                             let yPosition = 20;
                             
+                            // Add Arabic/Kurdish font support
+                            doc.addFileToVFS('NotoNaskhArabic-Regular.ttf', notoNaskhArabic);
+                            doc.addFont('NotoNaskhArabic-Regular.ttf', 'NotoNaskhArabic', 'normal');
+                            doc.setFont('NotoNaskhArabic');
+
                             // Add title
                             doc.setFontSize(18);
-                            doc.setFont(undefined, 'bold');
+                            doc.setFont('NotoNaskhArabic');
                             doc.text('پێشبینینی گۆڕانکارییەکان', pageWidth / 2, yPosition, { align: 'center' });
                             yPosition += 20;
                             
                             // Add original text section
                             doc.setFontSize(14);
-                            doc.setFont(undefined, 'bold');
+                            doc.setFont('NotoNaskhArabic');
                             doc.text('نووسینی سەرەتایی:', 10, yPosition);
                             yPosition += 10;
                             
                             doc.setFontSize(12);
-                            doc.setFont(undefined, 'normal');
                             const originalLines = doc.splitTextToSize(correction.original, pageWidth - 20);
                             for (let i = 0; i < originalLines.length; i++) {
                               if (yPosition > doc.internal.pageSize.getHeight() - 20) {
                                 doc.addPage();
                                 yPosition = 20;
+                                // Reset font for new page
+                                doc.setFont('NotoNaskhArabic');
                               }
                               doc.text(originalLines[i], 10, yPosition);
                               yPosition += 7;
@@ -670,17 +715,18 @@ export const GrammarChecker = () => {
                             
                             // Add corrected text section
                             doc.setFontSize(14);
-                            doc.setFont(undefined, 'bold');
+                            doc.setFont('NotoNaskhArabic');
                             doc.text('نووسینی ڕاستکراوە:', 10, yPosition);
                             yPosition += 10;
                             
                             doc.setFontSize(12);
-                            doc.setFont(undefined, 'normal');
                             const correctedLines = doc.splitTextToSize(correction.corrected, pageWidth - 20);
                             for (let i = 0; i < correctedLines.length; i++) {
                               if (yPosition > doc.internal.pageSize.getHeight() - 20) {
                                 doc.addPage();
                                 yPosition = 20;
+                                // Reset font for new page
+                                doc.setFont('NotoNaskhArabic');
                               }
                               doc.text(correctedLines[i], 10, yPosition);
                               yPosition += 7;

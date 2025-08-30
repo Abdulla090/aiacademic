@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,12 @@ import { useToast } from '@/components/ui/use-toast';
 import { jsPDF } from "jspdf";
 import { notoNaskhArabic } from '@/lib/fonts';
 
-export const ReportGenerator = () => {
+interface ReportGeneratorProps {
+  language: string;
+}
+
+export const ReportGenerator = ({ language }: ReportGeneratorProps) => {
+  const reportRef = useRef<HTMLDivElement | null>(null);
   const [topic, setTopic] = useState('');
   const [outline, setOutline] = useState<ReportOutline | null>(null);
   const [sections, setSections] = useState<ReportSection[]>([]);
@@ -31,7 +36,7 @@ export const ReportGenerator = () => {
 
     setLoading(true);
     try {
-      const result = await geminiService.generateReportOutline(topic);
+      const result = await geminiService.generateReportOutline(topic, language);
       setOutline(result);
       setSections([]);
       setCurrentStep(1);
@@ -55,7 +60,7 @@ export const ReportGenerator = () => {
 
     setGeneratingSection(sectionName);
     try {
-      const content = await geminiService.generateReportSection(outline, sectionName, sections);
+      const content = await geminiService.generateReportSection(outline, sectionName, sections, language);
       const newSection: ReportSection = {
         title: sectionName,
         content
@@ -76,75 +81,121 @@ export const ReportGenerator = () => {
     }
   };
 
-  const handleDownloadReport = (format: 'text' | 'pdf' = 'text') => {
-    if (!outline || sections.length === 0) return;
-    
-    if (format === 'pdf') {
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
+  const handleDownloadReport = async (format: 'text' | 'pdf' = 'text') => {
+    try {
+      if (!outline || sections.length === 0) {
+        toast({
+          title: 'هەڵە',
+          description: 'ڕاپۆرتەکە بەتاڵە',
+          variant: 'destructive'
+        });
+        return;
+      }
       
-      // Embed the font
-      doc.addFileToVFS('NotoNaskhArabic-Regular.ttf', notoNaskhArabic);
-      doc.addFont('NotoNaskhArabic-Regular.ttf', 'NotoNaskhArabic', 'normal');
-      doc.setFont('NotoNaskhArabic');
-
-      // Add title
-      doc.setFontSize(18);
-      doc.text(outline.title, pageWidth / 2, 20, { align: 'center' });
-
-      // Add sections
-      let yPosition = 40;
-
-      sections.forEach((section) => {
-        // Add section title
-        doc.setFontSize(14);
-        doc.setFont(undefined, 'bold');
-        const titleLines = doc.splitTextToSize(section.title, pageWidth - 40);
-        doc.text(titleLines, pageWidth - 20, yPosition, { align: 'right' });
-        yPosition += (titleLines.length * 7) + 5;
-
-        // Add section content
-        doc.setFontSize(12);
-        doc.setFont(undefined, 'normal');
-        const contentLines = doc.splitTextToSize(section.content, pageWidth - 40);
-        doc.text(contentLines, pageWidth - 20, yPosition, { align: 'right' });
-        yPosition += (contentLines.length * 7) + 10;
+      if (format === 'pdf') {
+        const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        let yPosition = 40;
         
-        // Add page break if needed
-        if (yPosition > pageHeight - 40) {
-          doc.addPage();
-          yPosition = 20;
+        // Add Arabic/Kurdish font support
+        if (language === 'ku' || language === 'ar') {
+          // Add font to VFS and register it
+          pdf.addFileToVFS('NotoNaskhArabic-Regular.ttf', notoNaskhArabic);
+          pdf.addFont('NotoNaskhArabic-Regular.ttf', 'NotoNaskhArabic', 'normal');
+          pdf.setFont('NotoNaskhArabic');
         }
-      });
-      
-      // Save the PDF
-      doc.save(`${outline.title}.pdf`);
-      return;
-    }
 
-    const reportText = `${outline.title}\n\n${sections.map(section => `${section.title}\n\n${section.content}\n\n`).join('')}`;
-    const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${outline.title}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    toast({
-      title: 'دابەزاندن',
-      description: 'ڕاپۆرتەکە دابەزێنرا'
-    });
+        // Add title
+        pdf.setFontSize(20);
+        const titleLines = pdf.splitTextToSize(outline.title || 'Report', pageWidth - 40);
+        pdf.text(titleLines, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += (titleLines.length * 25) + 20;
+        
+        // Add sections
+        pdf.setFontSize(12);
+        for (const section of sections) {
+          // Check if we need a new page
+          if (yPosition > pageHeight - 40) {
+            pdf.addPage();
+            yPosition = 40;
+            // Reset font for new page
+            if (language === 'ku' || language === 'ar') {
+              pdf.setFont('NotoNaskhArabic');
+            }
+          }
+          
+          // Add section title
+          pdf.setFontSize(16);
+          const sectionTitleLines = pdf.splitTextToSize(section.title, pageWidth - 40);
+          pdf.text(sectionTitleLines, language === 'ku' || language === 'ar' ? pageWidth - 20 : 20, yPosition, { 
+            align: language === 'ku' || language === 'ar' ? 'right' : 'left' 
+          });
+          yPosition += (sectionTitleLines.length * 20) + 15;
+          
+          // Reset font size for content
+          pdf.setFontSize(12);
+          
+          // Add section content
+          const contentLines = pdf.splitTextToSize(section.content || '', pageWidth - 40);
+          for (let i = 0; i < contentLines.length; i++) {
+            if (yPosition > pageHeight - 40) {
+              pdf.addPage();
+              yPosition = 40;
+              // Reset font for new page
+              if (language === 'ku' || language === 'ar') {
+                pdf.setFont('NotoNaskhArabic');
+                pdf.setFontSize(12);
+              }
+            }
+            
+            // Handle RTL alignment for Kurdish/Arabic
+            if (language === 'ku' || language === 'ar') {
+              pdf.text(contentLines[i], pageWidth - 20, yPosition, { align: 'right' });
+            } else {
+              pdf.text(contentLines[i], 20, yPosition);
+            }
+            yPosition += 15;
+          }
+          
+          yPosition += 20; // Space between sections
+        }
+        
+        pdf.save(`${(outline.title || 'report').substring(0, 50)}.pdf`);
+        toast({ title: 'دابەزاندن', description: 'PDF دابەزێنرا' });
+        return;
+      }
+      
+      const reportText = `${outline.title}\n\n${sections.map(section => `${section.title}\n\n${section.content}\n\n`).join('')}`;
+      const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${(outline.title || 'report').substring(0, 50)}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'دابەزاندن',
+        description: 'ڕاپۆرتەکە دابەزێنرا'
+      });
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({
+        title: 'هەڵە',
+        description: 'نەتوانرا فایلەکە دابەزێنرێت',
+        variant: 'destructive'
+      });
+    }
   };
 
   const progressPercentage = outline ? (sections.length / outline.sections.length) * 100 : 0;
   const isCompleted = outline && sections.length === outline.sections.length;
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="container mx-auto px-4 py-8 max-w-6xl" ref={reportRef}>
       <div className="flex items-center gap-3 mb-8">
         <div className="p-3 bg-gradient-primary rounded-xl text-primary-foreground">
           <FileText className="h-6 w-6" />

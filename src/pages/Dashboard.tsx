@@ -206,14 +206,14 @@ const Index = () => {
           </div>
         </div>
         {/* Welcome Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-4">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4">
             {t('welcomeTitle')}
           </h1>
-          <p className="text-xl text-muted-foreground mb-2">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-2">
             {t('welcomeSubtitle')}
           </p>
-          <p className="text-lg text-foreground-secondary max-w-3xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base text-foreground-secondary max-w-3xl mx-auto leading-relaxed">
             {t('welcomeDescription')}
           </p>
         </div>
@@ -232,14 +232,14 @@ const Index = () => {
                   variant={selectedCategory === category.key ? "default" : "outline"}
                   size="sm"
                   onClick={() => setSelectedCategory(category.key)}
-                  className={`text-sm ${selectedCategory === category.key ? 'btn-academic-primary' : 'btn-academic-outline'}`}
+                  className={`text-xs sm:text-sm ${selectedCategory === category.key ? 'btn-academic-primary' : 'btn-academic-outline'}`}
                 >
                   {t(category.label)}
                 </Button>
               ))}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto">
               <div className="flex items-center gap-1 border border-border rounded-lg p-1">
                 <Button
                   variant={viewMode === 'grid' ? 'default' : 'ghost'}
@@ -259,11 +259,11 @@ const Index = () => {
                 </Button>
               </div>
               
-              <div className="relative">
+              <div className="relative flex-grow w-full sm:w-auto">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input 
+                <Input
                   placeholder={t('searchPlaceholder')}
-                  className="input-academic pl-10 w-64"
+                  className="input-academic pl-10 w-full"
                 />
               </div>
             </div>
@@ -296,23 +296,23 @@ const Index = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="mt-12 card-academic p-8 text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-4">
+        <div className="mt-8 sm:mt-12 card-academic p-6 sm:p-8 text-center">
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 sm:mb-4">
             {t('quickActionsTitle')}
           </h2>
-          <p className="text-muted-foreground mb-6">
+          <p className="text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">
             {t('quickActionsSubtitle')}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button className="btn-academic-primary relative overflow-hidden">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+            <Button className="btn-academic-primary relative overflow-hidden text-sm sm:text-base">
               <span className="relative z-10">{t('newArticle')}</span>
               <span className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl"></span>
             </Button>
-            <Button className="btn-academic-secondary relative overflow-hidden">
+            <Button className="btn-academic-secondary relative overflow-hidden text-sm sm:text-base">
               <span className="relative z-10">{t('createReport')}</span>
               <span className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl"></span>
             </Button>
-            <Button className="btn-academic-outline relative overflow-hidden">
+            <Button className="btn-academic-outline relative overflow-hidden text-sm sm:text-base">
               <span className="relative z-10">{t('checkGrammar')}</span>
               <span className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl"></span>
             </Button>

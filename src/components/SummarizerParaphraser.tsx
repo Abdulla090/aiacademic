@@ -9,6 +9,7 @@ import { BookOpen, Copy, RefreshCw, FileText, RotateCcw, Download } from 'lucide
 import { geminiService } from '@/services/geminiService';
 import { useToast } from '@/components/ui/use-toast';
 import { jsPDF } from "jspdf";
+import { notoNaskhArabic } from '@/lib/fonts';
 
 export const SummarizerParaphraser = () => {
   const [text, setText] = useState('');
@@ -93,34 +94,73 @@ export const SummarizerParaphraser = () => {
     }
   };
   
-  const handleDownload = (text: string, title: string, format: 'text' | 'pdf' = 'text') => {
-    if (format === 'pdf') {
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
+  const handleDownload = async (text: string, title: string, format: 'text' | 'pdf' = 'text') => {
+    try {
+      if (format === 'pdf') {
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        let yPosition = 20;
+        
+        // Add Arabic/Kurdish font support
+        doc.addFileToVFS('NotoNaskhArabic-Regular.ttf', notoNaskhArabic);
+        doc.addFont('NotoNaskhArabic-Regular.ttf', 'NotoNaskhArabic', 'normal');
+        doc.setFont('NotoNaskhArabic');
+
+        // Add title
+        doc.setFontSize(16);
+        const titleLines = doc.splitTextToSize(title, pageWidth - 20);
+        doc.text(titleLines, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += (titleLines.length * 10) + 10;
+        
+        // Add content
+        doc.setFontSize(12);
+        const splitText = doc.splitTextToSize(text || '', pageWidth - 20);
+        
+        for (let i = 0; i < splitText.length; i++) {
+          // Check if we need a new page
+          if (yPosition > pageHeight - 20) {
+            doc.addPage();
+            yPosition = 20;
+            // Reset font for new page
+            doc.setFont('NotoNaskhArabic');
+          }
+          
+          doc.text(splitText[i], 10, yPosition);
+          yPosition += 7;
+        }
+        
+        // Save the PDF
+        doc.save(`${title || 'document'}.pdf`);
+        toast({
+          title: 'دابەزاندن',
+          description: 'فایل PDF دابەزێنرا'
+        });
+        return;
+      }
       
-      // Add title
-      doc.setFontSize(16);
-      doc.text(title, pageWidth / 2, 20, { align: 'center' });
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${title || 'document'}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
       
-      // Add content
-      doc.setFontSize(12);
-      const splitText = doc.splitTextToSize(text, pageWidth - 20);
-      doc.text(splitText, 10, 40);
-      
-      // Save the PDF
-      doc.save(`${title}.pdf`);
-      return;
+      toast({
+        title: 'دابەزاندن',
+        description: 'فایل دابەزێنرا'
+      });
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({
+        title: 'هەڵە',
+        description: 'نەتوانرا فایلەکە دابەزێنرێت',
+        variant: 'destructive'
+      });
     }
-    
-    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${title}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   return (

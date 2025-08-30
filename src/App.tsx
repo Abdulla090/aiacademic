@@ -25,7 +25,7 @@ import withLoading from "./hocs/withLoading";
 import ChatWithFile from "./pages/ChatWithFile";
 import About from "./pages/About";
 import { CustomSidebar } from "./components/CustomSidebar";
-import { SidebarProvider, SidebarTrigger, SidebarInset } from "./components/ui/sidebar";
+import { SidebarProvider, SidebarInset } from "./components/ui/sidebar";
 
 const queryClient = new QueryClient();
 
@@ -51,7 +51,7 @@ const AppContent = () => {
   const ChatWithFileWithLoading = withLoading(ChatWithFile);
  
   return (
-    <SidebarProvider defaultOpen={true}>
+    <SidebarProvider>
       {showSidebar && <CustomSidebar />}
       <SidebarInset>
         <Routes>

@@ -79,67 +79,99 @@ export const TaskPlanner = () => {
     }
   };
   
-  const handleExport = (format: 'text' | 'pdf' = 'text') => {
-    if (tasks.length === 0) return;
-    
-    const taskText = tasks.map((task, index) =>
-      `${index + 1}. ${task.title}\n   ${task.description}\n   کاتی کۆتایی: ${task.deadline}\n   گرنگی: ${getPriorityText(task.priority)}\n   دۆخ: ${getStatusText(task.status)}\n`
-    ).join('\n');
-    
-    if (format === 'pdf') {
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
+  const handleExport = async (format: 'text' | 'pdf' = 'text') => {
+    try {
+      if (tasks.length === 0) {
+        toast({
+          title: 'هەڵە',
+          description: 'هیچ ئەرکێک نییە بۆ دەرهێنان',
+          variant: 'destructive'
+        });
+        return;
+      }
       
-      // Add title
-      doc.setFontSize(16);
-      doc.text('پلانی ئەرکەکان', pageWidth / 2, 20, { align: 'center' });
+      const taskText = tasks.map((task, index) =>
+        `${index + 1}. ${task.title || 'نادیار'}\n   ${task.description || 'نادیار'}\n   کاتی کۆتایی: ${task.deadline || 'نادیار'}\n   گرنگی: ${getPriorityText(task.priority)}\n   دۆخ: ${getStatusText(task.status)}\n`
+      ).join('\n');
       
-      // Add project info
-      doc.setFontSize(12);
-      doc.text(`ناونیشانی پڕۆژە: ${projectTitle}`, 10, 40);
-      doc.text(`کاتی کۆتایی: ${deadline}`, 10, 50);
-      
-      // Add tasks
-      let yPosition = 70;
-      doc.setFontSize(10);
-      
-      tasks.forEach((task, index) => {
-        // Add task info
-        const taskInfo = [
-          `ئەرکی ${index + 1}: ${task.title}`,
-          `وەسف: ${task.description}`,
-          `کاتی کۆتایی: ${task.deadline}`,
-          `گرنگی: ${getPriorityText(task.priority)}`,
-          `دۆخ: ${getStatusText(task.status)}`
-        ];
+      if (format === 'pdf') {
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
         
-        taskInfo.forEach((line, lineIndex) => {
-          doc.text(line, 10, yPosition + (lineIndex * 7));
+        // Add title
+        doc.setFontSize(16);
+        doc.text('پلانی ئەرکەکان', pageWidth / 2, 20, { align: 'center' });
+        
+        // Add project info
+        doc.setFontSize(12);
+        doc.text(`ناونیشانی پڕۆژە: ${projectTitle || 'نادیار'}`, 10, 40);
+        doc.text(`کاتی کۆتایی: ${deadline || 'نادیار'}`, 10, 50);
+        
+        // Add tasks
+        let yPosition = 70;
+        doc.setFontSize(10);
+        
+        tasks.forEach((task, index) => {
+          // Add task info
+          const taskInfo = [
+            `ئەرکی ${index + 1}: ${task.title || 'نادیار'}`,
+            `وەسف: ${task.description || 'نادیار'}`,
+            `کاتی کۆتایی: ${task.deadline || 'نادیار'}`,
+            `گرنگی: ${getPriorityText(task.priority)}`,
+            `دۆخ: ${getStatusText(task.status)}`
+          ];
+          
+          taskInfo.forEach((line, lineIndex) => {
+            // Check if we need a new page
+            if (yPosition > pageHeight - 40) {
+              doc.addPage();
+              yPosition = 20;
+            }
+            
+            doc.text(line, 10, yPosition + (lineIndex * 7));
+          });
+          
+          yPosition += taskInfo.length * 7 + 10;
+          
+          // Add page break if needed
+          if (yPosition > pageHeight - 40) {
+            doc.addPage();
+            yPosition = 20;
+          }
         });
         
-        yPosition += taskInfo.length * 7 + 10;
-        
-        // Add page break if needed
-        if (yPosition > 250) {
-          doc.addPage();
-          yPosition = 20;
-        }
-      });
+        // Save the PDF
+        doc.save('پلانی ئەرکەکان.pdf');
+        toast({
+          title: 'دەرهێنان',
+          description: 'پلانی ئەرکەکان دابەزێنرا'
+        });
+        return;
+      }
       
-      // Save the PDF
-      doc.save('پلانی ئەرکەکان.pdf');
-      return;
+      const blob = new Blob([taskText], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'پلانی ئەرکەکان.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'دەرهێنان',
+        description: 'پلانی ئەرکەکان دابەزێنرا'
+      });
+    } catch (error) {
+      console.error('Export error:', error);
+      toast({
+        title: 'هەڵە',
+        description: 'نەتوانرا فایلەکە دابەزێنرێت',
+        variant: 'destructive'
+      });
     }
-    
-    const blob = new Blob([taskText], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'پلانی ئەرکەکان.txt';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   const getStatusIcon = (status: TaskPlan['status']) => {

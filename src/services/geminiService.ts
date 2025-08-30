@@ -11,6 +11,7 @@ export interface ArticleRequest {
   length: 'short' | 'medium' | 'long';
   citationStyle: CitationStyle['type'];
   includeReferences: boolean;
+  language: string;
 }
 
 export interface ReportSection {
@@ -120,18 +121,19 @@ class GeminiService {
 
   async generateArticle(request: ArticleRequest): Promise<string> {
     const lengthMap = {
-      short: '500-800 وشە',
-      medium: '1000-1500 وشە',
-      long: '2000-3000 وشە'
+      short: '500-800 words',
+      medium: '1000-1500 words',
+      long: '2000-3000 words'
     };
 
     const prompt = `
-    Become an expert academic writer who writes scientific articles in English.
+    Become an expert academic writer who writes scientific articles in ${request.language === 'ku' ? 'Sorani Kurdish' : request.language}.
 
     Topic: ${request.topic}
     Length: ${lengthMap[request.length]}
     Citation Style: ${request.citationStyle}
     ${request.includeReferences ? 'Add References: Yes' : 'Add References: No'}
+    Language: ${request.language}
 
     The article must have the following structure:
     1. Title - A suitable and clear title
@@ -141,7 +143,7 @@ class GeminiService {
     ${request.includeReferences ? '5. References - List of references in ' + request.citationStyle + ' style' : ''}
 
     Instructions:
-    - Language: English
+    - Language: ${request.language}
     - Style: Academic and professional
     - Grammar: Correct and clear
     - The article should be like a real academic paper, not a chat response
@@ -150,18 +152,18 @@ class GeminiService {
     - Use scientific sentences and words
     - Use conjunctions to connect the sections
 
-    Please write the article entirely in English.
+    Please write the article entirely in ${request.language}.
     `;
 
     const response = await this.makeRequest(prompt);
     return response.text;
   }
 
-  async generateReportOutline(topic: string): Promise<ReportOutline> {
+  async generateReportOutline(topic: string, language: string): Promise<ReportOutline> {
     const prompt = `
     Create a detailed, logical, and well-structured academic report outline for the topic: "${topic}".
 
-    The outline should be in English. It must include a clear title and a series of relevant sections that flow logically from one to the next.
+    The outline should be in ${language === 'ku' ? 'Sorani Kurdish' : language}. It must include a clear title and a series of relevant sections that flow logically from one to the next.
 
     IMPORTANT: Respond ONLY with a valid JSON object. Do not include any other text, explanations, or markdown formatting like \`\`\`json. The entire response must be a single JSON object.
 
@@ -198,9 +200,9 @@ class GeminiService {
     }
   }
 
-  async generateReportSection(outline: ReportOutline, sectionName: string, previousSections: ReportSection[]): Promise<string> {
+  async generateReportSection(outline: ReportOutline, sectionName: string, previousSections: ReportSection[], language: string): Promise<string> {
     const contextText = previousSections.length > 0 
-      ? `بەشە پێشووەکان:\n${previousSections.map(s => `${s.title}: ${s.content.substring(0, 200)}...`).join('\n')}`
+      ? `Previous sections:\n${previousSections.map(s => `${s.title}: ${s.content.substring(0, 200)}...`).join('\n')}`
       : '';
 
     const prompt = `
@@ -215,7 +217,7 @@ class GeminiService {
     - Be clear and organized.
     - Contain accurate and correct information.
     - Use academic and formal language.
-    - Be written in English.
+    - Be written in ${language === 'ku' ? 'Sorani Kurdish' : language}.
     - Be related to the other sections of the report.
 
     Length: Approximately 300-500 words.
@@ -232,31 +234,31 @@ class GeminiService {
     return "";
   }
 
-  async checkGrammar(text: string): Promise<GrammarCorrection> {
+  async checkGrammar(text: string, language: string): Promise<GrammarCorrection> {
     const prompt = `
-    ببە بە شارەزایەکی زمانی کوردی سۆرانی. ئەم نوسینەی خوارەوە بپشکنە و هەڵەکانی ڕێزمان، ڕێنووس و ستایل ڕاست بکەرەوە:
+    Become an expert in ${language === 'ku' ? 'Sorani Kurdish' : language} grammar. Check the following text and correct any grammar, spelling, and style mistakes:
 
     "${text}"
 
-    پێداویستییەکان:
-    - هەڵەکانی ڕێزمان دیاری بکە و ڕاست بکەرەوە
-    - ڕێنووس و خاڵبەندی باشتر بکە
-    - وشەسازی گونجاوتر پێشنیار بکە
-    - ڕستەکان ڕوونتر و خوێندراوتر بکە
-    - بەکارهێنانی هاوکێشەکان بۆ گرێدانی ڕستەکان
-    - دڵنیابە کە نووسینەکە بە شێوەیەکی ئەکادیمی و فۆرمەڵ بێت
+    Requirements:
+    - Identify and correct grammar mistakes
+    - Improve spelling and punctuation
+    - Suggest better vocabulary
+    - Make sentences clearer and more readable
+    - Use conjunctions to connect sentences
+    - Ensure the text is in a formal, academic style
 
-    وەڵامەکە بە JSON فۆرماتی خوارەوە بدەرەوە:
+    Provide the response in the following JSON format:
     {
-      "original": "نووسینی سەرەتایی",
-      "corrected": "نووسینی ڕاستکراوە",
+      "original": "The original text",
+      "corrected": "The corrected text",
       "suggestions": [
-        "پێشنیار 1: وردەکاری لەسەر هەڵەیەکی دیاریکراو",
-        "پێشنیار 2: وردەکاری لەسەر هەڵەیەکی دیاریکراو"
+        "Suggestion 1: Details about a specific mistake",
+        "Suggestion 2: Details about another mistake"
       ]
     }
     
-    وەڵامەکە دەبێت تەنها چاککردنەوەی ڕێزمان بێت، نەک دەقێکی نوێ. دڵنیابە کە هەڵەکان بە دیارییەوە دیاری بکەیت و ڕاست بکەیتەوە.
+    The response should only be a grammar correction, not a new text. Be sure to identify and correct the mistakes specifically.
     `;
 
     const response = await this.makeRequest(prompt);
@@ -266,7 +268,7 @@ class GeminiService {
       return {
         original: text,
         corrected: text,
-        suggestions: ['هیچ گۆڕانکاریەک پێویست نییە']
+        suggestions: ['No changes needed']
       };
     }
   }
@@ -341,25 +343,25 @@ class GeminiService {
 
   async summarizeText(text: string, length: 'short' | 'medium' | 'detailed'): Promise<string> {
     const lengthMap = {
-      short: '2-3 ڕستە',
-      medium: '1 پەرەگراف',
-      detailed: '2-3 پەرەگراف'
+      short: '2-3 sentences',
+      medium: '1 paragraph',
+      detailed: '2-3 paragraphs'
     };
 
     const prompt = `
-    ئەم نووسینەی خوارەوە بە کوردی سۆرانی کورت بکەرەوە:
+    Summarize the following text in Sorani Kurdish:
 
     "${text}"
 
-    درێژی کورتکردنەوە: ${lengthMap[length]}
+    Summary length: ${lengthMap[length]}
     
-    پێداویستییەکان:
-    - گرنگترین خاڵەکان بپارێزە
-    - زمانی ڕوون و گونجاو بەکاربهێنە
-    - واتای سەرەکی لەدەست نەدە
-    - بە کوردی سۆرانی بنووسە
+    Requirements:
+    - Preserve the most important points
+    - Use clear and concise language
+    - Do not lose the main meaning
+    - Write in Sorani Kurdish
     
-    کورتکردنەوەکە دەبێت وەک ڕاپۆرتێکی کورت بێت، نەک وەڵامێکی چات. دڵنیابە کە زانیاری گرنگەکان لەخۆدەگرێت.
+    The summary should be like a short report, not a chat response. Make sure it contains the important information.
     `;
 
     const response = await this.makeRequest(prompt);
@@ -368,17 +370,17 @@ class GeminiService {
 
   async paraphraseText(text: string): Promise<string> {
     const prompt = `
-    ئەم نووسینەی خوارەوە بە شێوەیەکی جیاواز و بە واتایەکی هەمان بنووسەرەوە:
+    Rewrite the following text in a different way, but with the same meaning:
 
     "${text}"
 
-    پێداویستییەکان:
-    - واتای سەرەکی هەمان بمێنێتەوە
-    - وشە و ڕستەکان بگۆڕە
-    - ستایلی نووسین جیاواز بکە
-    - زمانی کوردی سۆرانی بەکاربهێنە
+    Requirements:
+    - The main meaning should remain the same
+    - Change the words and sentences
+    - Use a different writing style
+    - Use Sorani Kurdish
     
-    نووسینەوەکە دەبێت وەک دەقێکی ئەکادیمی دووبارە بێت، نەک وەڵامێکی چات. دڵنیابە کە واتاکە هەمان بمێنێتەوە بەڵام بە شێوەیەکی جیاواز.
+    The rewritten text should be like a rewritten academic text, not a chat response. Make sure the meaning remains the same, but in a different way.
     `;
 
     const response = await this.makeRequest(prompt);
@@ -387,27 +389,27 @@ class GeminiService {
 
   async generateTaskPlan(projectTitle: string, deadline: string, details: string): Promise<TaskPlan[]> {
     const prompt = `
-    بۆ پڕۆژەی "${projectTitle}" کە دەبێت لە "${deadline}" تەواو بێت، پلانێکی ورد دروست بکە.
+    For the project "${projectTitle}" which must be completed by "${deadline}", create a detailed plan.
 
-    وردەکارییەکان: ${details}
+    Details: ${details}
 
-    پلانەکە دەبێت:
-    - ئەرکەکان بە ڕێکخستنی کاتی دابەش بکات
-    - گرنگی هەر ئەرکێک دیاری بکات
-    - کاتی ڕەنگبەرەنگ بۆ تەواوکردن تەرخان بکات
+    The plan must:
+    - Divide the tasks chronologically
+    - Specify the importance of each task
+    - Allocate a reasonable time for completion
 
-    وەڵامەکە بە JSON فۆرماتی خوارەوە بدەرەوە:
+    Provide the response in the following JSON format:
     [
       {
-        "title": "ناونیشانی ئەرک",
-        "description": "وەسفی ئەرک",
+        "title": "Task Title",
+        "description": "Task Description",
         "deadline": "YYYY-MM-DD",
         "priority": "high/medium/low",
         "status": "pending"
       }
     ]
     
-    پلانەکە دەبێت بۆ پڕۆژەی ڕاستەقینەی ئەکادیمی بێت، نەک وەڵامێکی چات. دڵنیابە کە ئەرکەکان ڕاستەقینە و پەیوەندیدار بن.
+    The plan should be for a real academic project, not a chat response. Make sure the tasks are realistic and relevant.
     `;
 
     const response = await this.makeRequest(prompt);

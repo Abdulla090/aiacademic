@@ -11,8 +11,13 @@ import { Download, Copy, RefreshCw, PenTool } from 'lucide-react';
 import { geminiService, type ArticleRequest } from '@/services/geminiService';
 import { useToast } from '@/components/ui/use-toast';
 import { jsPDF } from "jspdf";
+import { notoNaskhArabic } from '@/lib/fonts';
 
-export const ArticleWriter = () => {
+interface ArticleWriterProps {
+  language: string;
+}
+
+export const ArticleWriter = ({ language }: ArticleWriterProps) => {
   const [article, setArticle] = useState('');
   const [loading, setLoading] = useState(false);
   const [previewMode, setPreviewMode] = useState<'edit' | 'preview'>('edit');
@@ -20,7 +25,8 @@ export const ArticleWriter = () => {
     topic: '',
     length: 'medium',
     citationStyle: 'APA',
-    includeReferences: true
+    includeReferences: true,
+    language: 'en'
   });
   const { toast } = useToast();
 
@@ -36,7 +42,7 @@ export const ArticleWriter = () => {
 
     setLoading(true);
     try {
-      const result = await geminiService.generateArticle(request);
+      const result = await geminiService.generateArticle({ ...request, language });
       setArticle(result);
       toast({
         title: 'سەرکەوتوو',
@@ -69,56 +75,80 @@ export const ArticleWriter = () => {
     }
   };
 
-  const handleDownload = (format: 'text' | 'pdf' = 'text') => {
-    if (format === 'pdf') {
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      let yPosition = 20;
-      
-      // Add title
-      doc.setFontSize(18);
-      doc.setFont(undefined, 'bold');
-      const titleLines = doc.splitTextToSize(request.topic, pageWidth - 20);
-      doc.text(titleLines, pageWidth / 2, yPosition, { align: 'center' });
-      yPosition += (titleLines.length * 10) + 10;
-      
-      // Add article content
-      doc.setFontSize(12);
-      doc.setFont(undefined, 'normal');
-      const splitText = doc.splitTextToSize(article, pageWidth - 20);
-      
-      // Add content page by page
-      for (let i = 0; i < splitText.length; i++) {
-        // Check if we need a new page
-        if (yPosition > pageHeight - 20) {
-          doc.addPage();
-          yPosition = 20;
+  const handleDownload = async (format: 'text' | 'pdf' = 'text') => {
+    try {
+      if (format === 'pdf') {
+        const doc = new jsPDF();
+        
+        // Add Arabic/Kurdish font support
+        if (language === 'ku' || language === 'ar') {
+          // Add font to VFS and register it
+          doc.addFileToVFS('NotoNaskhArabic-Regular.ttf', notoNaskhArabic);
+          doc.addFont('NotoNaskhArabic-Regular.ttf', 'NotoNaskhArabic', 'normal');
+          doc.setFont('NotoNaskhArabic');
+        }
+
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        let yPosition = 20;
+        
+        doc.setFontSize(18);
+        const titleLines = doc.splitTextToSize(request.topic || 'Article', pageWidth - 20);
+        doc.text(titleLines, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += (titleLines.length * 10) + 10;
+        
+        doc.setFontSize(12);
+        const splitText = doc.splitTextToSize(article || '', pageWidth - 20);
+        
+        for (let i = 0; i < splitText.length; i++) {
+          if (yPosition > pageHeight - 20) {
+            doc.addPage();
+            yPosition = 20;
+            // Reset font for new page
+            if (language === 'ku' || language === 'ar') {
+              doc.setFont('NotoNaskhArabic');
+            }
+          }
+          
+          // Handle RTL alignment for Kurdish/Arabic
+          if (language === 'ku' || language === 'ar') {
+            doc.text(splitText[i], pageWidth - 10, yPosition, { align: 'right' });
+          } else {
+            doc.text(splitText[i], 10, yPosition);
+          }
+          yPosition += 7;
         }
         
-        doc.text(splitText[i], 10, yPosition);
-        yPosition += 7;
+        doc.save(`${(request.topic || 'article').substring(0, 50)}.pdf`);
+        toast({
+          title: 'دابەزاندن',
+          description: 'PDF دابەزێنرا'
+        });
+        return;
       }
       
-      // Save the PDF
-      doc.save(`${request.topic.substring(0, 50)}.pdf`);
-      return;
+      const blob = new Blob([article], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${(request.topic || 'article').substring(0, 50)}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'دابەزاندن',
+        description: 'بابەتەکە دابەزێنرا'
+      });
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({
+        title: 'هەڵە',
+        description: 'نەتوانرا فایلەکە دابەزێنرێت',
+        variant: 'destructive'
+      });
     }
-    
-    const blob = new Blob([article], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${request.topic.substring(0, 50)}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    toast({
-      title: 'دابەزاندن',
-      description: 'بابەتەکە دابەزێنرا'
-    });
   };
 
   return (

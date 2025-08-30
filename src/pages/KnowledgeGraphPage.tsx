@@ -13,11 +13,11 @@ const KnowledgeGraphPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-subtle p-8">
-      <h1 className="text-4xl font-bold text-foreground mb-8 text-center">
+    <div className="min-h-screen bg-gradient-subtle p-4 sm:p-8">
+      <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-6 sm:mb-8 text-center">
         {t('knowledgeGraphPageTitle')}
       </h1>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         <div>
           <KnowledgeGraphGenerator onGenerateGraph={handleGenerateGraph} />
         </div>
@@ -25,15 +25,15 @@ const KnowledgeGraphPage: React.FC = () => {
           {graphData ? (
             <Card className="card-academic h-full">
               <CardHeader>
-                <CardTitle>{t('generatedKnowledgeGraph')}</CardTitle>
+                <CardTitle className="text-xl sm:text-2xl">{t('generatedKnowledgeGraph')}</CardTitle>
               </CardHeader>
-              <CardContent className="h-[500px]"> {/* Adjust height as needed */}
+              <CardContent className="h-[400px] sm:h-[500px]"> {/* Adjust height as needed */}
                 <MindMapGenerator nodes={graphData.nodes} edges={graphData.edges} />
               </CardContent>
             </Card>
           ) : (
             <Card className="card-academic h-full flex items-center justify-center">
-              <CardContent className="text-muted-foreground text-center">
+              <CardContent className="text-muted-foreground text-center p-4">
                 {t('enterTextToGenerateGraph')}
               </CardContent>
             </Card>
