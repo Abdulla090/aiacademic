@@ -7,8 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { FileText, ChevronRight, Check, Download, RefreshCw, Pause, Play, Square } from 'lucide-react';
 import { geminiService, type ReportOutline, type ReportSection } from '@/services/geminiService';
 import { useToast } from '@/components/ui/use-toast';
-import { jsPDF } from "jspdf";
-import { notoNaskhArabic } from '@/lib/fonts';
+import html2pdf from 'html2pdf.js';
 import { TypingIndicator } from '@/components/ui/typing-indicator';
 import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
 import { FormattingControls } from '@/components/ui/formatting-controls';
@@ -16,6 +15,56 @@ import { FormattingControls } from '@/components/ui/formatting-controls';
 interface ReportGeneratorProps {
   language: string;
 }
+
+const convertMarkdownToHtml = (markdown: string): string => {
+  let html = markdown;
+  
+  // Convert headers (must be done before other formatting)
+  html = html.replace(/^######\s+(.+)$/gm, '<h6>$1</h6>');
+  html = html.replace(/^#####\s+(.+)$/gm, '<h5>$1</h5>');
+  html = html.replace(/^####\s+(.+)$/gm, '<h4>$1</h4>');
+  html = html.replace(/^###\s+(.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^##\s+(.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^#\s+(.+)$/gm, '<h1>$1</h1>');
+  
+  // Convert bold and italic (handle bold+italic first)
+  html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  
+  // Convert code blocks
+  html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  
+  // Convert blockquotes
+  html = html.replace(/^>\s*(.+)$/gm, '<blockquote>$1</blockquote>');
+  
+  // Convert horizontal rules
+  html = html.replace(/^[-*_]{3,}$/gm, '<hr>');
+  
+  // Convert unordered lists
+  html = html.replace(/^\s*[-*+]\s+(.+)$/gm, '<li>$1</li>');
+  html = html.replace(/(<li>.*<\/li>)/gs, (match) => {
+    if (!match.includes('<ul>') && !match.includes('<ol>')) {
+      return `<ul>${match}</ul>`;
+    }
+    return match;
+  });
+  
+  // Convert ordered lists
+  html = html.replace(/^\s*\d+\.\s+(.+)$/gm, '<li>$1</li>');
+  // Note: This is simplified - a more robust solution would handle nested lists properly
+  
+  // Convert line breaks to paragraphs
+  html = html.split('\n\n').map(paragraph => {
+    if (paragraph.trim() && !paragraph.includes('<h') && !paragraph.includes('<ul>') && !paragraph.includes('<ol>') && !paragraph.includes('<blockquote>') && !paragraph.includes('<pre>') && !paragraph.includes('<hr>')) {
+      return `<p>${paragraph.replace(/\n/g, '<br>')}</p>`;
+    }
+    return paragraph.replace(/\n/g, '<br>');
+  }).join('\n');
+  
+  return html;
+};
 
 export const ReportGenerator = ({ language }: ReportGeneratorProps) => {
   const reportRef = useRef<HTMLDivElement | null>(null);
@@ -129,9 +178,12 @@ export const ReportGenerator = ({ language }: ReportGeneratorProps) => {
     }
   };
 
-  const handleDownloadReport = async (format: 'text' | 'pdf' = 'text') => {
+  const handleDownloadReport = async (format: 'text' | 'pdf' = 'text', singleSection: ReportSection | null = null) => {
     try {
-      if (!outline || sections.length === 0) {
+      const sectionsToExport = singleSection ? [singleSection] : sections;
+      const titleToUse = singleSection ? singleSection.title : outline?.title || 'Report';
+      
+      if (sectionsToExport.length === 0) {
         toast({
           title: 'هەڵە',
           description: 'ڕاپۆرتەکە بەتاڵە',
@@ -141,257 +193,223 @@ export const ReportGenerator = ({ language }: ReportGeneratorProps) => {
       }
       
       if (format === 'pdf') {
-        const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        let yPosition = 40;
-        
-        // Add Arabic/Kurdish font support
-        if (language === 'ku' || language === 'ar') {
-          // Add font to VFS and register it
-          pdf.addFileToVFS('NotoNaskhArabic-Regular.ttf', notoNaskhArabic);
-          pdf.addFont('NotoNaskhArabic-Regular.ttf', 'NotoNaskhArabic', 'normal');
-          pdf.setFont('NotoNaskhArabic');
-        }
+        // Show loading toast
+        toast({
+          title: 'دروستکردنی PDF',
+          description: 'تکایە چاوەڕوان بە...',
+        });
 
-        // Add title
-        pdf.setFontSize(20);
-        pdf.setFont(undefined, 'bold');
-        const titleLines = pdf.splitTextToSize(outline.title || 'Report', pageWidth - 40);
-        pdf.text(titleLines, pageWidth / 2, yPosition, { align: 'center' });
-        yPosition += (titleLines.length * 25) + 20;
+        const isRTL = language === 'ku' || language === 'ar';
         
-        // Reset font
-        pdf.setFont(undefined, 'normal');
-        pdf.setFontSize(12);
-        
-        // Process each section with markdown formatting
-        for (const section of sections) {
-          // Check if we need a new page
-          if (yPosition > pageHeight - 40) {
-            pdf.addPage();
-            yPosition = 40;
-            // Reset font for new page
-            if (language === 'ku' || language === 'ar') {
-              pdf.setFont('NotoNaskhArabic');
-            }
-            pdf.setFontSize(12);
-          }
-          
-          // Add section title with formatting
-          pdf.setFontSize(16);
-          pdf.setFont(undefined, 'bold');
-          const sectionTitleLines = pdf.splitTextToSize(section.title, pageWidth - 40);
-          pdf.text(sectionTitleLines, language === 'ku' || language === 'ar' ? pageWidth - 20 : 20, yPosition, {
-            align: language === 'ku' || language === 'ar' ? 'right' : 'left'
-          });
-          yPosition += (sectionTitleLines.length * 20) + 15;
-          
-          // Reset font for content
-          pdf.setFont(undefined, 'normal');
-          pdf.setFontSize(12);
-          
-          // Process section content with markdown formatting
-          const lines = (section.content || '').split('\n');
-          let currentListItems: string[] = [];
-          let currentListType: 'ul' | 'ol' | null = null;
-          let inCodeBlock = false;
-          
-          const flushList = () => {
-            if (currentListItems.length > 0) {
-              currentListItems.forEach((item, index) => {
-                // Check if we need a new page
-                if (yPosition > pageHeight - 30) {
-                  pdf.addPage();
-                  yPosition = 40;
-                  // Reset font for new page
-                  if (language === 'ku' || language === 'ar') {
-                    pdf.setFont('NotoNaskhArabic');
-                  }
-                  pdf.setFontSize(12);
+        try {
+          // Create complete HTML document like ArticleWriter does
+          const htmlContent = `
+            <!DOCTYPE html>
+            <html lang="${language === 'ku' ? 'ku' : language === 'ar' ? 'ar' : 'en'}" dir="${isRTL ? 'rtl' : 'ltr'}">
+            <head>
+              <meta charset="UTF-8">
+              <style>
+                @import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;700&display=swap');
+                
+                body {
+                  font-family: 'Noto Naskh Arabic', 'Arial Unicode MS', Arial, sans-serif;
+                  font-size: 14px;
+                  line-height: 1.6;
+                  color: #333;
+                  max-width: 800px;
+                  margin: 0 auto;
+                  padding: 20px;
+                  direction: ${isRTL ? 'rtl' : 'ltr'};
+                  text-align: ${isRTL ? 'right' : 'left'};
                 }
                 
-                const bullet = currentListType === 'ol' ? `${index + 1}. ` : '• ';
-                const itemText = `${bullet}${item}`;
-                const itemLines = pdf.splitTextToSize(itemText, pageWidth - 50);
+                h1 {
+                  font-size: 24px;
+                  font-weight: bold;
+                  text-align: center;
+                  margin-bottom: 30px;
+                  color: #2c3e50;
+                  border-bottom: 2px solid #3498db;
+                  padding-bottom: 10px;
+                }
                 
-                pdf.text(itemLines, language === 'ku' || language === 'ar' ? pageWidth - 30 : 30, yPosition, {
-                  align: language === 'ku' || language === 'ar' ? 'right' : 'left'
-                });
-                yPosition += itemLines.length * 15 + 3;
-              });
-              currentListItems = [];
-              currentListType = null;
+                h2 {
+                  font-size: 20px;
+                  font-weight: bold;
+                  margin-top: 25px;
+                  margin-bottom: 15px;
+                  color: #34495e;
+                  border-${isRTL ? 'right' : 'left'}: 4px solid #3498db;
+                  padding-${isRTL ? 'right' : 'left'}: 15px;
+                }
+                
+                h3 {
+                  font-size: 18px;
+                  font-weight: bold;
+                  margin-top: 20px;
+                  margin-bottom: 12px;
+                  color: #34495e;
+                }
+                
+                h4, h5, h6 {
+                  font-size: 16px;
+                  font-weight: bold;
+                  margin-top: 15px;
+                  margin-bottom: 10px;
+                  color: #34495e;
+                }
+                
+                p {
+                  margin-bottom: 12px;
+                  text-align: justify;
+                }
+                
+                ul, ol {
+                  margin-bottom: 15px;
+                  padding-${isRTL ? 'right' : 'left'}: 25px;
+                }
+                
+                li {
+                  margin-bottom: 8px;
+                }
+                
+                blockquote {
+                  border-${isRTL ? 'right' : 'left'}: 4px solid #3498db;
+                  padding-${isRTL ? 'right' : 'left'}: 15px;
+                  margin: 15px 0;
+                  background-color: #f8f9fa;
+                  font-style: italic;
+                }
+                
+                code {
+                  background-color: #f4f4f4;
+                  padding: 2px 4px;
+                  border-radius: 3px;
+                  font-family: 'Courier New', monospace;
+                  font-size: 13px;
+                }
+                
+                pre {
+                  background-color: #f4f4f4;
+                  padding: 15px;
+                  border-radius: 5px;
+                  overflow-x: auto;
+                  margin: 15px 0;
+                }
+                
+                pre code {
+                  background: none;
+                  padding: 0;
+                }
+                
+                strong {
+                  font-weight: bold;
+                }
+                
+                em {
+                  font-style: italic;
+                }
+                
+                hr {
+                  border: none;
+                  height: 1px;
+                  background-color: #ddd;
+                  margin: 20px 0;
+                }
+                
+                .header-info {
+                  text-align: center;
+                  font-size: 12px;
+                  color: #666;
+                  margin-bottom: 20px;
+                  border-bottom: 1px solid #eee;
+                  padding-bottom: 15px;
+                }
+                
+                .section {
+                  margin-bottom: 30px;
+                  page-break-inside: avoid;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="header-info">
+                <strong>AI Academic Hub</strong><br>
+                Generated on: ${new Date().toLocaleDateString(language === 'ku' ? 'ku-Arab-IQ' : language === 'ar' ? 'ar-IQ' : 'en-US')}
+              </div>
+              
+              <h1>${titleToUse}</h1>
+              
+              ${sectionsToExport.map((section, index) => {
+                const cleanContent = (section.content || '').trim();
+                if (!cleanContent) return '';
+                
+                // Use the proper markdown conversion function
+                const processedContent = convertMarkdownToHtml(cleanContent);
+                
+                return `
+                  <div class="section">
+                    <h2>${section.title}</h2>
+                    <div>${processedContent}</div>
+                  </div>
+                `;
+              }).join('')}
+            </body>
+            </html>
+          `;
+
+          // Use the exact same configuration as ArticleWriter
+          const options = {
+            margin: [0.5, 0.5, 0.5, 0.5],
+            filename: `${titleToUse.substring(0, 50)}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { 
+              scale: 2,
+              useCORS: true,
+              letterRendering: true,
+              allowTaint: true
+            },
+            jsPDF: { 
+              unit: 'in', 
+              format: 'a4', 
+              orientation: 'portrait'
             }
           };
+
+          console.log('PDF Generation - Using ArticleWriter approach');
+          console.log('HTML length:', htmlContent.length);
+          console.log('Title:', titleToUse);
+          console.log('Sections:', sectionsToExport.length);
+
+          // Generate PDF using the exact same method as ArticleWriter
+          await html2pdf().set(options).from(htmlContent).save();
           
-          for (const line of lines) {
-            // Check if we need a new page
-            if (yPosition > pageHeight - 40) {
-              pdf.addPage();
-              yPosition = 40;
-              // Reset font for new page
-              if (language === 'ku' || language === 'ar') {
-                pdf.setFont('NotoNaskhArabic');
-              }
-              pdf.setFontSize(12);
-            }
-            
-            // Handle code blocks
-            if (line.trim().startsWith('```')) {
-              flushList();
-              inCodeBlock = !inCodeBlock;
-              continue;
-            }
-            
-            if (inCodeBlock) {
-              const codeLines = pdf.splitTextToSize(line, pageWidth - 50);
-              pdf.setFontSize(10);
-              codeLines.forEach(codeLine => {
-                // Check if we need a new page
-                if (yPosition > pageHeight - 40) {
-                  pdf.addPage();
-                  yPosition = 40;
-                  // Reset font for new page
-                  if (language === 'ku' || language === 'ar') {
-                    pdf.setFont('NotoNaskhArabic');
-                  }
-                  pdf.setFontSize(10);
-                }
-                pdf.text(codeLine, language === 'ku' || language === 'ar' ? pageWidth - 35 : 35, yPosition, {
-                  align: language === 'ku' || language === 'ar' ? 'right' : 'left'
-                });
-                yPosition += 15;
-              });
-              pdf.setFontSize(12);
-              continue;
-            }
-            
-            // Handle headers
-            const headerMatch = line.match(/^(#{1,6})\s+(.+)$/);
-            if (headerMatch) {
-              flushList();
-              const level = headerMatch[1].length;
-              const text = headerMatch[2];
-              const headerSize = 20 - (level * 2);
-              pdf.setFontSize(headerSize);
-              pdf.setFont(undefined, 'bold');
-              const headerLines = pdf.splitTextToSize(text, pageWidth - 40);
-              pdf.text(headerLines, language === 'ku' || language === 'ar' ? pageWidth - 20 : 20, yPosition, {
-                align: language === 'ku' || language === 'ar' ? 'right' : 'left'
-              });
-              yPosition += (headerLines.length * (headerSize * 0.7)) + 15;
-              pdf.setFont(undefined, 'normal');
-              pdf.setFontSize(12);
-              continue;
-            }
-            
-            // Handle unordered lists
-            const ulMatch = line.match(/^\s*[-*+]\s+(.+)$/);
-            if (ulMatch) {
-              if (currentListType !== 'ul') {
-                flushList();
-                currentListType = 'ul';
-              }
-              currentListItems.push(ulMatch[1]);
-              continue;
-            }
-            
-            // Handle ordered lists
-            const olMatch = line.match(/^\s*\d+\.\s+(.+)$/);
-            if (olMatch) {
-              if (currentListType !== 'ol') {
-                flushList();
-                currentListType = 'ol';
-              }
-              currentListItems.push(olMatch[1]);
-              continue;
-            }
-            
-            // Handle blockquotes
-            if (line.trim().startsWith('>')) {
-              flushList();
-              const quoteText = line.replace(/^\s*>\s*/, '');
-              pdf.setFont(undefined, 'italic');
-              const quoteLines = pdf.splitTextToSize(quoteText, pageWidth - 60);
-              quoteLines.forEach((quoteLine, index) => {
-                // Check if we need a new page
-                if (yPosition > pageHeight - 40) {
-                  pdf.addPage();
-                  yPosition = 40;
-                  // Reset font for new page
-                  if (language === 'ku' || language === 'ar') {
-                    pdf.setFont('NotoNaskhArabic');
-                  }
-                  pdf.setFont(undefined, 'italic');
-                }
-                pdf.text(quoteLine, language === 'ku' || language === 'ar' ? pageWidth - 40 : 40, yPosition, {
-                  align: language === 'ku' || language === 'ar' ? 'right' : 'left'
-                });
-                yPosition += 15;
-              });
-              pdf.setFont(undefined, 'normal');
-              yPosition += 5;
-              continue;
-            }
-            
-            // Handle horizontal rules
-            if (line.trim().match(/^[-*_]{3,}$/)) {
-              flushList();
-              pdf.line(20, yPosition, pageWidth - 20, yPosition);
-              yPosition += 15;
-              continue;
-            }
-            
-            // Handle empty lines
-            if (line.trim() === '') {
-              flushList();
-              yPosition += 15;
-              continue;
-            }
-            
-            // Handle regular paragraphs with inline formatting
-            flushList();
-            let formattedLine = line;
-            
-            // Handle bold text (**text**)
-            const boldMatches = [...formattedLine.matchAll(/\*\*(.*?)\*\*/g)];
-            if (boldMatches.length > 0) {
-              // For simplicity, we'll just remove the bold markers and add a note
-              formattedLine = formattedLine.replace(/\*\*(.*?)\*\*/g, '$1');
-            }
-            
-            // Handle italic text (*text*)
-            const italicMatches = [...formattedLine.matchAll(/\*(.*?)\*/g)];
-            if (italicMatches.length > 0) {
-              // For simplicity, we'll just remove the italic markers and add a note
-              formattedLine = formattedLine.replace(/\*(.*?)\*/g, '$1');
-            }
-            
-            const splitText = pdf.splitTextToSize(formattedLine, pageWidth - 40);
-            pdf.text(splitText, language === 'ku' || language === 'ar' ? pageWidth - 20 : 20, yPosition, {
-              align: language === 'ku' || language === 'ar' ? 'right' : 'left'
-            });
-            yPosition += splitText.length * 15 + 3;
-          }
+          toast({ 
+            title: 'سەرکەوتوو', 
+            description: singleSection ? `بەشی "${singleSection.title}" وەک PDF دابەزێنرا` : 'ڕاپۆرتی تەواو وەک PDF دابەزێنرا'
+          });
           
-          // Flush any remaining list
-          flushList();
-          
-          yPosition += 20; // Space between sections
+        } catch (error) {
+          console.error('PDF Generation Error:', error);
+          toast({
+            title: 'هەڵە',
+            description: 'نەتوانرا PDF دروست بکرێت: ' + error.message,
+            variant: 'destructive'
+          });
         }
-        
-        pdf.save(`${(outline.title || 'report').substring(0, 50)}.pdf`);
-        toast({ title: 'دابەزاندن', description: 'PDF دابەزێنرا' });
         return;
       }
       
-      const reportText = `${outline.title}\n\n${sections.map(section => `${section.title}\n\n${section.content}\n\n`).join('')}`;
+      // Text format download
+      const reportText = singleSection 
+        ? `${singleSection.title}\n\n${singleSection.content}`
+        : `${outline?.title}\n\n${sectionsToExport.map(section => `${section.title}\n\n${section.content}\n\n`).join('')}`;
+      
       const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${(outline.title || 'report').substring(0, 50)}.txt`;
+      a.download = `${titleToUse.substring(0, 50).replace(/[^a-zA-Z0-9\u0600-\u06FF\s]/g, '')}.txt`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -399,7 +417,7 @@ export const ReportGenerator = ({ language }: ReportGeneratorProps) => {
       
       toast({
         title: 'دابەزاندن',
-        description: 'ڕاپۆرتەکە دابەزێنرا'
+        description: singleSection ? `بەشی "${singleSection.title}" دابەزێنرا` : 'ڕاپۆرتی تەواو دابەزێنرا'
       });
     } catch (error) {
       console.error('Download error:', error);
@@ -557,7 +575,29 @@ export const ReportGenerator = ({ language }: ReportGeneratorProps) => {
               <div className="space-y-6">
                 {sections.map((section, index) => (
                   <div key={index} className="border-l-4 border-primary/30 pl-4">
-                    <h3 className="font-bold text-lg mb-3 sorani-text">{section.title}</h3>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-bold text-lg sorani-text">{section.title}</h3>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDownloadReport('text', section)}
+                          className="text-xs"
+                        >
+                          <Download className="h-3 w-3 mr-1" />
+                          دەق
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDownloadReport('pdf', section)}
+                          className="text-xs"
+                        >
+                          <Download className="h-3 w-3 mr-1" />
+                          PDF
+                        </Button>
+                      </div>
+                    </div>
                     {showFormatting ? (
                       <RichTextRenderer 
                         content={section.content}
