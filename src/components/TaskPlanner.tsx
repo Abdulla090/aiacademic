@@ -8,6 +8,7 @@ import { Calendar, Clock, CheckCircle, Circle, AlertCircle, RefreshCw, Plus, Dow
 import { geminiService, type TaskPlan } from '@/services/geminiService';
 import { useToast } from '@/components/ui/use-toast';
 import { jsPDF } from "jspdf";
+import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
 
 export const TaskPlanner = () => {
   const [projectTitle, setProjectTitle] = useState('');
@@ -101,44 +102,59 @@ export const TaskPlanner = () => {
         
         // Add title
         doc.setFontSize(16);
+        doc.setFont(undefined, 'bold');
         doc.text('پلانی ئەرکەکان', pageWidth / 2, 20, { align: 'center' });
         
-        // Add project info
+        // Reset font
+        doc.setFont(undefined, 'normal');
         doc.setFontSize(12);
+        
+        // Add project info
         doc.text(`ناونیشانی پڕۆژە: ${projectTitle || 'نادیار'}`, 10, 40);
         doc.text(`کاتی کۆتایی: ${deadline || 'نادیار'}`, 10, 50);
         
-        // Add tasks
+        // Add tasks with better formatting
         let yPosition = 70;
         doc.setFontSize(10);
         
         tasks.forEach((task, index) => {
-          // Add task info
-          const taskInfo = [
-            `ئەرکی ${index + 1}: ${task.title || 'نادیار'}`,
+          // Check if we need a new page
+          if (yPosition > pageHeight - 60) {
+            doc.addPage();
+            yPosition = 20;
+            doc.setFontSize(10);
+          }
+          
+          // Add task title with bold formatting
+          doc.setFont(undefined, 'bold');
+          doc.text(`ئەرکی ${index + 1}: ${task.title || 'نادیار'}`, 10, yPosition);
+          yPosition += 10;
+          
+          // Reset font for task details
+          doc.setFont(undefined, 'normal');
+          
+          // Add task details
+          const taskDetails = [
             `وەسف: ${task.description || 'نادیار'}`,
             `کاتی کۆتایی: ${task.deadline || 'نادیار'}`,
             `گرنگی: ${getPriorityText(task.priority)}`,
             `دۆخ: ${getStatusText(task.status)}`
           ];
           
-          taskInfo.forEach((line, lineIndex) => {
+          taskDetails.forEach((line, lineIndex) => {
             // Check if we need a new page
             if (yPosition > pageHeight - 40) {
               doc.addPage();
               yPosition = 20;
+              doc.setFontSize(10);
+              doc.setFont(undefined, 'normal');
             }
             
-            doc.text(line, 10, yPosition + (lineIndex * 7));
+            doc.text(line, 15, yPosition);
+            yPosition += 7;
           });
           
-          yPosition += taskInfo.length * 7 + 10;
-          
-          // Add page break if needed
-          if (yPosition > pageHeight - 40) {
-            doc.addPage();
-            yPosition = 20;
-          }
+          yPosition += 15; // Space between tasks
         });
         
         // Save the PDF
@@ -320,7 +336,13 @@ export const TaskPlanner = () => {
                           </button>
                           <h3 className="font-semibold sorani-text">{task.title}</h3>
                         </div>
-                        <p className="text-sm text-muted-foreground sorani-text">{task.description}</p>
+                        <div className="sorani-text text-sm text-muted-foreground">
+                          <RichTextRenderer
+                            content={task.description}
+                            showCopyButton={false}
+                            className="sorani-text"
+                          />
+                        </div>
                       </div>
                     </div>
                     

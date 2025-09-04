@@ -12,6 +12,7 @@ import { readFileContent } from '@/lib/fileReader';
 import Reveal from 'reveal.js';
 import 'reveal.js/dist/reveal.css';
 import 'reveal.js/dist/theme/white.css';
+import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
 
 export const PresentationGenerator = () => {
   const [text, setText] = useState('');
@@ -77,8 +78,16 @@ export const PresentationGenerator = () => {
     if (file) {
       try {
         const content = await readFileContent(file);
-        setText(content);
-        await triggerGeneration(content);
+        if (typeof content === 'string') {
+          setText(content);
+          await triggerGeneration(content);
+        } else {
+          toast({
+            title: 'جۆری فایل پشتگیری نەکراوە',
+            description: 'دەرهێنانی دەق لە فایلەکانی PDF لە ئێستادا بۆ دروستکردنی پێشکەشکردن بەردەست نییە.',
+            variant: 'destructive',
+          });
+        }
       } catch (error) {
         toast({
           title: 'هەڵە لە خوێندنەوەی فایل',
@@ -169,14 +178,30 @@ export const PresentationGenerator = () => {
                     <div className="h-full w-full flex flex-col justify-center items-center text-center p-8">
                       {slide.layout === 'title' ? (
                         <>
-                          <h1 className="text-5xl font-bold mb-4">{slide.title}</h1>
-                          <p className="text-xl">{slide.content}</p>
+                          <RichTextRenderer
+                            content={slide.title}
+                            showCopyButton={false}
+                            className="text-5xl font-bold mb-4"
+                          />
+                          <RichTextRenderer
+                            content={slide.content}
+                            showCopyButton={false}
+                            className="text-xl"
+                          />
                         </>
                       ) : slide.layout === 'image-right' ? (
                         <div className="flex items-center w-full">
                           <div className="w-1/2 pr-8">
-                            <h2 className="text-4xl font-semibold mb-4">{slide.title}</h2>
-                            <p>{slide.content}</p>
+                            <RichTextRenderer
+                              content={slide.title}
+                              showCopyButton={false}
+                              className="text-4xl font-semibold mb-4"
+                            />
+                            <RichTextRenderer
+                              content={slide.content}
+                              showCopyButton={false}
+                              className=""
+                            />
                           </div>
                           <div className="w-1/2">
                             <img src={`https://source.unsplash.com/800x600/?${slide.imageSearchTerm}`} alt={slide.title} className="rounded-lg shadow-lg" />
@@ -188,14 +213,30 @@ export const PresentationGenerator = () => {
                             <img src={`https://source.unsplash.com/800x600/?${slide.imageSearchTerm}`} alt={slide.title} className="rounded-lg shadow-lg" />
                           </div>
                           <div className="w-1/2 pl-8">
-                            <h2 className="text-4xl font-semibold mb-4">{slide.title}</h2>
-                            <p>{slide.content}</p>
+                            <RichTextRenderer
+                              content={slide.title}
+                              showCopyButton={false}
+                              className="text-4xl font-semibold mb-4"
+                            />
+                            <RichTextRenderer
+                              content={slide.content}
+                              showCopyButton={false}
+                              className=""
+                            />
                           </div>
                         </div>
                       ) : (
                         <>
-                          <h2 className="text-4xl font-semibold mb-4">{slide.title}</h2>
-                          <p className="max-w-4xl">{slide.content}</p>
+                          <RichTextRenderer
+                            content={slide.title}
+                            showCopyButton={false}
+                            className="text-4xl font-semibold mb-4"
+                          />
+                          <RichTextRenderer
+                            content={slide.content}
+                            showCopyButton={false}
+                            className="max-w-4xl"
+                          />
                         </>
                       )}
                     </div>

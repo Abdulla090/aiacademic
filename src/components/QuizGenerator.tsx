@@ -7,6 +7,7 @@ import { geminiService, type QuizQuestion } from '@/services/geminiService';
 import { useToast } from '@/components/ui/use-toast';
 import { motion } from 'framer-motion';
 import { readFileContent } from '@/lib/fileReader';
+import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
 
 export const QuizGenerator = () => {
   const [text, setText] = useState('');
@@ -52,8 +53,8 @@ export const QuizGenerator = () => {
     if (file) {
       try {
         const content = await readFileContent(file);
-        setText(content);
-        await triggerGeneration(content);
+        setText(content as string);
+        await triggerGeneration(content as string);
       } catch (error) {
         toast({
           title: 'هەڵە لە خوێندنەوەی فایل',
@@ -127,7 +128,13 @@ export const QuizGenerator = () => {
                     >
                         <Card>
                             <CardHeader>
-                                <CardTitle>{i + 1}. {q.question}</CardTitle>
+                                <CardTitle>
+                                    {i + 1}. <RichTextRenderer
+                                        content={q.question}
+                                        showCopyButton={false}
+                                        className="inline"
+                                    />
+                                </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-2">
                                 {q.options.map((option, j) => (
@@ -139,7 +146,11 @@ export const QuizGenerator = () => {
                                             option === q.correctAnswer ? 'bg-green-200' : (answers[i] === option ? 'bg-red-200' : '')
                                         ) : ''}`}
                                     >
-                                        {option}
+                                        <RichTextRenderer
+                                            content={option}
+                                            showCopyButton={false}
+                                            className="inline"
+                                        />
                                     </Button>
                                 ))}
                             </CardContent>

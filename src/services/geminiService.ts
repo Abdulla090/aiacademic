@@ -2,6 +2,15 @@ export interface GeminiResponse {
   text: string;
 }
 
+export type StreamCallback = (chunk: string) => void;
+export type StreamingOptions = {
+  onChunk?: (chunk: string) => void;
+  onComplete?: () => void;
+  onError?: (error: Error) => void;
+  chunkSize?: number;
+  delay?: number;
+};
+
 export interface CitationStyle {
   type: 'APA' | 'MLA' | 'IEEE';
 }
@@ -82,44 +91,112 @@ class GeminiService {
   private apiKey = 'AIzaSyBsMPe_MEasu7x3u9EK85ULYDHZ3oykklM';
   private baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
 
-  private async makeRequest(prompt: string, model = 'gemini-2.0-flash-exp'): Promise<GeminiResponse> {
+  private async makeRequest(prompt: string, model = 'gemini-2.0-flash-exp', streamCallback?: StreamCallback): Promise<GeminiResponse> {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
     try {
-      const response = await fetch(`${url}?key=${this.apiKey}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: prompt
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 8192,
+      // If we have a streamCallback, use streaming mode
+      if (streamCallback) {
+        // For streaming, we need to use the streamGenerateContent endpoint
+        const streamUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${this.apiKey}`;
+        const response = await fetch(streamUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: prompt
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 8192,
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`API stream request failed: ${response.status}`);
+        }
+
+        if (!response.body) {
+          throw new Error('ReadableStream not supported');
+        }
+
+        const reader = response.body.getReader();
+        let fullText = '';
+
+        try {
+          // Read the stream
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            // Convert the chunk to text
+            const chunk = new TextDecoder().decode(value);
+            
+            // Parse the chunk - each line is a separate JSON object
+            const lines = chunk.split('\n').filter(line => line.trim() !== '');
+            
+            for (const line of lines) {
+              try {
+                const data = JSON.parse(line);
+                if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+                  const chunkText = data.candidates[0].content.parts[0].text;
+                  fullText += chunkText;
+                  streamCallback(chunkText);
+                }
+              } catch (e) {
+                console.error('Error parsing JSON from stream:', e);
+              }
+            }
           }
-        })
-      });
+        } finally {
+          reader.releaseLock();
+        }
+        
+        return { text: fullText };
+      } else {
+        // Non-streaming mode (original implementation)
+        const response = await fetch(`${url}?key=${this.apiKey}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: prompt
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 8192,
+            }
+          })
+        });
 
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`);
+        if (!response.ok) {
+          throw new Error(`API request failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return {
+          text: data.candidates[0].content.parts[0].text
+        };
       }
-
-      const data = await response.json();
-      return {
-        text: data.candidates[0].content.parts[0].text
-      };
     } catch (error) {
       console.error('Gemini API Error:', error);
       throw new Error('Failed to communicate with AI service');
     }
   }
 
-  async generateArticle(request: ArticleRequest): Promise<string> {
+  async generateArticleStreaming(request: ArticleRequest, options: StreamingOptions): Promise<void> {
     const lengthMap = {
       short: '500-800 words',
       medium: '1000-1500 words',
@@ -151,11 +228,75 @@ class GeminiService {
     - Each section should be at least 200 words
     - Use scientific sentences and words
     - Use conjunctions to connect the sections
+    - Use proper markdown formatting for enhanced readability:
+      * Use **bold text** for key terms and important concepts
+      * Use *italic text* for emphasis and foreign terms
+      * Use ## for main section headings (e.g., ## Introduction)
+      * Use ### for subsection headings
+      * Use bullet points (- or *) for lists
+      * Use numbered lists (1., 2., 3.) when sequence matters
+      * Use > for important quotes or definitions
+      * Use backticks for technical terms or specific terminology
+      * Use proper paragraph spacing with empty lines
 
-    Please write the article entirely in ${request.language}.
+    Please write the article entirely in ${request.language} with proper markdown formatting.
     `;
 
-    const response = await this.makeRequest(prompt);
+    try {
+      const response = await this.makeRequest(prompt);
+      await this.simulateStreaming(response.text, options);
+    } catch (error) {
+      options.onError?.(error instanceof Error ? error : new Error('Failed to generate article'));
+    }
+  }
+
+  async generateArticle(request: ArticleRequest, streamCallback?: StreamCallback): Promise<string> {
+    const lengthMap = {
+      short: '500-800 words',
+      medium: '1000-1500 words',
+      long: '2000-3000 words'
+    };
+
+    const prompt = `
+    Become an expert academic writer who writes scientific articles in ${request.language === 'ku' ? 'Sorani Kurdish' : request.language}.
+
+    Topic: ${request.topic}
+    Length: ${lengthMap[request.length]}
+    Citation Style: ${request.citationStyle}
+    ${request.includeReferences ? 'Add References: Yes' : 'Add References: No'}
+    Language: ${request.language}
+
+    The article must have the following structure:
+    1. Title - A suitable and clear title
+    2. Abstract - A 150-250 word summary that explains the topic
+    3. Sections - The main sections of the article (must have at least 3 sections)
+    4. Conclusion - Conclusion and recommendations
+    ${request.includeReferences ? '5. References - List of references in ' + request.citationStyle + ' style' : ''}
+
+    Instructions:
+    - Language: ${request.language}
+    - Style: Academic and professional
+    - Grammar: Correct and clear
+    - The article should be like a real academic paper, not a chat response
+    - Make sure the article has an academic structure and contains real information
+    - Each section should be at least 200 words
+    - Use scientific sentences and words
+    - Use conjunctions to connect the sections
+    - Use proper markdown formatting for enhanced readability:
+      * Use **bold text** for key terms and important concepts
+      * Use *italic text* for emphasis and foreign terms
+      * Use ## for main section headings (e.g., ## Introduction)
+      * Use ### for subsection headings
+      * Use bullet points (- or *) for lists
+      * Use numbered lists (1., 2., 3.) when sequence matters
+      * Use > for important quotes or definitions
+      * Use backticks for technical terms or specific terminology
+      * Use proper paragraph spacing with empty lines
+
+    Please write the article entirely in ${request.language} with proper markdown formatting.
+    `;
+
+    const response = await this.makeRequest(prompt, 'gemini-2.0-flash-exp', streamCallback);
     return response.text;
   }
 
@@ -200,7 +341,7 @@ class GeminiService {
     }
   }
 
-  async generateReportSection(outline: ReportOutline, sectionName: string, previousSections: ReportSection[], language: string): Promise<string> {
+  async generateReportSectionStreaming(outline: ReportOutline, sectionName: string, previousSections: ReportSection[], language: string, options: StreamingOptions): Promise<void> {
     const contextText = previousSections.length > 0 
       ? `Previous sections:\n${previousSections.map(s => `${s.title}: ${s.content.substring(0, 200)}...`).join('\n')}`
       : '';
@@ -219,13 +360,62 @@ class GeminiService {
     - Use academic and formal language.
     - Be written in ${language === 'ku' ? 'Sorani Kurdish' : language}.
     - Be related to the other sections of the report.
+    - Use proper markdown formatting for enhanced readability:
+      * Use **bold text** for key findings and important concepts
+      * Use *italic text* for emphasis and terminology
+      * Use ### for any subsection headings within the section
+      * Use bullet points (- or *) for listing key points
+      * Use numbered lists (1., 2., 3.) when sequence or priority matters
+      * Use > for important quotes, definitions, or highlighted information
+      * Use proper paragraph spacing with empty lines
 
     Length: Approximately 300-500 words.
     
-    Please write the content as part of an academic report, not as a chat response. Focus on analyzing and presenting information, not on presenting hypotheses and new research methodologies.
+    Please write the content as part of an academic report, not as a chat response. Focus on analyzing and presenting information, not on presenting hypotheses and new research methodologies. Use markdown formatting to make the content more readable and professionally structured.
     `;
 
-    const response = await this.makeRequest(prompt);
+    try {
+      const response = await this.makeRequest(prompt);
+      await this.simulateStreaming(response.text, options);
+    } catch (error) {
+      options.onError?.(error instanceof Error ? error : new Error('Failed to generate section'));
+    }
+  }
+
+  async generateReportSection(outline: ReportOutline, sectionName: string, previousSections: ReportSection[], language: string, streamCallback?: StreamCallback): Promise<string> {
+    const contextText = previousSections.length > 0 
+      ? `Previous sections:\n${previousSections.map(s => `${s.title}: ${s.content.substring(0, 200)}...`).join('\n')}`
+      : '';
+
+    const prompt = `
+    Academic Report: ${outline.title}
+    Current Section: ${sectionName}
+    
+    ${contextText}
+
+    For the section "${sectionName}", write a complete and academic content that has the style of an academic report, not a research paper. The content should be an analysis and summary of information on the topic.
+
+    The content must:
+    - Be clear and organized.
+    - Contain accurate and correct information.
+    - Use academic and formal language.
+    - Be written in ${language === 'ku' ? 'Sorani Kurdish' : language}.
+    - Be related to the other sections of the report.
+    - Use proper markdown formatting for enhanced readability:
+      * Use **bold text** for key findings and important concepts
+      * Use *italic text* for emphasis and terminology
+      * Use ### for any subsection headings within the section
+      * Use bullet points (- or *) for listing key points
+      * Use numbered lists (1., 2., 3.) when sequence or priority matters
+      * Use > for important quotes, definitions, or highlighted information
+      * Use proper paragraph spacing with empty lines
+
+    Length: Approximately 300-500 words.
+    
+    Please write the content as part of an academic report, not as a chat response. Focus on analyzing and presenting information, not on presenting hypotheses and new research methodologies. Use markdown formatting to make the content more readable and professionally structured.
+    `;
+
+    const response = await this.makeRequest(prompt, 'gemini-2.0-flash-exp', streamCallback);
     if (typeof response.text === 'string') {
       return response.text;
     }
@@ -616,6 +806,36 @@ class GeminiService {
     } catch (error) {
       console.error("Failed to parse next sentence JSON:", error, "Raw response:", response.text);
       throw error;
+    }
+  }
+
+  private async simulateStreaming(text: string, options: StreamingOptions): Promise<void> {
+    const { onChunk, onComplete, onError, chunkSize = 3, delay = 50 } = options;
+    
+    try {
+      // Split text into words to make streaming more natural
+      const words = text.split(' ');
+      let currentChunk = '';
+      
+      for (let i = 0; i < words.length; i++) {
+        // Add word to current chunk
+        currentChunk += (currentChunk ? ' ' : '') + words[i];
+        
+        // Send chunk when we reach the desired chunk size or at the end
+        if ((i + 1) % chunkSize === 0 || i === words.length - 1) {
+          onChunk?.(currentChunk);
+          currentChunk = '';
+          
+          // Add delay to simulate real-time streaming
+          if (i < words.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, delay));
+          }
+        }
+      }
+      
+      onComplete?.();
+    } catch (error) {
+      onError?.(error instanceof Error ? error : new Error('Streaming error'));
     }
   }
 

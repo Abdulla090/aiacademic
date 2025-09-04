@@ -10,6 +10,7 @@ import { geminiService } from '@/services/geminiService';
 import { useToast } from '@/components/ui/use-toast';
 import { jsPDF } from "jspdf";
 import { notoNaskhArabic } from '@/lib/fonts';
+import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
 
 export const SummarizerParaphraser = () => {
   const [text, setText] = useState('');
@@ -109,26 +110,183 @@ export const SummarizerParaphraser = () => {
 
         // Add title
         doc.setFontSize(16);
+        doc.setFont(undefined, 'bold');
         const titleLines = doc.splitTextToSize(title, pageWidth - 20);
         doc.text(titleLines, pageWidth / 2, yPosition, { align: 'center' });
         yPosition += (titleLines.length * 10) + 10;
         
-        // Add content
+        // Reset font
+        doc.setFont(undefined, 'normal');
         doc.setFontSize(12);
-        const splitText = doc.splitTextToSize(text || '', pageWidth - 20);
         
-        for (let i = 0; i < splitText.length; i++) {
+        // Process content with markdown formatting
+        const lines = (text || '').split('\n');
+        let currentListItems: string[] = [];
+        let currentListType: 'ul' | 'ol' | null = null;
+        let inCodeBlock = false;
+        
+        const flushList = () => {
+          if (currentListItems.length > 0) {
+            currentListItems.forEach((item, index) => {
+              // Check if we need a new page
+              if (yPosition > pageHeight - 30) {
+                doc.addPage();
+                yPosition = 20;
+                // Reset font for new page
+                doc.setFont('NotoNaskhArabic');
+                doc.setFontSize(12);
+              }
+              
+              const bullet = currentListType === 'ol' ? `${index + 1}. ` : '• ';
+              const itemText = `${bullet}${item}`;
+              const itemLines = doc.splitTextToSize(itemText, pageWidth - 30);
+              
+              doc.text(itemLines, 20, yPosition);
+              yPosition += itemLines.length * 7 + 3;
+            });
+            currentListItems = [];
+            currentListType = null;
+          }
+        };
+        
+        for (const line of lines) {
           // Check if we need a new page
-          if (yPosition > pageHeight - 20) {
+          if (yPosition > pageHeight - 30) {
             doc.addPage();
             yPosition = 20;
             // Reset font for new page
             doc.setFont('NotoNaskhArabic');
+            doc.setFontSize(12);
           }
           
-          doc.text(splitText[i], 10, yPosition);
-          yPosition += 7;
+          // Handle code blocks
+          if (line.trim().startsWith('```')) {
+            flushList();
+            inCodeBlock = !inCodeBlock;
+            continue;
+          }
+          
+          if (inCodeBlock) {
+            const codeLines = doc.splitTextToSize(line, pageWidth - 30);
+            doc.setFontSize(10);
+            codeLines.forEach(codeLine => {
+              // Check if we need a new page
+              if (yPosition > pageHeight - 30) {
+                doc.addPage();
+                yPosition = 20;
+                // Reset font for new page
+                doc.setFont('NotoNaskhArabic');
+                doc.setFontSize(10);
+              }
+              doc.text(codeLine, 25, yPosition);
+              yPosition += 7;
+            });
+            doc.setFontSize(12);
+            continue;
+          }
+          
+          // Handle headers
+          const headerMatch = line.match(/^(#{1,6})\s+(.+)$/);
+          if (headerMatch) {
+            flushList();
+            const level = headerMatch[1].length;
+            const text = headerMatch[2];
+            const headerSize = 24 - (level * 2);
+            doc.setFontSize(headerSize);
+            doc.setFont(undefined, 'bold');
+            const headerLines = doc.splitTextToSize(text, pageWidth - 20);
+            doc.text(headerLines, pageWidth / 2, yPosition, { align: 'center' });
+            yPosition += (headerLines.length * (headerSize * 0.7)) + 10;
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(12);
+            continue;
+          }
+          
+          // Handle unordered lists
+          const ulMatch = line.match(/^\s*[-*+]\s+(.+)$/);
+          if (ulMatch) {
+            if (currentListType !== 'ul') {
+              flushList();
+              currentListType = 'ul';
+            }
+            currentListItems.push(ulMatch[1]);
+            continue;
+          }
+          
+          // Handle ordered lists
+          const olMatch = line.match(/^\s*\d+\.\s+(.+)$/);
+          if (olMatch) {
+            if (currentListType !== 'ol') {
+              flushList();
+              currentListType = 'ol';
+            }
+            currentListItems.push(olMatch[1]);
+            continue;
+          }
+          
+          // Handle blockquotes
+          if (line.trim().startsWith('>')) {
+            flushList();
+            const quoteText = line.replace(/^\s*>\s*/, '');
+            doc.setFont(undefined, 'italic');
+            const quoteLines = doc.splitTextToSize(quoteText, pageWidth - 40);
+            quoteLines.forEach((quoteLine, index) => {
+              // Check if we need a new page
+              if (yPosition > pageHeight - 30) {
+                doc.addPage();
+                yPosition = 20;
+                // Reset font for new page
+                doc.setFont('NotoNaskhArabic');
+                doc.setFont(undefined, 'italic');
+              }
+              doc.text(quoteLine, 30, yPosition);
+              yPosition += 7;
+            });
+            doc.setFont(undefined, 'normal');
+            yPosition += 5;
+            continue;
+          }
+          
+          // Handle horizontal rules
+          if (line.trim().match(/^[-*_]{3,}$/)) {
+            flushList();
+            doc.line(20, yPosition, pageWidth - 20, yPosition);
+            yPosition += 10;
+            continue;
+          }
+          
+          // Handle empty lines
+          if (line.trim() === '') {
+            flushList();
+            yPosition += 7;
+            continue;
+          }
+          
+          // Handle regular paragraphs with inline formatting
+          flushList();
+          let formattedLine = line;
+          
+          // Handle bold text (**text**)
+          const boldMatches = [...formattedLine.matchAll(/\*\*(.*?)\*\*/g)];
+          if (boldMatches.length > 0) {
+            // For simplicity, we'll just remove the bold markers and add a note
+            formattedLine = formattedLine.replace(/\*\*(.*?)\*\*/g, '$1');
+          }
+          
+          // Handle italic text (*text*)
+          const italicMatches = [...formattedLine.matchAll(/\*(.*?)\*/g)];
+          if (italicMatches.length > 0) {
+            // For simplicity, we'll just remove the italic markers and add a note
+            formattedLine = formattedLine.replace(/\*(.*?)\*/g, '$1');
+          }
+          
+          const splitText = doc.splitTextToSize(formattedLine, pageWidth - 20);
+          doc.text(splitText, 10, yPosition);
+          yPosition += splitText.length * 7 + 3;
         }
+        
+        // Flush any remaining list
+        flushList();
         
         // Save the PDF
         doc.save(`${title || 'document'}.pdf`);
@@ -288,11 +446,13 @@ export const SummarizerParaphraser = () => {
                   <Badge variant="secondary" className="mb-4">
                     کورتکردنەوە - {summaryLength === 'short' ? 'کورت' : summaryLength === 'medium' ? 'ناوەند' : 'ورد'}
                   </Badge>
-                  <Textarea
-                    value={summarizedText}
-                    onChange={(e) => setSummarizedText(e.target.value)}
-                    className="min-h-[400px] sorani-text text-base leading-relaxed"
-                  />
+                  <div className="min-h-[400px] p-4 border border-border rounded-lg bg-background overflow-y-auto">
+                    <RichTextRenderer
+                      content={summarizedText}
+                      showCopyButton={true}
+                      className="sorani-text"
+                    />
+                  </div>
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-[400px] text-muted-foreground">
@@ -308,11 +468,13 @@ export const SummarizerParaphraser = () => {
                   <Badge variant="secondary" className="mb-4">
                     نووسینەوە
                   </Badge>
-                  <Textarea
-                    value={paraphrasedText}
-                    onChange={(e) => setParaphrasedText(e.target.value)}
-                    className="min-h-[400px] sorani-text text-base leading-relaxed"
-                  />
+                  <div className="min-h-[400px] p-4 border border-border rounded-lg bg-background overflow-y-auto">
+                    <RichTextRenderer
+                      content={paraphrasedText}
+                      showCopyButton={true}
+                      className="sorani-text"
+                    />
+                  </div>
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-[400px] text-muted-foreground">

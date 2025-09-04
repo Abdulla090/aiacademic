@@ -4,11 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { FileText, ChevronRight, Check, Download, RefreshCw } from 'lucide-react';
+import { FileText, ChevronRight, Check, Download, RefreshCw, Pause, Play, Square } from 'lucide-react';
 import { geminiService, type ReportOutline, type ReportSection } from '@/services/geminiService';
 import { useToast } from '@/components/ui/use-toast';
 import { jsPDF } from "jspdf";
 import { notoNaskhArabic } from '@/lib/fonts';
+import { TypingIndicator } from '@/components/ui/typing-indicator';
+import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
+import { FormattingControls } from '@/components/ui/formatting-controls';
 
 interface ReportGeneratorProps {
   language: string;
@@ -22,6 +25,10 @@ export const ReportGenerator = ({ language }: ReportGeneratorProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [generatingSection, setGeneratingSection] = useState<string | null>(null);
+  const [currentSectionContent, setCurrentSectionContent] = useState('');
+  const [streamedSectionText, setStreamedSectionText] = useState('');
+  const [isSectionStreaming, setIsSectionStreaming] = useState(false);
+  const [showFormatting, setShowFormatting] = useState(true);
   const { toast } = useToast();
 
   const handleGenerateOutline = async () => {
@@ -59,24 +66,65 @@ export const ReportGenerator = ({ language }: ReportGeneratorProps) => {
     if (!outline) return;
 
     setGeneratingSection(sectionName);
+    setCurrentSectionContent('');
+    setStreamedSectionText('');
+    setIsSectionStreaming(false);
+    
     try {
+      // Get the AI response first
       const content = await geminiService.generateReportSection(outline, sectionName, sections, language);
+      
+      // Start streaming the result
+      setIsSectionStreaming(true);
+      const words = content.split(' ');
+      let currentText = '';
+      
+      for (let i = 0; i < words.length; i++) {
+        // Check if section generation was stopped
+        if (generatingSection !== sectionName) break;
+        
+        currentText += (i === 0 ? '' : ' ') + words[i];
+        setStreamedSectionText(currentText);
+        
+        // Add delay between words for realistic typing effect
+        await new Promise(resolve => setTimeout(resolve, 40));
+      }
+      
+      // Complete the section
       const newSection: ReportSection = {
         title: sectionName,
         content
       };
       setSections(prev => [...prev, newSection]);
+      setCurrentSectionContent(content);
+      setIsSectionStreaming(false);
+      setGeneratingSection(null);
+      
       toast({
         title: 'بەش دروست کرا',
-        description: `بەشی "${sectionName}" ئامادە کرا`
+        description: `بەشی "${sectionName}" تەواو کرا`
       });
+      
     } catch (error) {
+      setIsSectionStreaming(false);
+      setGeneratingSection(null);
       toast({
         title: 'هەڵە',
         description: 'نەتوانرا بەشەکە دروست بکرێت',
         variant: 'destructive'
       });
-    } finally {
+    }
+  };
+  
+  const handleStopSectionStreaming = () => {
+    if (generatingSection) {
+      const newSection: ReportSection = {
+        title: generatingSection,
+        content: streamedSectionText
+      };
+      setSections(prev => [...prev, newSection]);
+      setCurrentSectionContent(streamedSectionText);
+      setIsSectionStreaming(false);
       setGeneratingSection(null);
     }
   };
@@ -108,12 +156,16 @@ export const ReportGenerator = ({ language }: ReportGeneratorProps) => {
 
         // Add title
         pdf.setFontSize(20);
+        pdf.setFont(undefined, 'bold');
         const titleLines = pdf.splitTextToSize(outline.title || 'Report', pageWidth - 40);
         pdf.text(titleLines, pageWidth / 2, yPosition, { align: 'center' });
         yPosition += (titleLines.length * 25) + 20;
         
-        // Add sections
+        // Reset font
+        pdf.setFont(undefined, 'normal');
         pdf.setFontSize(12);
+        
+        // Process each section with markdown formatting
         for (const section of sections) {
           // Check if we need a new page
           if (yPosition > pageHeight - 40) {
@@ -123,40 +175,208 @@ export const ReportGenerator = ({ language }: ReportGeneratorProps) => {
             if (language === 'ku' || language === 'ar') {
               pdf.setFont('NotoNaskhArabic');
             }
+            pdf.setFontSize(12);
           }
           
-          // Add section title
+          // Add section title with formatting
           pdf.setFontSize(16);
+          pdf.setFont(undefined, 'bold');
           const sectionTitleLines = pdf.splitTextToSize(section.title, pageWidth - 40);
-          pdf.text(sectionTitleLines, language === 'ku' || language === 'ar' ? pageWidth - 20 : 20, yPosition, { 
-            align: language === 'ku' || language === 'ar' ? 'right' : 'left' 
+          pdf.text(sectionTitleLines, language === 'ku' || language === 'ar' ? pageWidth - 20 : 20, yPosition, {
+            align: language === 'ku' || language === 'ar' ? 'right' : 'left'
           });
           yPosition += (sectionTitleLines.length * 20) + 15;
           
-          // Reset font size for content
+          // Reset font for content
+          pdf.setFont(undefined, 'normal');
           pdf.setFontSize(12);
           
-          // Add section content
-          const contentLines = pdf.splitTextToSize(section.content || '', pageWidth - 40);
-          for (let i = 0; i < contentLines.length; i++) {
+          // Process section content with markdown formatting
+          const lines = (section.content || '').split('\n');
+          let currentListItems: string[] = [];
+          let currentListType: 'ul' | 'ol' | null = null;
+          let inCodeBlock = false;
+          
+          const flushList = () => {
+            if (currentListItems.length > 0) {
+              currentListItems.forEach((item, index) => {
+                // Check if we need a new page
+                if (yPosition > pageHeight - 30) {
+                  pdf.addPage();
+                  yPosition = 40;
+                  // Reset font for new page
+                  if (language === 'ku' || language === 'ar') {
+                    pdf.setFont('NotoNaskhArabic');
+                  }
+                  pdf.setFontSize(12);
+                }
+                
+                const bullet = currentListType === 'ol' ? `${index + 1}. ` : '• ';
+                const itemText = `${bullet}${item}`;
+                const itemLines = pdf.splitTextToSize(itemText, pageWidth - 50);
+                
+                pdf.text(itemLines, language === 'ku' || language === 'ar' ? pageWidth - 30 : 30, yPosition, {
+                  align: language === 'ku' || language === 'ar' ? 'right' : 'left'
+                });
+                yPosition += itemLines.length * 15 + 3;
+              });
+              currentListItems = [];
+              currentListType = null;
+            }
+          };
+          
+          for (const line of lines) {
+            // Check if we need a new page
             if (yPosition > pageHeight - 40) {
               pdf.addPage();
               yPosition = 40;
               // Reset font for new page
               if (language === 'ku' || language === 'ar') {
                 pdf.setFont('NotoNaskhArabic');
-                pdf.setFontSize(12);
               }
+              pdf.setFontSize(12);
             }
             
-            // Handle RTL alignment for Kurdish/Arabic
-            if (language === 'ku' || language === 'ar') {
-              pdf.text(contentLines[i], pageWidth - 20, yPosition, { align: 'right' });
-            } else {
-              pdf.text(contentLines[i], 20, yPosition);
+            // Handle code blocks
+            if (line.trim().startsWith('```')) {
+              flushList();
+              inCodeBlock = !inCodeBlock;
+              continue;
             }
-            yPosition += 15;
+            
+            if (inCodeBlock) {
+              const codeLines = pdf.splitTextToSize(line, pageWidth - 50);
+              pdf.setFontSize(10);
+              codeLines.forEach(codeLine => {
+                // Check if we need a new page
+                if (yPosition > pageHeight - 40) {
+                  pdf.addPage();
+                  yPosition = 40;
+                  // Reset font for new page
+                  if (language === 'ku' || language === 'ar') {
+                    pdf.setFont('NotoNaskhArabic');
+                  }
+                  pdf.setFontSize(10);
+                }
+                pdf.text(codeLine, language === 'ku' || language === 'ar' ? pageWidth - 35 : 35, yPosition, {
+                  align: language === 'ku' || language === 'ar' ? 'right' : 'left'
+                });
+                yPosition += 15;
+              });
+              pdf.setFontSize(12);
+              continue;
+            }
+            
+            // Handle headers
+            const headerMatch = line.match(/^(#{1,6})\s+(.+)$/);
+            if (headerMatch) {
+              flushList();
+              const level = headerMatch[1].length;
+              const text = headerMatch[2];
+              const headerSize = 20 - (level * 2);
+              pdf.setFontSize(headerSize);
+              pdf.setFont(undefined, 'bold');
+              const headerLines = pdf.splitTextToSize(text, pageWidth - 40);
+              pdf.text(headerLines, language === 'ku' || language === 'ar' ? pageWidth - 20 : 20, yPosition, {
+                align: language === 'ku' || language === 'ar' ? 'right' : 'left'
+              });
+              yPosition += (headerLines.length * (headerSize * 0.7)) + 15;
+              pdf.setFont(undefined, 'normal');
+              pdf.setFontSize(12);
+              continue;
+            }
+            
+            // Handle unordered lists
+            const ulMatch = line.match(/^\s*[-*+]\s+(.+)$/);
+            if (ulMatch) {
+              if (currentListType !== 'ul') {
+                flushList();
+                currentListType = 'ul';
+              }
+              currentListItems.push(ulMatch[1]);
+              continue;
+            }
+            
+            // Handle ordered lists
+            const olMatch = line.match(/^\s*\d+\.\s+(.+)$/);
+            if (olMatch) {
+              if (currentListType !== 'ol') {
+                flushList();
+                currentListType = 'ol';
+              }
+              currentListItems.push(olMatch[1]);
+              continue;
+            }
+            
+            // Handle blockquotes
+            if (line.trim().startsWith('>')) {
+              flushList();
+              const quoteText = line.replace(/^\s*>\s*/, '');
+              pdf.setFont(undefined, 'italic');
+              const quoteLines = pdf.splitTextToSize(quoteText, pageWidth - 60);
+              quoteLines.forEach((quoteLine, index) => {
+                // Check if we need a new page
+                if (yPosition > pageHeight - 40) {
+                  pdf.addPage();
+                  yPosition = 40;
+                  // Reset font for new page
+                  if (language === 'ku' || language === 'ar') {
+                    pdf.setFont('NotoNaskhArabic');
+                  }
+                  pdf.setFont(undefined, 'italic');
+                }
+                pdf.text(quoteLine, language === 'ku' || language === 'ar' ? pageWidth - 40 : 40, yPosition, {
+                  align: language === 'ku' || language === 'ar' ? 'right' : 'left'
+                });
+                yPosition += 15;
+              });
+              pdf.setFont(undefined, 'normal');
+              yPosition += 5;
+              continue;
+            }
+            
+            // Handle horizontal rules
+            if (line.trim().match(/^[-*_]{3,}$/)) {
+              flushList();
+              pdf.line(20, yPosition, pageWidth - 20, yPosition);
+              yPosition += 15;
+              continue;
+            }
+            
+            // Handle empty lines
+            if (line.trim() === '') {
+              flushList();
+              yPosition += 15;
+              continue;
+            }
+            
+            // Handle regular paragraphs with inline formatting
+            flushList();
+            let formattedLine = line;
+            
+            // Handle bold text (**text**)
+            const boldMatches = [...formattedLine.matchAll(/\*\*(.*?)\*\*/g)];
+            if (boldMatches.length > 0) {
+              // For simplicity, we'll just remove the bold markers and add a note
+              formattedLine = formattedLine.replace(/\*\*(.*?)\*\*/g, '$1');
+            }
+            
+            // Handle italic text (*text*)
+            const italicMatches = [...formattedLine.matchAll(/\*(.*?)\*/g)];
+            if (italicMatches.length > 0) {
+              // For simplicity, we'll just remove the italic markers and add a note
+              formattedLine = formattedLine.replace(/\*(.*?)\*/g, '$1');
+            }
+            
+            const splitText = pdf.splitTextToSize(formattedLine, pageWidth - 40);
+            pdf.text(splitText, language === 'ku' || language === 'ar' ? pageWidth - 20 : 20, yPosition, {
+              align: language === 'ku' || language === 'ar' ? 'right' : 'left'
+            });
+            yPosition += splitText.length * 15 + 3;
           }
+          
+          // Flush any remaining list
+          flushList();
           
           yPosition += 20; // Space between sections
         }
@@ -270,23 +490,26 @@ export const ReportGenerator = ({ language }: ReportGeneratorProps) => {
                           <span className="sorani-text">{section}</span>
                         </div>
                         
-                        {!isGenerated && (
-                          <Button 
-                            size="sm" 
-                            onClick={() => handleGenerateSection(section)}
-                            disabled={isGenerating}
-                            className="btn-academic-secondary"
-                          >
-                            {isGenerating ? (
-                              <>
-                                <RefreshCw className="h-4 w-4 animate-spin mr-1" />
-                                دروستکردن...
-                              </>
-                            ) : (
-                              'دروستکردن'
-                            )}
-                          </Button>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {isGenerating && isSectionStreaming && (
+                            <div className="flex gap-2">
+                              <Button size="sm" variant="outline" onClick={handleStopSectionStreaming} className="gap-1">
+                                <Square className="h-3 w-3" />
+                                وەستان
+                              </Button>
+                            </div>
+                          )}
+                          
+                          {!isGenerated && !isGenerating && (
+                            <Button 
+                              size="sm" 
+                              onClick={() => handleGenerateSection(section)}
+                              className="btn-academic-secondary"
+                            >
+                              دروستکردن
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     );
                   })}
@@ -326,17 +549,58 @@ export const ReportGenerator = ({ language }: ReportGeneratorProps) => {
               )}
             </CardHeader>
             <CardContent>
+              <FormattingControls 
+                showFormatting={showFormatting}
+                onToggleFormatting={setShowFormatting}
+                className="mb-6"
+              />
               <div className="space-y-6">
                 {sections.map((section, index) => (
                   <div key={index} className="border-l-4 border-primary/30 pl-4">
                     <h3 className="font-bold text-lg mb-3 sorani-text">{section.title}</h3>
-                    <div className="prose prose-sm max-w-none">
-                      <p className="text-base leading-relaxed sorani-text whitespace-pre-wrap">
+                    {showFormatting ? (
+                      <RichTextRenderer 
+                        content={section.content}
+                        showCopyButton={true}
+                        className="sorani-text"
+                      />
+                    ) : (
+                      <div className="sorani-text text-base leading-relaxed whitespace-pre-wrap">
                         {section.content}
-                      </p>
-                    </div>
+                      </div>
+                    )}
                   </div>
                 ))}
+                
+                {/* Show currently generating section with streaming */}
+                {generatingSection && (
+                  <div className="border-l-4 border-primary/30 pl-4 bg-secondary/20 rounded-r-lg p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <h3 className="font-bold text-lg sorani-text">{generatingSection}</h3>
+                      {isSectionStreaming && (
+                        <div className="flex items-center gap-2">
+                          <TypingIndicator size="sm" />
+                          <span className="text-sm text-muted-foreground sorani-text">دەنووسرێت...</span>
+                        </div>
+                      )}
+                    </div>
+                    {showFormatting ? (
+                      <RichTextRenderer 
+                        content={streamedSectionText}
+                        isStreaming={isSectionStreaming}
+                        showCopyButton={false}
+                        className="sorani-text"
+                      />
+                    ) : (
+                      <div className="sorani-text text-base leading-relaxed whitespace-pre-wrap relative">
+                        {streamedSectionText}
+                        {isSectionStreaming && (
+                          <span className="inline-block w-0.5 h-5 bg-primary ml-1 animate-pulse" />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
                 
                 {isCompleted && (
                   <div className="text-center py-6">

@@ -7,6 +7,7 @@ import { geminiService, type Flashcard } from '@/services/geminiService';
 import { useToast } from '@/components/ui/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { readFileContent } from '@/lib/fileReader';
+import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
 
 export const FlashcardGenerator = () => {
   const [text, setText] = useState('');
@@ -130,7 +131,11 @@ export const FlashcardGenerator = () => {
                             animate={{ rotateY: isFlipped ? 180 : 0 }}
                         >
                             <Card className="h-full flex items-center justify-center p-6 text-xl font-semibold text-center">
-                                {flashcards[currentCard].question}
+                                <RichTextRenderer
+                                  content={flashcards[currentCard].question}
+                                  showCopyButton={false}
+                                  className="text-xl font-semibold text-center"
+                                />
                             </Card>
                         </motion.div>
                         <motion.div
@@ -139,7 +144,11 @@ export const FlashcardGenerator = () => {
                             animate={{ rotateY: isFlipped ? 0 : -180 }}
                         >
                             <Card className="h-full flex items-center justify-center p-6 text-lg text-center bg-secondary">
-                                {flashcards[currentCard].answer}
+                                <RichTextRenderer
+                                  content={flashcards[currentCard].answer}
+                                  showCopyButton={false}
+                                  className="text-lg text-center"
+                                />
                             </Card>
                         </motion.div>
                     </motion.div>
