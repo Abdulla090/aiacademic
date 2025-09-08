@@ -21,9 +21,13 @@ import QuizGenerator from "./pages/QuizGenerator";
 import PresentationGenerator from "./pages/PresentationGenerator";
 import KnowledgeGraphPage from "./pages/KnowledgeGraphPage";
 import WritingSupervisor from "./pages/WritingSupervisor";
+import OCRExtractor from "./pages/OCRExtractor";
 import withLoading from "./hocs/withLoading";
 import ChatWithFile from "./pages/ChatWithFile";
 import About from "./pages/About";
+import KurdishDialectTranslator from "./pages/KurdishDialectTranslator";
+import StudyAnalyticsDashboard from "./pages/StudyAnalyticsDashboard";
+import AIResearchAssistant from "./pages/AIResearchAssistant";
 import { CustomSidebar } from "./components/CustomSidebar";
 import { SidebarProvider, SidebarInset } from "./components/ui/sidebar";
 
@@ -49,6 +53,10 @@ const AppContent = () => {
   const CitationGeneratorWithLoading = withLoading(CitationGenerator);
   const KnowledgeGraphPageWithLoading = withLoading(KnowledgeGraphPage);
   const ChatWithFileWithLoading = withLoading(ChatWithFile);
+  const OCRExtractorWithLoading = withLoading(OCRExtractor);
+  const KurdishDialectTranslatorWithLoading = withLoading(KurdishDialectTranslator);
+  const StudyAnalyticsDashboardWithLoading = withLoading(StudyAnalyticsDashboard);
+  const AIResearchAssistantWithLoading = withLoading(AIResearchAssistant);
  
   return (
     <SidebarProvider>
@@ -72,6 +80,10 @@ const AppContent = () => {
           <Route path="/presentation-generator" element={<PresentationGeneratorWithLoading />} />
           <Route path="/writing-supervisor" element={<WritingSupervisorWithLoading />} />
           <Route path="/knowledge-graph" element={<KnowledgeGraphPageWithLoading />} />
+          <Route path="/ocr-extractor" element={<OCRExtractorWithLoading />} />
+          <Route path="/kurdish-dialect-translator" element={<KurdishDialectTranslatorWithLoading />} />
+          <Route path="/study-analytics-dashboard" element={<StudyAnalyticsDashboardWithLoading />} />
+          <Route path="/ai-research-assistant" element={<AIResearchAssistantWithLoading />} />
           <Route path="/about" element={<About />} />
           <Route path="/chat-with-file" element={<ChatWithFileWithLoading />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
@@ -88,7 +100,10 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter future={{ v7_relativeSplatPath: true }}>
+        <BrowserRouter future={{ 
+          v7_relativeSplatPath: true,
+          v7_startTransition: true 
+        }}>
           <AppContent />
         </BrowserRouter>
       </TooltipProvider>

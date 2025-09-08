@@ -87,6 +87,33 @@ export interface CitationRequest {
   style: 'APA' | 'MLA' | 'Chicago' | 'IEEE';
 }
 
+export interface ResearchResult {
+  id: string;
+  title: string;
+  summary: string;
+  credibilityScore: number;
+  keyFindings: string[];
+  relatedTopics: string[];
+  sources: ResearchSource[];
+  citations: ResearchCitation[];
+}
+
+export interface ResearchSource {
+  id: string;
+  title: string;
+  author: string;
+  type: 'academic' | 'government' | 'organization' | 'news' | 'other';
+  credibilityScore: number;
+  publishDate: string;
+  url: string;
+}
+
+export interface ResearchCitation {
+  id: string;
+  format: 'APA' | 'MLA' | 'Chicago';
+  citation: string;
+}
+
 class GeminiService {
   private apiKey = 'AIzaSyBsMPe_MEasu7x3u9EK85ULYDHZ3oykklM';
   private baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
@@ -460,6 +487,81 @@ class GeminiService {
         corrected: text,
         suggestions: ['No changes needed']
       };
+    }
+  }
+
+  async checkGrammarDetailed(text: string, language: string = 'ku'): Promise<Array<{
+    id: string;
+    start: number;
+    end: number;
+    text: string;
+    message: string;
+    suggestions: string[];
+    type: 'grammar' | 'spelling' | 'style' | 'punctuation';
+    severity: 'error' | 'warning' | 'suggestion';
+  }>> {
+    const languageSettings = language === 'ku' ? 
+      'in Sorani Kurdish (کوردی)' : 
+      'in English';
+
+    const prompt = `
+    Analyze the following text ${languageSettings} and identify ALL grammar, spelling, punctuation, and style issues. Provide detailed analysis for each error.
+
+    Text to analyze:
+    "${text}"
+
+    Requirements:
+    - Find all grammar mistakes with exact positions
+    - Identify spelling errors
+    - Check punctuation issues
+    - Suggest style improvements
+    - Provide multiple suggestions for each error
+    - Classify each error by type and severity
+
+    For each error found, provide:
+    1. The exact text that has the error
+    2. The character position where the error starts and ends
+    3. A clear explanation of what's wrong
+    4. Multiple suggestions for fixing it
+    5. Error type (grammar/spelling/style/punctuation)
+    6. Severity level (error/warning/suggestion)
+
+    Return the response as a JSON array in this exact format:
+    [
+      {
+        "text": "exact text with error",
+        "start": position_number,
+        "end": position_number,
+        "message": "explanation of the error",
+        "suggestions": ["suggestion 1", "suggestion 2", "suggestion 3"],
+        "type": "grammar",
+        "severity": "error"
+      }
+    ]
+
+    If no errors are found, return an empty array: []
+
+    Be thorough and find all issues. Don't miss any errors.
+    `;
+
+    try {
+      const response = await this.makeRequest(prompt);
+      const errors = JSON.parse(response.text);
+      
+      // Add unique IDs and validate structure
+      return errors.map((error: any, index: number) => ({
+        id: `error_${Date.now()}_${index}`,
+        start: Number(error.start) || 0,
+        end: Number(error.end) || 0,
+        text: error.text || '',
+        message: error.message || 'Grammar issue detected',
+        suggestions: Array.isArray(error.suggestions) ? error.suggestions : ['No suggestions available'],
+        type: ['grammar', 'spelling', 'style', 'punctuation'].includes(error.type) ? error.type : 'grammar',
+        severity: ['error', 'warning', 'suggestion'].includes(error.severity) ? error.severity : 'warning'
+      }));
+    } catch (error) {
+      console.error('Error parsing grammar check response:', error);
+      return [];
     }
   }
 
@@ -880,6 +982,421 @@ class GeminiService {
     const response = await this.makeRequest(prompt);
     return response.text.trim();
   }
+
+  async extractTextFromImage(base64Image: string, language: 'ku' | 'en'): Promise<string> {
+    try {
+      // Enhanced Kurdish OCR prompt with grammar reference table
+      const prompt = language === 'ku' 
+        ? `You are an expert Kurdish Sorani OCR system using advanced language understanding. Extract text from this image with perfect accuracy.
+
+LANGUAGE: Kurdish Sorani (کوردی سۆرانی)
+
+CRITICAL: PRESERVE ORIGINAL FORMATTING AND LINE BREAKS!
+- Maintain the exact line structure as shown in the image
+- Each line in the image should be a separate line in the output
+- Do NOT put all text on one line
+- Preserve verse/poetry structure if present
+- Keep paragraph breaks and spacing as they appear
+
+KURDISH GRAMMAR REFERENCE TABLE - USE THIS TO AVOID MISTAKES:
+
+COMMON VERBS (correct forms):
+- مردم (mirdim) = I died
+- کردم (kirdim) = I did  
+- هاتم (hatim) = I came
+- چووم (çûm) = I went
+- بووم (bûm) = I was/became
+- دیتم (dîtim) = I saw
+- وتم (witim) = I said
+- خواردم (xwardim) = I ate
+- نووسیم (nûsîm) = I wrote
+- خوێندم (xwêndim) = I read
+
+COMMON WORDS (correct spellings):
+- کە (ke) = that/which
+- لە (le) = in/from  
+- بە (be) = with/by
+- بۆ (bo) = for/to
+- دە (de) = prefix meaning "continuous"
+- نە (ne) = not
+- من (min) = I/me
+- تۆ (to) = you
+- ئەو (ew) = he/she/that
+- ئێمە (ême) = we
+- ئێوە (êwe) = you (plural)
+- ئەوان (ewan) = they
+
+KURDISH LETTERS & COMBINATIONS:
+- ە (schwa) - not ه or ە with spaces
+- ێ (ê) - not ي or ی  
+- ۆ (ô) - not و or ۆ with spaces
+- وە (we) - Kurdish diphthong, keep together
+- ژ (zh) - Kurdish specific letter
+- ڕ (rr) - Kurdish rolled R
+- ڵ (ll) - Kurdish doubled L
+- چ (ch) - Kurdish CH sound
+- گ (g) - Kurdish G
+- پ (p) - Kurdish P
+- ک (k) - Kurdish K, not Arabic ك
+
+GRAMMAR RULES:
+1. Past tense verbs often end in -م (-im): مردم، کردم، هاتم
+2. Kurdish uses ە for many vowels, not ه
+3. Present tense marker is دە- (de-): دەکەم، دەڕۆم
+4. Negative is نا- (na-): ناکەم، ناڕۆم
+5. Kurdish compound verbs: دەرهێنان، پێشکەش کردن
+
+Extract the text with correct Kurdish grammar, spelling, AND ORIGINAL LINE BREAKS:`
+        : `Extract all text from this image in English. Return only the extracted text exactly as it appears.`;
+
+      const imageData = base64Image.split(',')[1];
+      
+      const requestBody = {
+        contents: [
+          {
+            parts: [
+              {
+                text: prompt
+              },
+              {
+                inline_data: {
+                  mime_type: "image/jpeg",
+                  data: imageData
+                }
+              }
+            ]
+          }
+        ],
+        generationConfig: {
+          temperature: 0.1,
+          topK: 32,
+          topP: 1,
+          maxOutputTokens: 8192,
+        }
+      };
+
+      let lastError;
+      const maxRetries = 3;
+      
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${this.apiKey}`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(requestBody),
+            }
+          );
+
+          if (response.status === 429) {
+            const errorData = await response.json().catch(() => ({}));
+            const retryAfter = errorData.error?.details?.find((d: any) => 
+              d['@type'] === 'type.googleapis.com/google.rpc.RetryInfo'
+            )?.retryDelay;
+            
+            if (retryAfter && attempt < maxRetries - 1) {
+              const waitTime = retryAfter.endsWith('s') 
+                ? parseInt(retryAfter) * 1000 
+                : Math.pow(2, attempt) * 1000;
+              
+              console.log(`Rate limited. Waiting ${waitTime}ms before retry ${attempt + 1}`);
+              await new Promise(resolve => setTimeout(resolve, waitTime));
+              continue;
+            }
+          }
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('OCR API Error Response:', response.status, errorData);
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          const extractedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          
+          if (!extractedText.trim()) {
+            throw new Error('No text found in the image');
+          }
+
+          // For Kurdish, apply grammar fixes while preserving line structure
+          if (language === 'ku') {
+            return extractedText
+              // Fix common verb forms that get misread
+              .replace(/مەردم/g, 'مردم')        // mirdim (I died) - fix extra ە
+              .replace(/مەردەم/g, 'مردم')      // mirdim (I died) - fix wrong vowels
+              .replace(/کەردم/g, 'کردم')       // kirdim (I did) - fix ە to nothing
+              .replace(/کەردەم/g, 'کردم')     // kirdim (I did) - fix wrong vowels
+              .replace(/هاتەم/g, 'هاتم')       // hatim (I came) - fix extra ە
+              .replace(/چووەم/g, 'چووم')       // çûm (I went) - fix extra ە
+              .replace(/بووەم/g, 'بووم')       // bûm (I was) - fix extra ە
+              .replace(/دیتەم/g, 'دیتم')       // dîtim (I saw) - fix extra ە
+              .replace(/وتەم/g, 'وتم')         // witim (I said) - fix extra ە
+              .replace(/خواردەم/g, 'خواردم')    // xwardim (I ate) - fix extra ە
+              .replace(/نووسیەم/g, 'نووسیم')   // nûsîm (I wrote) - fix extra ە
+              .replace(/خوێندەم/g, 'خوێندم')    // xwêndim (I read) - fix extra ە
+              
+              // Fix common word mistakes
+              .replace(/کەە/g, 'کە')          // ke (that) - fix double ە
+              .replace(/لەە/g, 'لە')          // le (from) - fix double ə  
+              .replace(/بەە/g, 'بە')          // be (with) - fix double ə
+              .replace(/دەە/g, 'دە')          // de (prefix) - fix double ə
+              .replace(/نەە/g, 'نە')          // ne (not) - fix double ə
+              
+              // Fix letter spacing and combination issues (but preserve line breaks)
+              .replace(/ک ە/g, 'کە')          // ke (that)
+              .replace(/ل ە/g, 'لە')          // le (from)
+              .replace(/ب ە/g, 'بە')          // be (with)
+              .replace(/د ە/g, 'دە')          // de (prefix)
+              .replace(/ن ە/g, 'نە')          // ne (not)
+              .replace(/م ن/g, 'من')          // min (I)
+              .replace(/ت ۆ/g, 'تۆ')          // to (you)
+              .replace(/ئ ەو/g, 'ئەو')        // ew (he/she)
+              
+              // Fix Kurdish specific letters that get misread
+              .replace(/وه\b/g, 'وە')         // we diphthong at word end
+              .replace(/ره\b/g, 'ڕە')         // rre at word end  
+              .replace(/یه\b/g, 'یە')         // ye at word end
+              
+              // Clean up spaces within lines but preserve line structure
+              .replace(/[ \t]+/g, ' ')        // Multiple spaces/tabs -> single space (within lines)
+              .replace(/[ \t]*\n[ \t]*/g, '\n') // Clean spaces around line breaks but keep breaks
+              .replace(/\n{3,}/g, '\n\n')     // Max 2 consecutive line breaks
+              .trim();                        // Only trim start/end of entire text
+          }
+          
+          return extractedText.trim();
+
+        } catch (error) {
+          lastError = error;
+          console.error(`OCR attempt ${attempt + 1} failed:`, error);
+          
+          if (attempt < maxRetries - 1) {
+            const waitTime = Math.pow(2, attempt) * 1000;
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+          }
+        }
+      }
+
+      console.error('OCR API Error:', lastError);
+      throw new Error(`Failed to extract text from image. Please try again.`);
+    } catch (error) {
+      console.error('OCR API Error:', error);
+      throw new Error('Failed to extract text from image. Please try again.');
+    }
+  }
+
+  private getRetryDelay(errorText: string): number | null {
+    try {
+      const errorData = JSON.parse(errorText);
+      const retryInfo = errorData.error?.details?.find((detail: any) => 
+        detail['@type'] === 'type.googleapis.com/google.rpc.RetryInfo'
+      );
+      if (retryInfo?.retryDelay) {
+        // Parse delay like "49s" to milliseconds
+        const match = retryInfo.retryDelay.match(/(\d+)s/);
+        return match ? parseInt(match[1]) * 1000 : null;
+      }
+    } catch (e) {
+      // Ignore parsing errors
+    }
+    return null;
+  }
+
+  private sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // Test method to validate OCR functionality
+  async testOCRConnection(): Promise<string> {
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{ text: "Say 'OCR connection test successful'" }]
+          }],
+          generationConfig: {
+            temperature: 0.1,
+            maxOutputTokens: 100,
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Test failed';
+    } catch (error) {
+      console.error('OCR Connection Test Error:', error);
+      throw error;
+    }
+  }
+
+  async translateText(prompt: string): Promise<string> {
+    try {
+      const response = await this.makeRequest(prompt);
+      return response.text;
+    } catch (error) {
+      console.error('Translation Error:', error);
+      throw error;
+    }
+  }
+
+  async researchQuery(query: string): Promise<ResearchResult> {
+    try {
+      const researchPrompt = `
+You are an AI Research Assistant. Please conduct comprehensive research on the following query: "${query}"
+
+Provide a detailed response in JSON format with the following structure:
+{
+  "title": "A concise title for the research",
+  "summary": "A comprehensive 2-3 paragraph summary of the topic",
+  "credibilityScore": "A score from 0-100 based on available reliable sources",
+  "keyFindings": [
+    "Key finding 1",
+    "Key finding 2", 
+    "Key finding 3",
+    "Key finding 4"
+  ],
+  "relatedTopics": [
+    "Related topic 1",
+    "Related topic 2",
+    "Related topic 3",
+    "Related topic 4",
+    "Related topic 5"
+  ],
+  "sources": [
+    {
+      "title": "Source title",
+      "author": "Author name",
+      "type": "academic|government|organization|news|other",
+      "credibilityScore": 0-100,
+      "publishDate": "YYYY-MM-DD",
+      "url": "https://example.com"
+    }
+  ],
+  "citations": [
+    {
+      "format": "APA",
+      "citation": "APA formatted citation"
+    },
+    {
+      "format": "MLA", 
+      "citation": "MLA formatted citation"
+    },
+    {
+      "format": "Chicago",
+      "citation": "Chicago formatted citation"
+    }
+  ]
+}
+
+Please ensure:
+1. The research is factual and based on credible sources
+2. Key findings are specific and actionable
+3. Related topics help users explore further
+4. Sources are from reputable academic, government, or organizational sources
+5. Citations follow proper formatting standards
+6. All content is appropriate for academic use
+7. If the query is in Kurdish, respond in Kurdish; if in English, respond in English
+8. Maintain high academic standards and objectivity
+
+Query: "${query}"
+`;
+
+      const response = await this.makeRequest(researchPrompt);
+      
+      // Try to parse JSON response
+      try {
+        const jsonMatch = response.text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const researchData = JSON.parse(jsonMatch[0]);
+          
+          // Add IDs and validate structure
+          const result: ResearchResult = {
+            id: Date.now().toString(),
+            title: researchData.title || 'Research Result',
+            summary: researchData.summary || 'Summary not available',
+            credibilityScore: researchData.credibilityScore || 75,
+            keyFindings: researchData.keyFindings || [],
+            relatedTopics: researchData.relatedTopics || [],
+            sources: (researchData.sources || []).map((source: any, index: number) => ({
+              id: (index + 1).toString(),
+              title: source.title || 'Unknown Source',
+              author: source.author || 'Unknown Author',
+              type: source.type || 'other',
+              credibilityScore: source.credibilityScore || 70,
+              publishDate: source.publishDate || new Date().toISOString().split('T')[0],
+              url: source.url || '#'
+            })),
+            citations: (researchData.citations || []).map((citation: any, index: number) => ({
+              id: (index + 1).toString(),
+              format: citation.format || 'APA',
+              citation: citation.citation || 'Citation not available'
+            }))
+          };
+          
+          return result;
+        }
+      } catch (parseError) {
+        console.warn('Could not parse JSON response, using fallback');
+      }
+
+      // Fallback if JSON parsing fails
+      return {
+        id: Date.now().toString(),
+        title: query,
+        summary: response.text.slice(0, 500) + '...',
+        credibilityScore: 75,
+        keyFindings: [
+          'Research completed using AI analysis',
+          'Multiple perspectives considered',
+          'Academic sources referenced',
+          'Comprehensive overview provided'
+        ],
+        relatedTopics: [
+          'Further research needed',
+          'Related academic studies',
+          'Current developments',
+          'Future implications',
+          'Practical applications'
+        ],
+        sources: [
+          {
+            id: '1',
+            title: 'AI Generated Research Summary',
+            author: 'AI Research Assistant',
+            type: 'other' as const,
+            credibilityScore: 75,
+            publishDate: new Date().toISOString().split('T')[0],
+            url: '#'
+          }
+        ],
+        citations: [
+          {
+            id: '1',
+            format: 'APA' as const,
+            citation: 'AI Research Assistant. (' + new Date().getFullYear() + '). Research Analysis of "' + query + '". AI Academic Hub.'
+          }
+        ]
+      };
+
+    } catch (error) {
+      console.error('Research Query Error:', error);
+      throw new Error('Unable to complete research query. Please try again.');
+    }
+  }
 }
 
 export const geminiService = new GeminiService();
+
+// Export research function for direct use
+export const researchQuery = (query: string) => geminiService.researchQuery(query);

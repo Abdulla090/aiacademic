@@ -124,5 +124,14 @@
   "knowledgeGraphGeneratorTitle": "Knowledge Graph Generator",
   "knowledgeGraphGeneratorDescription": "Visualize connections between concepts and ideas from your text.",
   "chatWithFile": "Chat with File",
-  "chatWithFileDescription": "Chat with your documents (PDF, DOCX, etc.) and get answers with references."
+  "chatWithFileDescription": "Chat with your documents (PDF, DOCX, etc.) and get answers with references.",
+  "ocrExtractor": "OCR Text Extractor",
+  "ocrExtractorDescription": "Extract text from images in Kurdish and English with high accuracy.",
+  "kurdishDialectTranslator": "Kurdish Dialect Translator",
+  "kurdishDialectTranslatorDescription": "Translate between Sorani and Kurmanji dialects with comprehensive dictionary.",
+  "translateBetweenSoraniKurmanji": "Translate between Sorani and Kurmanji",
+  "studyAnalyticsDashboard": "Study Analytics Dashboard",
+  "studyAnalyticsDashboardDescription": "Track and analyze your academic progress across all tools.",
+  "aiResearchAssistant": "AI Research Assistant",
+  "aiResearchAssistantDescription": "Advanced research helper with source validation and comprehensive research support."
 }

@@ -21,7 +21,11 @@ import {
   Image,
   Minimize,
   Network,
-  MessageSquare
+  MessageSquare,
+  FileImage,
+  Globe,
+  BarChart3,
+  Bot
 } from "lucide-react";
 import { MobileSidebarTrigger } from "@/components/MobileSidebarTrigger";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -177,6 +181,35 @@ const Index = () => {
       icon: MessageSquare,
       category: "tools",
       path: "/chat-with-file"
+    },
+    {
+      title: "ocrExtractor",
+      description: "ocrExtractorDescription",
+      icon: FileImage,
+      image: "/card-images/imaage-converter.png",
+      category: "tools",
+      path: "/ocr-extractor"
+    },
+    {
+      title: "kurdishDialectTranslator",
+      description: "kurdishDialectTranslatorDescription",
+      icon: Globe,
+      category: "tools",
+      path: "/kurdish-dialect-translator"
+    },
+    {
+      title: "studyAnalyticsDashboard",
+      description: "studyAnalyticsDashboardDescription",
+      icon: BarChart3,
+      category: "study",
+      path: "/study-analytics-dashboard"
+    },
+    {
+      title: "aiResearchAssistant",
+      description: "aiResearchAssistantDescription",
+      icon: Bot,
+      category: "study",
+      path: "/ai-research-assistant"
     }
   ];
 

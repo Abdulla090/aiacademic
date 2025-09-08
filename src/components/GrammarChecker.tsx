@@ -1,13 +1,24 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { CheckSquare, Copy, RefreshCw, CheckCircle, Download, Save, History, X, Upload } from 'lucide-react';
-import { geminiService, type GrammarCorrection } from '@/services/geminiService';
+import { CheckSquare, Copy, RefreshCw, CheckCircle, Download, Save, X, Upload, AlertCircle, Check, Lightbulb } from 'lucide-react';
+import { geminiService } from '@/services/geminiService';
 import { useToast } from '@/components/ui/use-toast';
-import { jsPDF } from "jspdf";
-import { notoNaskhArabic } from '@/lib/fonts';
+import html2pdf from 'html2pdf.js';
+import useIsMobile from '@/hooks/use-is-mobile';
+
+interface GrammarError {
+  id: string;
+  start: number;
+  end: number;
+  text: string;
+  message: string;
+  suggestions: string[];
+  type: 'grammar' | 'spelling' | 'style' | 'punctuation';
+  severity: 'error' | 'warning' | 'suggestion';
+}
 
 interface GrammarCheckerProps {
   language: string;
@@ -15,32 +26,25 @@ interface GrammarCheckerProps {
 
 export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
   const [text, setText] = useState('');
-  const [correction, setCorrection] = useState<GrammarCorrection | null>(null);
-  const [correctionHistory, setCorrectionHistory] = useState<GrammarCorrection[]>([]);
+  const [errors, setErrors] = useState<GrammarError[]>([]);
   const [loading, setLoading] = useState(false);
-  const [previewMode, setPreviewMode] = useState<'edit' | 'preview'>('edit');
-  const [showHistory, setShowHistory] = useState(false);
+  const [selectedError, setSelectedError] = useState<GrammarError | null>(null);
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+  const [showPopup, setShowPopup] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const popupRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   const { toast } = useToast();
-  
-  // Load saved text and history from localStorage on component mount
+
+  // Load saved text from localStorage
   useEffect(() => {
     const savedText = localStorage.getItem('grammarCheckerText');
     if (savedText) {
       setText(savedText);
     }
-    
-    const savedHistory = localStorage.getItem('grammarCheckerHistory');
-    if (savedHistory) {
-      try {
-        setCorrectionHistory(JSON.parse(savedHistory));
-      } catch {
-        // If parsing fails, clear the invalid history
-        localStorage.removeItem('grammarCheckerHistory');
-      }
-    }
   }, []);
-  
-  // Save text to localStorage whenever it changes
+
+  // Save text to localStorage
   useEffect(() => {
     if (text) {
       localStorage.setItem('grammarCheckerText', text);
@@ -48,17 +52,8 @@ export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
       localStorage.removeItem('grammarCheckerText');
     }
   }, [text]);
-  
-  // Save history to localStorage whenever it changes
-  useEffect(() => {
-    if (correctionHistory.length > 0) {
-      localStorage.setItem('grammarCheckerHistory', JSON.stringify(correctionHistory));
-    } else {
-      localStorage.removeItem('grammarCheckerHistory');
-    }
-  }, [correctionHistory]);
 
-  const handleCheck = async () => {
+  const checkGrammar = async () => {
     if (!text.trim()) {
       toast({
         title: 'هەڵە',
@@ -69,21 +64,25 @@ export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
     }
 
     setLoading(true);
+    setErrors([]);
+    
     try {
-      const result = await geminiService.checkGrammar(text, language);
-      setCorrection(result);
+      const result = await geminiService.checkGrammarDetailed(text, language);
+      setErrors(result);
       
-      // Add to history (limit to 10 items)
-      setCorrectionHistory(prev => {
-        const newHistory = [result, ...prev.slice(0, 9)];
-        return newHistory;
-      });
-      
-      toast({
-        title: 'پشکنین تەواو بوو',
-        description: 'ڕێزمانەکە پشکنرا'
-      });
+      if (result.length === 0) {
+        toast({
+          title: 'زۆر باش!',
+          description: 'هیچ هەڵەیەک نەدۆزرایەوە',
+        });
+      } else {
+        toast({
+          title: 'پشکنین تەواو بوو',
+          description: `${result.length} هەڵە دۆزرایەوە`,
+        });
+      }
     } catch (error) {
+      console.error('Grammar check error:', error);
       toast({
         title: 'هەڵە',
         description: 'نەتوانرا ڕێزمانەکە پشکنرێت',
@@ -94,24 +93,102 @@ export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
     }
   };
 
-  const handleAccept = () => {
-    if (correction) {
-      setText(correction.corrected);
-      toast({
-        title: 'گۆڕانکارییەکان جێبەجێ کران',
-        description: 'نووسینەکە ڕاست کرایەوە'
-      });
+  const applySuggestion = useCallback((error: GrammarError, suggestion: string) => {
+    const newText = text.substring(0, error.start) + suggestion + text.substring(error.end);
+    setText(newText);
+    
+    const updatedErrors = errors.filter(e => e.id !== error.id).map(e => {
+      if (e.start > error.end) {
+        const lengthDiff = suggestion.length - (error.end - error.start);
+        return {
+          ...e,
+          start: e.start + lengthDiff,
+          end: e.end + lengthDiff
+        };
+      }
+      return e;
+    });
+    
+    setErrors(updatedErrors);
+    setShowPopup(false);
+    setSelectedError(null);
+    
+    toast({
+      title: 'گۆڕانکاری جێبەجێ کرا',
+      description: 'پێشنیارەکە جێبەجێ کرا',
+    });
+  }, [text, errors]);
+
+  const handleTextClick = useCallback((event: React.MouseEvent<HTMLTextAreaElement>) => {
+    if (!textareaRef.current || errors.length === 0) return;
+
+    const textarea = textareaRef.current;
+    const clickPosition = textarea.selectionStart;
+    
+    const clickedError = errors.find(error => 
+      clickPosition >= error.start && clickPosition <= error.end
+    );
+
+    if (clickedError) {
+      if (isMobile) {
+        setSelectedError(clickedError);
+        setShowPopup(true);
+      } else {
+        const rect = textarea.getBoundingClientRect();
+        const textBeforeClick = text.substring(0, clickPosition);
+        const lines = textBeforeClick.split('\n');
+        const lineHeight = 20;
+        const charWidth = 8;
+        
+        const x = rect.left + (lines[lines.length - 1].length * charWidth);
+        const y = rect.top + (lines.length - 1) * lineHeight;
+        
+        setPopupPosition({ x, y });
+        setSelectedError(clickedError);
+        setShowPopup(true);
+      }
+    } else {
+      setShowPopup(false);
+      setSelectedError(null);
     }
+  }, [errors, text, isMobile]);
+
+  const getHighlightedText = () => {
+    if (errors.length === 0) return text;
+
+    let result = '';
+    let lastIndex = 0;
+
+    const sortedErrors = [...errors].sort((a, b) => a.start - b.start);
+
+    for (const error of sortedErrors) {
+      result += text.substring(lastIndex, error.start);
+      
+      const errorText = text.substring(error.start, error.end);
+      const colorClass = {
+        'error': 'bg-red-200 border-b-2 border-red-500',
+        'warning': 'bg-yellow-200 border-b-2 border-yellow-500',
+        'suggestion': 'bg-blue-200 border-b-2 border-blue-500'
+      }[error.severity];
+      
+      result += `<span class="${colorClass} cursor-pointer" data-error-id="${error.id}">${errorText}</span>`;
+      lastIndex = error.end;
+    }
+    
+    result += text.substring(lastIndex);
+    return result;
   };
 
-  const handleCopy = async (textToCopy: string) => {
+  const copyToClipboard = async () => {
+    if (!text.trim()) return;
+    
     try {
-      await navigator.clipboard.writeText(textToCopy);
+      await navigator.clipboard.writeText(text);
       toast({
         title: 'کۆپی کرا',
-        description: 'نووسینەکە بۆ کلیپبۆرد کۆپی کرا'
+        description: 'نووسینەکە کۆپی کرا'
       });
-    } catch {
+    } catch (error) {
       toast({
         title: 'هەڵە',
         description: 'نەتوانرا کۆپی بکرێت',
@@ -119,234 +196,218 @@ export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
       });
     }
   };
-  
-  const handleDownload = async (text: string, format: 'text' | 'pdf' = 'text') => {
-    try {
-      if (format === 'pdf') {
-        const doc = new jsPDF();
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const pageHeight = doc.internal.pageSize.getHeight();
-        let yPosition = 20;
-        
-        // Add Arabic/Kurdish font support
-        doc.addFileToVFS('NotoNaskhArabic-Regular.ttf', notoNaskhArabic);
-        doc.addFont('NotoNaskhArabic-Regular.ttf', 'NotoNaskhArabic', 'normal');
-        doc.setFont('NotoNaskhArabic');
 
-        // Add title
-        doc.setFontSize(18);
-        doc.setFont(undefined, 'bold');
-        const titleLines = doc.splitTextToSize('نووسینی ڕاستکراوە', pageWidth - 20);
-        doc.text(titleLines, pageWidth / 2, yPosition, { align: 'center' });
-        yPosition += (titleLines.length * 10) + 10;
-        
-        // Reset font
-        doc.setFont(undefined, 'normal');
-        doc.setFontSize(12);
-        
-        // Process content with markdown formatting
-        const lines = (text || '').split('\n');
-        let currentListItems: string[] = [];
-        let currentListType: 'ul' | 'ol' | null = null;
-        let inCodeBlock = false;
-        
-        const flushList = () => {
-          if (currentListItems.length > 0) {
-            currentListItems.forEach((item, index) => {
-              // Check if we need a new page
-              if (yPosition > pageHeight - 30) {
-                doc.addPage();
-                yPosition = 20;
-                // Reset font for new page
-                doc.setFont('NotoNaskhArabic');
-                doc.setFontSize(12);
-              }
-              
-              const bullet = currentListType === 'ol' ? `${index + 1}. ` : '• ';
-              const itemText = `${bullet}${item}`;
-              const itemLines = doc.splitTextToSize(itemText, pageWidth - 30);
-              
-              doc.text(itemLines, 20, yPosition);
-              yPosition += itemLines.length * 7 + 3;
-            });
-            currentListItems = [];
-            currentListType = null;
-          }
-        };
-        
-        for (const line of lines) {
-          // Check if we need a new page
-          if (yPosition > pageHeight - 30) {
-            doc.addPage();
-            yPosition = 20;
-            // Reset font for new page
-            doc.setFont('NotoNaskhArabic');
-            doc.setFontSize(12);
-          }
-          
-          // Handle code blocks
-          if (line.trim().startsWith('```')) {
-            flushList();
-            inCodeBlock = !inCodeBlock;
-            continue;
-          }
-          
-          if (inCodeBlock) {
-            const codeLines = doc.splitTextToSize(line, pageWidth - 30);
-            doc.setFontSize(10);
-            codeLines.forEach(codeLine => {
-              // Check if we need a new page
-              if (yPosition > pageHeight - 30) {
-                doc.addPage();
-                yPosition = 20;
-                // Reset font for new page
-                doc.setFont('NotoNaskhArabic');
-                doc.setFontSize(10);
-              }
-              doc.text(codeLine, 25, yPosition);
-              yPosition += 7;
-            });
-            doc.setFontSize(12);
-            continue;
-          }
-          
-          // Handle headers
-          const headerMatch = line.match(/^(#{1,6})\s+(.+)$/);
-          if (headerMatch) {
-            flushList();
-            const level = headerMatch[1].length;
-            const text = headerMatch[2];
-            const headerSize = 24 - (level * 2);
-            doc.setFontSize(headerSize);
-            doc.setFont(undefined, 'bold');
-            const headerLines = doc.splitTextToSize(text, pageWidth - 20);
-            doc.text(headerLines, pageWidth / 2, yPosition, { align: 'center' });
-            yPosition += (headerLines.length * (headerSize * 0.7)) + 10;
-            doc.setFont(undefined, 'normal');
-            doc.setFontSize(12);
-            continue;
-          }
-          
-          // Handle unordered lists
-          const ulMatch = line.match(/^\s*[-*+]\s+(.+)$/);
-          if (ulMatch) {
-            if (currentListType !== 'ul') {
-              flushList();
-              currentListType = 'ul';
-            }
-            currentListItems.push(ulMatch[1]);
-            continue;
-          }
-          
-          // Handle ordered lists
-          const olMatch = line.match(/^\s*\d+\.\s+(.+)$/);
-          if (olMatch) {
-            if (currentListType !== 'ol') {
-              flushList();
-              currentListType = 'ol';
-            }
-            currentListItems.push(olMatch[1]);
-            continue;
-          }
-          
-          // Handle blockquotes
-          if (line.trim().startsWith('>')) {
-            flushList();
-            const quoteText = line.replace(/^\s*>\s*/, '');
-            doc.setFont(undefined, 'italic');
-            const quoteLines = doc.splitTextToSize(quoteText, pageWidth - 40);
-            quoteLines.forEach((quoteLine, index) => {
-              // Check if we need a new page
-              if (yPosition > pageHeight - 30) {
-                doc.addPage();
-                yPosition = 20;
-                // Reset font for new page
-                doc.setFont('NotoNaskhArabic');
-                doc.setFont(undefined, 'italic');
-              }
-              doc.text(quoteLine, 30, yPosition);
-              yPosition += 7;
-            });
-            doc.setFont(undefined, 'normal');
-            yPosition += 5;
-            continue;
-          }
-          
-          // Handle horizontal rules
-          if (line.trim().match(/^[-*_]{3,}$/)) {
-            flushList();
-            doc.line(20, yPosition, pageWidth - 20, yPosition);
-            yPosition += 10;
-            continue;
-          }
-          
-          // Handle empty lines
-          if (line.trim() === '') {
-            flushList();
-            yPosition += 7;
-            continue;
-          }
-          
-          // Handle regular paragraphs with inline formatting
-          flushList();
-          let formattedLine = line;
-          
-          // Handle bold text (**text**)
-          const boldMatches = [...formattedLine.matchAll(/\*\*(.*?)\*\*/g)];
-          if (boldMatches.length > 0) {
-            // For simplicity, we'll just remove the bold markers and add a note
-            formattedLine = formattedLine.replace(/\*\*(.*?)\*\*/g, '$1');
-          }
-          
-          // Handle italic text (*text*)
-          const italicMatches = [...formattedLine.matchAll(/\*(.*?)\*/g)];
-          if (italicMatches.length > 0) {
-            // For simplicity, we'll just remove the italic markers and add a note
-            formattedLine = formattedLine.replace(/\*(.*?)\*/g, '$1');
-          }
-          
-          const splitText = doc.splitTextToSize(formattedLine, pageWidth - 20);
-          doc.text(splitText, 10, yPosition);
-          yPosition += splitText.length * 7 + 3;
-        }
-        
-        // Flush any remaining list
-        flushList();
-        
-        // Save the PDF
-        doc.save('نووسینی ڕاستکراوە.pdf');
-        toast({
-          title: 'دابەزاندن',
-          description: 'فایل PDF دابەزێنرا'
-        });
-        return;
-      }
-      
-      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'نووسینی ڕاستکراوە.txt';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      toast({
-        title: 'دابەزاندن',
-        description: 'فایل دابەزێنرا'
-      });
-    } catch (error) {
-      console.error('Download error:', error);
+  const saveText = () => {
+    const element = document.createElement('a');
+    const file = new Blob([text], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = 'grammar-checked-text.txt';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    
+    toast({
+      title: 'سەرکەوتوو بوو',
+      description: 'فایلەکە پاشەکەوت کرا'
+    });
+  };
+
+  const exportToPDF = async () => {
+    if (!text.trim()) {
       toast({
         title: 'هەڵە',
-        description: 'نەتوانرا فایلەکە دابەزێنرێت',
+        description: 'هیچ نووسینێک نییە بۆ هەناردن',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    try {
+      const correctedText = errors.length > 0 ? 
+        errors.reduce((acc, error) => {
+          if (error.suggestions.length > 0) {
+            return acc.replace(error.text, error.suggestions[0]);
+          }
+          return acc;
+        }, text) : text;
+
+      const htmlContent = `
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
+            <style>
+              body { font-family: 'Noto Naskh Arabic', serif; line-height: 1.8; direction: rtl; padding: 20px; }
+              .container { max-width: 800px; margin: 0 auto; padding: 40px; }
+              .header { text-align: center; margin-bottom: 40px; border-bottom: 3px solid #8B5CF6; padding-bottom: 20px; }
+              .title { font-size: 28px; font-weight: bold; color: #1F2937; margin-bottom: 10px; }
+              .content { font-size: 16px; line-height: 2; color: #374151; text-align: justify; }
+              .stats { display: flex; justify-content: space-around; background: #F3F4F6; padding: 20px; border-radius: 8px; margin-top: 30px; }
+              .stat-item { text-align: center; }
+              .stat-number { font-size: 24px; font-weight: bold; color: #8B5CF6; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <div class="title">ڕاپۆرتی ڕاستکردنەوەی ڕێزمان</div>
+              </div>
+              <div class="content">${correctedText.replace(/\n/g, '<br>')}</div>
+              <div class="stats">
+                <div class="stat-item"><div class="stat-number">${text.split(/\s+/).length}</div><div>وشە</div></div>
+                <div class="stat-item"><div class="stat-number">${errors.length}</div><div>هەڵە</div></div>
+              </div>
+            </div>
+          </body>
+        </html>
+      `;
+
+      const opt = {
+        margin: 1,
+        filename: 'grammar-report.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, allowTaint: true, letterRendering: true },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+
+      await html2pdf().from(htmlContent).set(opt).save();
+      
+      toast({
+        title: 'سەرکەوتوو بوو',
+        description: 'ڕاپۆرتەکە بە PDF هەناردە کرا',
+      });
+
+    } catch (error) {
+      console.error('PDF export error:', error);
+      toast({
+        title: 'هەڵە',
+        description: 'نەتوانرا PDF هەناردە بکرێت',
         variant: 'destructive'
       });
     }
   };
 
-  const hasCorrections = correction && correction.original !== correction.corrected;
+  const loadFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      setText(content);
+      setErrors([]);
+      toast({
+        title: 'سەرکەوتوو بوو',
+        description: 'فایلەکە بارکرا'
+      });
+    };
+    reader.readAsText(file);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
+        setShowPopup(false);
+        setSelectedError(null);
+      }
+    };
+
+    if (showPopup && !isMobile) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showPopup, isMobile]);
+
+  const ErrorPopup = () => {
+    if (!showPopup || !selectedError) return null;
+
+    const severityIcon = {
+      'error': <AlertCircle className="h-4 w-4 text-red-500" />,
+      'warning': <AlertCircle className="h-4 w-4 text-yellow-500" />,
+      'suggestion': <Lightbulb className="h-4 w-4 text-blue-500" />
+    }[selectedError.severity];
+
+    const severityColor = {
+      'error': 'border-red-500 bg-red-50',
+      'warning': 'border-yellow-500 bg-yellow-50',
+      'suggestion': 'border-blue-500 bg-blue-50'
+    }[selectedError.severity];
+
+    if (isMobile) {
+      return (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center">
+          <div className={`bg-white rounded-t-lg p-4 w-full max-w-md border-t-4 ${severityColor} max-h-80 overflow-y-auto`}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                {severityIcon}
+                <span className="font-semibold capitalize">{selectedError.type}</span>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setShowPopup(false)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <p className="text-sm text-gray-700 mb-3">{selectedError.message}</p>
+            
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-gray-600">پێشنیارەکان:</p>
+              {selectedError.suggestions.map((suggestion, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start text-right"
+                  onClick={() => applySuggestion(selectedError, suggestion)}
+                >
+                  <Check className="h-3 w-3 mr-2" />
+                  {suggestion}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div 
+        ref={popupRef}
+        className={`absolute z-50 bg-white rounded-lg shadow-lg border-2 p-3 w-64 ${severityColor}`}
+        style={{ 
+          left: popupPosition.x, 
+          top: popupPosition.y - 100,
+          transform: 'translateX(-50%)'
+        }}
+      >
+        <div className="flex items-center gap-2 mb-2">
+          {severityIcon}
+          <span className="font-semibold text-sm capitalize">{selectedError.type}</span>
+        </div>
+        
+        <p className="text-sm text-gray-700 mb-3">{selectedError.message}</p>
+        
+        <div className="space-y-1">
+          <p className="text-xs font-medium text-gray-600">پێشنیارەکان:</p>
+          {selectedError.suggestions.map((suggestion, index) => (
+            <Button
+              key={index}
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start text-xs h-auto p-1"
+              onClick={() => applySuggestion(selectedError, suggestion)}
+            >
+              <Check className="h-3 w-3 mr-1" />
+              {suggestion}
+            </Button>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -355,596 +416,220 @@ export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
           <CheckSquare className="h-6 w-6" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-foreground sorani-text">پشکنەری ڕێزمان</h1>
-          <p className="text-muted-foreground latin-text">Grammar Checker</p>
+          <h1 className="text-3xl font-bold text-foreground sorani-text">ڕاستکەرەوەی ڕێزمان</h1>
+          <p className="text-muted-foreground latin-text">Advanced Grammar Checker</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Input Panel */}
+      <div className="grid gap-8 lg:grid-cols-2">
         <Card className="card-academic">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="sorani-text flex items-center gap-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
               <CheckSquare className="h-5 w-5" />
-              نووسینی سەرەتایی
+              <span className="sorani-text">نووسینەکەت بنووسە</span>
             </CardTitle>
-            <div className="flex gap-2">
-              <Button size="sm" variant="outline" onClick={() => handleCopy(text)} disabled={!text} className="gap-1">
-                <Copy className="h-4 w-4" />
-                کۆپی
-              </Button>
-              <Button size="sm" variant="outline" onClick={() => handleDownload(text, 'pdf')} disabled={!text} className="gap-1">
-                <Download className="h-4 w-4" />
-                PDF
-              </Button>
-            </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex justify-between items-center">
-              <p className="text-sm text-muted-foreground sorani-text">
-                وشەکان: {text.split(/\s+/).filter(word => word.length > 0).length}
-              </p>
-              <p className="text-sm text-muted-foreground sorani-text">
-                نووسەکان: {text.length}
-              </p>
-            </div>
-            
-            <Textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="نووسینەکەت لێرە بنووسە بۆ پشکنینی ڕێزمان و ستایل..."
-              className="min-h-[500px] sorani-text text-base leading-relaxed"
-            />
-            
-            <div className="flex justify-between items-center">
-              <p className="text-sm text-muted-foreground sorani-text">
-                وشەکان: {text.split(/\s+/).filter(word => word.length > 0).length}
-              </p>
-              <p className="text-sm text-muted-foreground sorani-text">
-                نووسەکان: {text.length}
-              </p>
-            </div>
-            
-            <div className="flex gap-2">
-              <Button
-                onClick={handleCheck}
-                disabled={loading || !text.trim()}
-                className="btn-academic-primary flex-1"
-              >
-                {loading ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 animate-spin mr-2" />
-                    پشکنین...
-                  </>
-                ) : (
-                  <>
-                    <CheckSquare className="h-4 w-4 mr-2" />
-                    پشکنینی ڕێزمان
-                  </>
-                )}
-              </Button>
-              
-              <Button
-                onClick={() => setText('')}
-                variant="outline"
-                className="gap-1"
-              >
-                <RefreshCw className="h-4 w-4" />
-                دووبارەکردنەوە
-              </Button>
-              
-              <Button
-                onClick={() => {
-                  const savedCorrectedText = localStorage.getItem('grammarCheckerCorrectedText');
-                  if (savedCorrectedText) {
-                    setText(savedCorrectedText);
-                    toast({
-                      title: 'بارکردن',
-                      description: 'نووسینی ڕاستکراوە بار کرایەوە'
-                    });
-                  } else {
-                    toast({
-                      title: 'هیچ نووسینێک نەدۆزرایەوە',
-                      description: 'هیچ نووسینێکی ڕاستکراوە پاشەکەوت نەکراوە',
-                      variant: 'destructive'
-                    });
-                  }
+            <div className="relative">
+              <Textarea
+                ref={textareaRef}
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                onClick={handleTextClick}
+                placeholder="نووسینەکەت لێرە بنووسە..."
+                className="input-academic sorani-text min-h-[400px] font-mono"
+                style={{ 
+                  background: errors.length > 0 ? 'transparent' : undefined,
+                  position: errors.length > 0 ? 'absolute' : 'relative',
+                  zIndex: errors.length > 0 ? 2 : 'auto',
+                  color: errors.length > 0 ? 'transparent' : undefined
                 }}
-                variant="outline"
-                className="gap-1"
-              >
-                <Save className="h-4 w-4" />
-                بارکردن
-              </Button>
+              />
               
-              <Button
-                onClick={() => setShowHistory(true)}
-                variant="outline"
-                className="gap-1"
-              >
-                <History className="h-4 w-4" />
-                مێژوو
-              </Button>
-              
-              {/* History Modal */}
-              {showHistory && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                  <div className="bg-background rounded-lg max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col">
-                    <div className="flex justify-between items-center p-4 border-b">
-                      <h3 className="text-lg font-semibold sorani-text">مێژووی گۆڕانکارییەکان</h3>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowHistory(false)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="overflow-y-auto flex-1 p-4">
-                      {correctionHistory.length > 0 ? (
-                        <div className="space-y-4">
-                          {correctionHistory.map((item, index) => (
-                            <div key={index} className="border border-border rounded-lg p-4">
-                              <div className="flex justify-between items-start mb-2">
-                                <h4 className="font-semibold text-sm sorani-text">
-                                  گۆڕانکاریی #{correctionHistory.length - index}
-                                </h4>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => {
-                                    setText(item.corrected);
-                                    setShowHistory(false);
-                                    toast({
-                                      title: 'بارکردن',
-                                      description: 'نووسینی ڕاستکراوە بار کرایەوە'
-                                    });
-                                  }}
-                                  className="gap-1"
-                                >
-                                  <Download className="h-4 w-4" />
-                                  بارکردن
-                                </Button>
-                              </div>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                  <h5 className="text-xs font-medium text-muted-foreground mb-1 sorani-text">سەرەتایی:</h5>
-                                  <p className="text-sm sorani-text line-clamp-3" style={{ whiteSpace: 'pre-wrap' }}>
-                                    {item.original}
-                                  </p>
-                                </div>
-                                <div>
-                                  <h5 className="text-xs font-medium text-muted-foreground mb-1 sorani-text">ڕاستکراوە:</h5>
-                                  <p className="text-sm sorani-text line-clamp-3" style={{ whiteSpace: 'pre-wrap' }}>
-                                    {item.corrected}
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="text-center py-8 text-muted-foreground">
-                          <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                          <p className="sorani-text">هیچ مێژووێک نییە</p>
-                          <p className="text-sm mt-1 sorani-text">هیچ گۆڕانکارییەک پاشەکەوت نەکراوە</p>
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-4 border-t flex justify-between">
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          onClick={() => {
-                            const doc = new jsPDF();
-                            const pageWidth = doc.internal.pageSize.getWidth();
-                            let yPosition = 20;
-                            
-                            // Add Arabic/Kurdish font support
-                            doc.addFileToVFS('NotoNaskhArabic-Regular.ttf', notoNaskhArabic);
-                            doc.addFont('NotoNaskhArabic-Regular.ttf', 'NotoNaskhArabic', 'normal');
-                            doc.setFont('NotoNaskhArabic');
-
-                            // Add title
-                            doc.setFontSize(18);
-                            doc.setFont('NotoNaskhArabic');
-                            doc.text('مێژووی گۆڕانکارییەکان', pageWidth / 2, yPosition, { align: 'center' });
-                            yPosition += 20;
-                            
-                            // Add history items
-                            correctionHistory.forEach((item, index) => {
-                              // Check if we need a new page
-                              if (yPosition > doc.internal.pageSize.getHeight() - 40) {
-                                doc.addPage();
-                                yPosition = 20;
-                                // Reset font for new page
-                                doc.setFont('NotoNaskhArabic');
-                              }
-                              
-                              // Add item title
-                              doc.setFontSize(14);
-                              doc.setFont('NotoNaskhArabic');
-                              doc.text(`گۆڕانکاریی #${correctionHistory.length - index}`, 10, yPosition);
-                              yPosition += 10;
-                              
-                              // Add original text
-                              doc.setFontSize(12);
-                              doc.text('سەرەتایی:', 10, yPosition);
-                              yPosition += 7;
-                              
-                              const originalLines = doc.splitTextToSize(item.original, pageWidth - 20);
-                              for (let i = 0; i < originalLines.length; i++) {
-                                if (yPosition > doc.internal.pageSize.getHeight() - 20) {
-                                  doc.addPage();
-                                  yPosition = 20;
-                                  // Reset font for new page
-                                  doc.setFont('NotoNaskhArabic');
-                                }
-                                doc.text(originalLines[i], 15, yPosition);
-                                yPosition += 7;
-                              }
-                              
-                              yPosition += 5;
-                              
-                              // Add corrected text
-                              doc.setFont('NotoNaskhArabic');
-                              doc.text('ڕاستکراوە:', 10, yPosition);
-                              yPosition += 7;
-                              
-                              doc.setFont('NotoNaskhArabic');
-                              const correctedLines = doc.splitTextToSize(item.corrected, pageWidth - 20);
-                              for (let i = 0; i < correctedLines.length; i++) {
-                                if (yPosition > doc.internal.pageSize.getHeight() - 20) {
-                                  doc.addPage();
-                                  yPosition = 20;
-                                  // Reset font for new page
-                                  doc.setFont('NotoNaskhArabic');
-                                }
-                                doc.text(correctedLines[i], 15, yPosition);
-                                yPosition += 7;
-                              }
-                              
-                              yPosition += 15;
-                            });
-                            
-                            // Save the PDF
-                            doc.save('مێژووی گۆڕانکارییەکان.pdf');
-                          }}
-                          className="gap-1"
-                        >
-                          <Download className="h-4 w-4" />
-                          PDF
-                        </Button>
-                        
-                        <Button
-                          variant="outline"
-                          onClick={() => {
-                            const input = document.createElement('input');
-                            input.type = 'file';
-                            input.accept = '.json';
-                            input.onchange = (event) => {
-                              const file = (event.target as HTMLInputElement).files?.[0];
-                              if (file) {
-                                const reader = new FileReader();
-                                reader.onload = (e) => {
-                                  try {
-                                    const content = e.target?.result as string;
-                                    const parsedHistory = JSON.parse(content);
-                                    if (Array.isArray(parsedHistory)) {
-                                      setCorrectionHistory(parsedHistory);
-                                      localStorage.setItem('grammarCheckerHistory', JSON.stringify(parsedHistory));
-                                      toast({
-                                        title: 'هاوردەکردن',
-                                        description: 'مێژووی گۆڕانکارییەکان هاوردە کرایەوە'
-                                      });
-                                    } else {
-                                      throw new Error('Invalid file format');
-                                    }
-                                  } catch {
-                                    toast({
-                                      title: 'هەڵە',
-                                      description: 'نەتوانرا فایلەکە هاوردە بکرێت',
-                                      variant: 'destructive'
-                                    });
-                                  }
-                                };
-                                reader.readAsText(file);
-                              }
-                            };
-                            input.click();
-                          }}
-                          className="gap-1"
-                        >
-                          <Upload className="h-4 w-4" />
-                          هاوردەکردن
-                        </Button>
-                        
-                        <Button
-                          variant="outline"
-                          onClick={() => {
-                            const blob = new Blob([JSON.stringify(correctionHistory, null, 2)], { type: 'application/json' });
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = 'مێژووی گۆڕانکارییەکان.json';
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                            URL.revokeObjectURL(url);
-                            
-                            toast({
-                              title: 'هاوردەکردن',
-                              description: 'مێژووی گۆڕانکارییەکان هاوردە کرایەوە'
-                            });
-                          }}
-                          className="gap-1"
-                        >
-                          <Download className="h-4 w-4" />
-                          هاوردەکردن
-                        </Button>
-                      </div>
-                      
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setCorrectionHistory([]);
-                          localStorage.removeItem('grammarCheckerHistory');
-                          toast({
-                            title: 'مێژوو سڕایەوە',
-                            description: 'هەموو مێژووی گۆڕانکارییەکان سڕدرایەوە'
-                          });
-                        }}
-                      >
-                        سڕینەوەی هەموو مێژوو
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+              {errors.length > 0 && (
+                <div 
+                  className="absolute inset-0 p-3 font-mono text-sm pointer-events-none whitespace-pre-wrap break-words"
+                  style={{ 
+                    zIndex: 1,
+                    fontSize: '14px',
+                    lineHeight: '1.5',
+                    fontFamily: 'monospace'
+                  }}
+                  dangerouslySetInnerHTML={{ __html: getHighlightedText() }}
+                />
               )}
             </div>
+            
+            <div className="flex flex-wrap gap-2">
+              <Button 
+                onClick={checkGrammar}
+                disabled={loading || !text.trim()}
+                className="btn-academic-primary"
+              >
+                {loading ? (
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <CheckSquare className="h-4 w-4 mr-2" />
+                )}
+                <span className="sorani-text">پشکنین</span>
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setText('');
+                  setErrors([]);
+                  setShowPopup(false);
+                }}
+                className="btn-academic-secondary"
+              >
+                <X className="h-4 w-4 mr-2" />
+                <span className="sorani-text">پاککردنەوە</span>
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={copyToClipboard}
+                disabled={!text.trim()}
+                className="btn-academic-secondary"
+              >
+                <Copy className="h-4 w-4 mr-2" />
+                <span className="sorani-text">کۆپی</span>
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={saveText}
+                disabled={!text.trim()}
+                className="btn-academic-secondary"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                <span className="sorani-text">پاشەکەوت</span>
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={exportToPDF}
+                disabled={!text.trim()}
+                className="btn-academic-secondary"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                <span className="sorani-text">PDF</span>
+              </Button>
+
+              <div className="relative">
+                <input
+                  type="file"
+                  accept=".txt"
+                  onChange={loadFile}
+                  className="hidden"
+                  id="file-upload"
+                />
+                <Button
+                  variant="outline"
+                  onClick={() => document.getElementById('file-upload')?.click()}
+                  className="btn-academic-secondary"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  <span className="sorani-text">بارکردن</span>
+                </Button>
+              </div>
+            </div>
+
+            {errors.length > 0 && (
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="font-semibold mb-2 sorani-text">کورتەی هەڵەکان</h3>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(
+                    errors.reduce((acc, error) => {
+                      acc[error.type] = (acc[error.type] || 0) + 1;
+                      return acc;
+                    }, {} as Record<string, number>)
+                  ).map(([type, count]) => (
+                    <Badge key={type} variant="secondary" className="sorani-text">
+                      {type}: {count}
+                    </Badge>
+                  ))}
+                </div>
+                <p className="text-sm text-muted-foreground mt-2 sorani-text">
+                  لەسەر نووسینەکە کلیک بکە بۆ دیتنی پێشنیارەکان
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Output Panel */}
         <Card className="card-academic">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="sorani-text flex items-center gap-2">
-              <CheckSquare className="h-5 w-5" />
-              نووسینی ڕاستکراوە
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5" />
+              <span className="sorani-text">ئەنجامەکان</span>
             </CardTitle>
-            {correction && (
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant={previewMode === 'edit' ? 'default' : 'outline'}
-                  onClick={() => setPreviewMode('edit')}
-                  className="gap-1"
-                >
-                  دەستکاری
-                </Button>
-                <Button
-                  size="sm"
-                  variant={previewMode === 'preview' ? 'default' : 'outline'}
-                  onClick={() => setPreviewMode('preview')}
-                  className="gap-1"
-                >
-                  پێشبینین
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => handleCopy(correction.corrected)} className="gap-1">
-                  <Copy className="h-4 w-4" />
-                  کۆپی
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => handleDownload(correction.corrected, 'pdf')} className="gap-1">
-                  <Download className="h-4 w-4" />
-                  PDF
-                </Button>
-                {hasCorrections && (
-                  <Button size="sm" onClick={handleAccept} className="btn-academic-primary gap-1">
-                    <CheckCircle className="h-4 w-4" />
-                    جێبەجێکردن
-                  </Button>
-                )}
-              </div>
-            )}
-            
-            {correction && (
-              <div className="border-t border-border pt-4 mt-4">
-                <h3 className="font-semibold text-sm text-foreground mb-2 sorani-text">ئامارەکانی نووسینی ڕاستکراوە:</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-secondary/20 p-3 rounded-lg">
-                    <p className="text-xs text-muted-foreground sorani-text">وشەکان</p>
-                    <p className="text-lg font-semibold">{correction.corrected.split(/\s+/).filter(word => word.length > 0).length}</p>
-                  </div>
-                  <div className="bg-secondary/20 p-3 rounded-lg">
-                    <p className="text-xs text-muted-foreground sorani-text">نووسەکان</p>
-                    <p className="text-lg font-semibold">{correction.corrected.length}</p>
-                  </div>
-                  <div className="bg-secondary/20 p-3 rounded-lg">
-                    <p className="text-xs text-muted-foreground sorani-text">گۆڕانکارییەکان</p>
-                    <p className="text-lg font-semibold">{hasCorrections ? correction.suggestions.length : 0}</p>
-                  </div>
-                  <div className="bg-secondary/20 p-3 rounded-lg">
-                    <p className="text-xs text-muted-foreground sorani-text">ڕێژەی گۆڕانکاری</p>
-                    <p className="text-lg font-semibold">
-                      {correction.original.length > 0
-                        ? Math.round((correction.corrected.length / correction.original.length) * 100)
-                        : 0}%
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
           </CardHeader>
           <CardContent>
-            {correction ? (
-              <div className="space-y-6">
-                {hasCorrections ? (
-                  <Badge variant="secondary" className="bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300">
-                    گۆڕانکاریەکان هەن
-                  </Badge>
-                ) : (
-                  <Badge variant="secondary" className="bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                    هیچ گۆڕانکارییەک پێویست نییە
-                  </Badge>
-                )}
-
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="font-semibold text-sm text-foreground sorani-text">نووسینی ڕاستکراوە:</h3>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          localStorage.setItem('grammarCheckerCorrectedText', correction.corrected);
-                          toast({
-                            title: 'پاشەکەوتکردن',
-                            description: 'نووسینی ڕاستکراوە پاشەکەوت کرایەوە'
-                          });
-                        }}
-                        className="gap-1"
-                      >
-                        <Save className="h-4 w-4" />
-                        پاشەکەوتکردن
-                      </Button>
-                    </div>
-                    {previewMode === 'edit' ? (
-                      <Textarea
-                        value={correction.corrected}
-                        readOnly
-                        className="min-h-[300px] sorani-text text-base leading-relaxed bg-secondary/50"
-                      />
-                    ) : (
-                      <div
-                        className="min-h-[300px] sorani-text text-base leading-relaxed p-4 border border-border rounded-lg bg-background overflow-y-auto"
-                        style={{ whiteSpace: 'pre-wrap' }}
-                      >
-                        {correction.corrected}
-                      </div>
-                    )}
-                  </div>
-
-                  {hasCorrections && (
-                    <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <h3 className="font-semibold text-sm text-foreground sorani-text">پێشبینینی گۆڕانکارییەکان:</h3>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            const doc = new jsPDF();
-                            const pageWidth = doc.internal.pageSize.getWidth();
-                            let yPosition = 20;
-                            
-                            // Add Arabic/Kurdish font support
-                            doc.addFileToVFS('NotoNaskhArabic-Regular.ttf', notoNaskhArabic);
-                            doc.addFont('NotoNaskhArabic-Regular.ttf', 'NotoNaskhArabic', 'normal');
-                            doc.setFont('NotoNaskhArabic');
-
-                            // Add title
-                            doc.setFontSize(18);
-                            doc.setFont('NotoNaskhArabic');
-                            doc.text('پێشبینینی گۆڕانکارییەکان', pageWidth / 2, yPosition, { align: 'center' });
-                            yPosition += 20;
-                            
-                            // Add original text section
-                            doc.setFontSize(14);
-                            doc.setFont('NotoNaskhArabic');
-                            doc.text('نووسینی سەرەتایی:', 10, yPosition);
-                            yPosition += 10;
-                            
-                            doc.setFontSize(12);
-                            const originalLines = doc.splitTextToSize(correction.original, pageWidth - 20);
-                            for (let i = 0; i < originalLines.length; i++) {
-                              if (yPosition > doc.internal.pageSize.getHeight() - 20) {
-                                doc.addPage();
-                                yPosition = 20;
-                                // Reset font for new page
-                                doc.setFont('NotoNaskhArabic');
-                              }
-                              doc.text(originalLines[i], 10, yPosition);
-                              yPosition += 7;
-                            }
-                            
-                            yPosition += 10;
-                            
-                            // Add corrected text section
-                            doc.setFontSize(14);
-                            doc.setFont('NotoNaskhArabic');
-                            doc.text('نووسینی ڕاستکراوە:', 10, yPosition);
-                            yPosition += 10;
-                            
-                            doc.setFontSize(12);
-                            const correctedLines = doc.splitTextToSize(correction.corrected, pageWidth - 20);
-                            for (let i = 0; i < correctedLines.length; i++) {
-                              if (yPosition > doc.internal.pageSize.getHeight() - 20) {
-                                doc.addPage();
-                                yPosition = 20;
-                                // Reset font for new page
-                                doc.setFont('NotoNaskhArabic');
-                              }
-                              doc.text(correctedLines[i], 10, yPosition);
-                              yPosition += 7;
-                            }
-                            
-                            // Save the PDF
-                            doc.save('پێشبینینی گۆڕانکارییەکان.pdf');
-                          }}
-                          className="gap-1"
-                        >
-                          <Download className="h-4 w-4" />
-                          PDF
-                        </Button>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="border border-border rounded-lg p-4 bg-red-50/50 dark:bg-red-950/20">
-                          <h4 className="font-semibold text-sm text-foreground mb-2 sorani-text">نووسینی سەرەتایی:</h4>
-                          <div
-                            className="sorani-text text-base leading-relaxed max-h-[200px] overflow-y-auto"
-                            style={{ whiteSpace: 'pre-wrap' }}
-                          >
-                            {correction.original}
-                          </div>
-                        </div>
-                        <div className="border border-border rounded-lg p-4 bg-green-50/50 dark:bg-green-950/20">
-                          <h4 className="font-semibold text-sm text-foreground mb-2 sorani-text">نووسینی ڕاستکراوە:</h4>
-                          <div
-                            className="sorani-text text-base leading-relaxed max-h-[200px] overflow-y-auto"
-                            style={{ whiteSpace: 'pre-wrap' }}
-                          >
-                            {correction.corrected}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {correction.suggestions.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold text-sm text-foreground mb-2 sorani-text">پێشنیارەکان:</h3>
-                      <div className="space-y-2">
-                        {correction.suggestions.map((suggestion, index) => (
-                          <div key={index} className="p-3 bg-secondary/30 rounded-lg">
-                            <p className="text-sm sorani-text">{suggestion}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center">
+                  <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+                  <p className="text-muted-foreground sorani-text">پشکنینی ڕێزمان...</p>
                 </div>
               </div>
+            ) : errors.length === 0 ? (
+              <div className="text-center py-12">
+                <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-500" />
+                <p className="text-lg font-semibold sorani-text">هیچ هەڵەیەک نەدۆزرایەوە!</p>
+                <p className="text-muted-foreground sorani-text">نووسینەکەت زۆر باشە</p>
+              </div>
             ) : (
-              <div className="flex flex-col items-center justify-center h-[500px] text-muted-foreground">
-                <div className="text-center">
-                  <CheckSquare className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <h3 className="text-xl font-semibold mb-2 sorani-text">ئەنجامی پشکنین لێرە دەردەکەوێت</h3>
-                  <p className="sorani-text">نووسینەکەت بنووسە و کلیک لە "پشکنینی ڕێزمان" بکە</p>
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground sorani-text">
+                  لەسەر هەڵەکان کلیک بکە بۆ دیتنی پێشنیارەکان
+                </p>
+                
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {errors.map((error) => (
+                    <div 
+                      key={error.id}
+                      className={`border rounded-lg p-3 cursor-pointer hover:bg-gray-50 transition-colors ${
+                        error.severity === 'error' ? 'border-red-200' :
+                        error.severity === 'warning' ? 'border-yellow-200' : 'border-blue-200'
+                      }`}
+                      onClick={() => {
+                        setSelectedError(error);
+                        setShowPopup(true);
+                      }}
+                    >
+                      <div className="flex items-start gap-2">
+                        {error.severity === 'error' ? (
+                          <AlertCircle className="h-4 w-4 text-red-500 mt-0.5" />
+                        ) : error.severity === 'warning' ? (
+                          <AlertCircle className="h-4 w-4 text-yellow-500 mt-0.5" />
+                        ) : (
+                          <Lightbulb className="h-4 w-4 text-blue-500 mt-0.5" />
+                        )}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge 
+                              variant={error.severity === 'error' ? 'destructive' : 'secondary'}
+                              className="text-xs"
+                            >
+                              {error.type}
+                            </Badge>
+                          </div>
+                          <p className="text-sm font-medium sorani-text">"{error.text}"</p>
+                          <p className="text-xs text-muted-foreground mt-1">{error.message}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
           </CardContent>
         </Card>
       </div>
+
+      <ErrorPopup />
     </div>
   );
 };
