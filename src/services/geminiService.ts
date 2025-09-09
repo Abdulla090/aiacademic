@@ -53,6 +53,11 @@ export interface TaskPlan {
   deadline: string;
   priority: 'high' | 'medium' | 'low';
   status: 'pending' | 'in-progress' | 'completed';
+  duration?: string; // estimated time to complete
+  category?: string; // study, revision, assignment, etc.
+  difficulty?: 'easy' | 'medium' | 'hard';
+  resources?: string[]; // required materials/resources
+  dailyTime?: string; // recommended daily time
 }
 
 export interface Flashcard {
@@ -679,37 +684,213 @@ class GeminiService {
     return response.text;
   }
 
-  async generateTaskPlan(projectTitle: string, deadline: string, details: string): Promise<TaskPlan[]> {
+  async generateSmartTaskPlan(
+    projectTitle: string, 
+    deadline: string, 
+    details: string, 
+    taskType: string = 'study',
+    currentLevel: string = 'beginner',
+    availableHoursPerDay: number = 2,
+    preferredStudyTimes: string[] = ['morning'],
+    subjects?: string[],
+    documentContent?: string
+  ): Promise<TaskPlan[]> {
+    const today = new Date();
+    const targetDate = new Date(deadline);
+    const daysAvailable = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    
+    const taskTypePrompts = {
+      exam: `Create an intensive exam preparation plan with spaced repetition, practice tests, and review sessions.`,
+      study: `Create a comprehensive study plan with learning phases, practice, and consolidation.`,
+      assignment: `Create a project completion plan with research, drafting, editing, and final review phases.`,
+      workout: `Create a progressive fitness plan with warm-up, main exercises, and recovery periods.`,
+      work: `Create a professional work plan with planning, execution, review, and delivery phases.`,
+      research: `Create a structured research plan with literature review, data collection, analysis, and writing phases.`,
+      language: `Create a language learning plan with vocabulary, grammar, speaking, and listening practice.`,
+      skill: `Create a skill development plan with foundation building, practice, and mastery phases.`
+    };
+
     const prompt = `
-    For the project "${projectTitle}" which must be completed by "${deadline}", create a detailed plan.
+    You are an expert planning AI. Create a MAGICAL, highly intelligent plan for: "${projectTitle}"
+    
+    📋 PROJECT DETAILS:
+    - Type: ${taskType.toUpperCase()}
+    - Deadline: ${deadline} (${daysAvailable} days available)
+    - Current Level: ${currentLevel}
+    - Available Study Time: ${availableHoursPerDay} hours/day
+    - Preferred Times: ${preferredStudyTimes.join(', ')}
+    - Subjects/Topics: ${subjects?.join(', ') || 'Not specified'}
+    - Additional Details: ${details}
 
-    Details: ${details}
+    ${documentContent ? `
+    📖 DOCUMENT CONTENT ANALYSIS:
+    Based on the uploaded documents, here is the key content to create a plan around:
+    
+    ${documentContent}
+    
+    🎯 MAGIC INSTRUCTION: Analyze the document content above and create a highly personalized plan that:
+    - Addresses the specific topics, concepts, and requirements mentioned in the documents
+    - Follows the structure and learning objectives outlined in the materials
+    - Creates tasks that directly relate to the document content
+    - Identifies key chapters, sections, or concepts that need focused attention
+    - Builds upon the knowledge presented in the documents progressively
+    ` : ''}
 
-    The plan must:
-    - Divide the tasks chronologically
-    - Specify the importance of each task
-    - Allocate a reasonable time for completion
+    🎯 PLANNING STRATEGY:
+    ${taskTypePrompts[taskType as keyof typeof taskTypePrompts] || taskTypePrompts.study}
 
-    Provide the response in the following JSON format:
+    📚 INTELLIGENT FEATURES TO INCLUDE:
+    - Spaced repetition for long-term retention
+    - Progressive difficulty scaling
+    - Buffer time for unexpected delays
+    - Regular review and consolidation sessions
+    - Milestone checkpoints
+    - Active recall techniques
+    - Variety in learning methods
+    - Rest and recovery periods
+    - Emergency catch-up plans
+
+    ⚡ MAGIC HAPPENS HERE - Make the plan:
+    1. ADAPTIVE: Adjusts based on available time and difficulty
+    2. SCIENTIFIC: Uses proven learning techniques
+    3. REALISTIC: Accounts for human limitations and motivation
+    4. COMPREHENSIVE: Covers all necessary aspects
+    5. MOTIVATING: Includes achievements and milestones
+
+    🎨 CRITICAL: RESPOND WITH VALID JSON ONLY - NO MARKDOWN, NO EXPLANATIONS!
+    
+    Required JSON Format (respond with this exact structure):
     [
       {
-        "title": "Task Title",
-        "description": "Task Description",
+        "title": "Engaging task title with emojis",
+        "description": "Detailed description with specific actions, techniques, and expected outcomes. Include WHY this step is important.",
         "deadline": "YYYY-MM-DD",
-        "priority": "high/medium/low",
-        "status": "pending"
+        "priority": "high",
+        "status": "pending",
+        "duration": "2 hours",
+        "category": "learning",
+        "difficulty": "medium",
+        "resources": ["textbook chapter 3", "practice problems", "flashcards"],
+        "dailyTime": "morning 9-11 AM"
       }
     ]
     
-    The plan should be for a real academic project, not a chat response. Make sure the tasks are realistic and relevant.
+    IMPORTANT: 
+    - Do NOT wrap in code blocks
+    - Do NOT include any text before or after the JSON array
+    - Start directly with [ and end with ]
+    - Use only double quotes for strings
+    - Ensure valid JSON syntax
+    
+    IMPORTANT RULES:
+    ✅ Create ${Math.min(Math.max(daysAvailable, 5), 20)} tasks spread strategically across ${daysAvailable} days
+    ✅ Start with easier tasks and progress to harder ones
+    ✅ Include regular review sessions (spaced repetition)
+    ✅ Add buffer time before the deadline
+    ✅ Balance intensive work with rest periods
+    ✅ Include milestone celebrations
+    ✅ Make each task specific and actionable
+    ✅ Add variety to prevent burnout
+    
+    Remember: This isn't just a task list - it's a MAGICAL LEARNING EXPERIENCE! 🌟
     `;
 
     const response = await this.makeRequest(prompt);
     try {
-      return JSON.parse(response.text);
-    } catch {
-      return [];
+      let cleanText = response.text.trim();
+      
+      // Remove markdown code blocks if present
+      if (cleanText.startsWith('```json')) {
+        cleanText = cleanText.replace(/```json\s*/, '').replace(/```\s*$/, '');
+      } else if (cleanText.startsWith('```')) {
+        cleanText = cleanText.replace(/```\s*/, '').replace(/```\s*$/, '');
+      }
+      
+      // Remove any leading/trailing whitespace
+      cleanText = cleanText.trim();
+      
+      // Try to find JSON array in the response if it's mixed with other text
+      const jsonMatch = cleanText.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        cleanText = jsonMatch[0];
+      }
+      
+      console.log('Attempting to parse cleaned text:', cleanText.substring(0, 200) + '...');
+      
+      const parsed = JSON.parse(cleanText);
+      
+      // Ensure it's an array
+      if (!Array.isArray(parsed)) {
+        console.error('Parsed result is not an array:', parsed);
+        return [];
+      }
+      
+      // Ensure all tasks have required fields
+      return parsed.map((task: any) => ({
+        title: task.title || 'Untitled Task',
+        description: task.description || 'No description provided',
+        deadline: task.deadline || new Date().toISOString().split('T')[0],
+        priority: task.priority || 'medium',
+        status: task.status || 'pending',
+        duration: task.duration || '1 hour',
+        category: task.category || 'study',
+        difficulty: task.difficulty || 'medium',
+        resources: task.resources || [],
+        dailyTime: task.dailyTime || 'flexible'
+      }));
+    } catch (error) {
+      console.error('Failed to parse AI response:', error);
+      console.error('Raw response text:', response.text);
+      
+      // Return a fallback basic plan if parsing fails
+      const today = new Date();
+      const targetDate = new Date(deadline);
+      const daysAvailable = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      
+      return [
+        {
+          title: `📚 Start ${projectTitle}`,
+          description: `Begin working on ${projectTitle}. Break down the main components and create a detailed outline.`,
+          deadline: new Date(Date.now() + Math.max(1, Math.floor(daysAvailable * 0.2)) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          priority: 'high' as const,
+          status: 'pending' as const,
+          duration: '2 hours',
+          category: 'planning',
+          difficulty: 'medium' as const,
+          resources: ['notebook', 'research materials'],
+          dailyTime: 'morning'
+        },
+        {
+          title: `⚡ Main Work Phase`,
+          description: `Focus on the core work of ${projectTitle}. Apply concentrated effort during your most productive hours.`,
+          deadline: new Date(Date.now() + Math.max(2, Math.floor(daysAvailable * 0.7)) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          priority: 'high' as const,
+          status: 'pending' as const,
+          duration: `${availableHoursPerDay} hours`,
+          category: 'execution',
+          difficulty: 'hard' as const,
+          resources: ['all necessary materials'],
+          dailyTime: preferredStudyTimes[0] || 'morning'
+        },
+        {
+          title: `✅ Review and Finalize`,
+          description: `Review all work, make final adjustments, and prepare for submission/completion of ${projectTitle}.`,
+          deadline: deadline,
+          priority: 'medium' as const,
+          status: 'pending' as const,
+          duration: '1 hour',
+          category: 'review',
+          difficulty: 'easy' as const,
+          resources: ['completed work', 'checklist'],
+          dailyTime: 'flexible'
+        }
+      ];
     }
+  }
+
+  // Keep the original method for backwards compatibility
+  async generateTaskPlan(projectTitle: string, deadline: string, details: string): Promise<TaskPlan[]> {
+    return this.generateSmartTaskPlan(projectTitle, deadline, details);
   }
 
   async generateFlashcards(text: string): Promise<Flashcard[]> {
@@ -981,6 +1162,104 @@ class GeminiService {
 
     const response = await this.makeRequest(prompt);
     return response.text.trim();
+  }
+
+  private async makeFileRequest(prompt: string, fileData: { mimeType: string; data: string }): Promise<GeminiResponse> {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${this.apiKey}`;
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { text: prompt },
+              {
+                inlineData: fileData
+              }
+            ]
+          }],
+          generationConfig: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 8192,
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return {
+        text: data.candidates[0].content.parts[0].text
+      };
+    } catch (error) {
+      console.error('Gemini File API Error:', error);
+      throw new Error('Failed to communicate with AI service for file processing');
+    }
+  }
+
+  async extractTextFromPDF(file: File): Promise<string> {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+      
+      // Convert to base64 for sending to Gemini
+      const base64 = btoa(String.fromCharCode(...uint8Array));
+      
+      const prompt = `
+      Please extract all text content from this PDF document. 
+      Return only the plain text content, organized in a readable format.
+      Focus on:
+      - Main headings and sections
+      - Key topics and concepts
+      - Important details and requirements
+      - Learning objectives or goals
+      
+      Provide clean, well-structured text that can be used for academic planning.
+      `;
+
+      const response = await this.makeFileRequest(prompt, {
+        mimeType: 'application/pdf',
+        data: base64
+      });
+
+      return response.text || 'Could not extract text from PDF';
+    } catch (error) {
+      console.error('PDF extraction error:', error);
+      throw new Error('Failed to extract text from PDF');
+    }
+  }
+
+  async extractTextFromMultipleFiles(files: File[]): Promise<string> {
+    try {
+      const extractedTexts: string[] = [];
+      
+      for (const file of files) {
+        if (file.type === 'application/pdf') {
+          const text = await this.extractTextFromPDF(file);
+          extractedTexts.push(`\n=== ${file.name} ===\n${text}\n`);
+        } else if (file.type === 'text/plain' || file.name.endsWith('.md')) {
+          const text = await file.text();
+          extractedTexts.push(`\n=== ${file.name} ===\n${text}\n`);
+        } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+          // Handle Word documents using the existing fileReader
+          const { readFileContent } = await import('@/lib/fileReader');
+          const text = await readFileContent(file) as string;
+          extractedTexts.push(`\n=== ${file.name} ===\n${text}\n`);
+        }
+      }
+      
+      return extractedTexts.join('\n');
+    } catch (error) {
+      console.error('Multi-file extraction error:', error);
+      throw new Error('Failed to extract text from files');
+    }
   }
 
   async extractTextFromImage(base64Image: string, language: 'ku' | 'en'): Promise<string> {

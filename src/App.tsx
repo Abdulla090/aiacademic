@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { useState } from "react";
 import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
@@ -30,12 +31,17 @@ import StudyAnalyticsDashboard from "./pages/StudyAnalyticsDashboard";
 import AIResearchAssistant from "./pages/AIResearchAssistant";
 import { CustomSidebar } from "./components/CustomSidebar";
 import { SidebarProvider, SidebarInset } from "./components/ui/sidebar";
+import { MobileBottomNav } from "./components/MobileBottomNav";
+import { MobileSettingsModal } from "./components/MobileSettingsModal";
+import { useIsMobile } from "./hooks/use-mobile";
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
   const location = useLocation();
-  const showSidebar = location.pathname !== '/';
+  const isMobile = useIsMobile();
+  const [showMobileSettings, setShowMobileSettings] = useState(false);
+  const showSidebar = location.pathname !== '/' && !isMobile;
 
   const ArticleWriterWithLoading = withLoading(ArticleWriter);
   const GrammarCheckerWithLoading = withLoading(GrammarChecker);
@@ -61,7 +67,7 @@ const AppContent = () => {
   return (
     <SidebarProvider>
       {showSidebar && <CustomSidebar />}
-      <SidebarInset>
+      <SidebarInset className={isMobile ? 'pb-16' : ''}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
@@ -89,6 +95,19 @@ const AppContent = () => {
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        
+        {/* Mobile Bottom Navigation */}
+        {isMobile && location.pathname !== '/' && (
+          <MobileBottomNav 
+            onSettingsClick={() => setShowMobileSettings(true)}
+          />
+        )}
+        
+        {/* Mobile Settings Modal */}
+        <MobileSettingsModal 
+          isOpen={showMobileSettings}
+          onClose={() => setShowMobileSettings(false)}
+        />
       </SidebarInset>
     </SidebarProvider>
   );

@@ -532,4 +532,38 @@ suggestion,
   background-color: #fff !important; /* Ensure canvas background is white */
 }
 
+/* Mobile Bottom Navigation Styles */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Ensure mobile content doesn't get hidden behind bottom nav */
+@media (max-width: 768px) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Add extra padding to prevent content from being hidden */
+  .mobile-safe-content {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+  }
+  
+  /* Mobile bottom navigation z-index */
+  .mobile-bottom-nav {
+    z-index: 1000;
+  }
+  
+  /* Hide desktop sidebar on mobile */
+  .sidebar-desktop {
+    display: none !important;
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 769px) {
+  .mobile-bottom-nav {
+    display: none !important;
+  }
+}
+
 }

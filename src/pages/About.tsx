@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { GraduationCap } from "lucide-react";
-import { MobileSidebarTrigger } from "@/components/MobileSidebarTrigger";
+import { PageHeader } from "@/components/PageHeader";
 
 const About = () => {
   const { t } = useTranslation();
@@ -8,9 +8,7 @@ const About = () => {
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <MobileSidebarTrigger />
-        </div>
+        <PageHeader />
         
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-primary/10 to-secondary/10 py-10 sm:py-12 mb-8 sm:mb-12 rounded-2xl">

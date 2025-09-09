@@ -27,8 +27,7 @@ import {
   BarChart3,
   Bot
 } from "lucide-react";
-import { MobileSidebarTrigger } from "@/components/MobileSidebarTrigger";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { PageHeader } from "@/components/PageHeader"; 
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArticleWriter } from "@/components/ArticleWriter";
@@ -232,12 +231,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-subtle">
       
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <div className="flex items-center gap-2">
-            <SidebarTrigger />
-            <MobileSidebarTrigger />
-          </div>
-        </div>
+        <PageHeader />
         {/* Welcome Section */}
         <div className="text-center mb-8 sm:mb-12">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4">

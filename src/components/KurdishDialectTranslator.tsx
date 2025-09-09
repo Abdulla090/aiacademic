@@ -393,7 +393,687 @@ const dialectDictionary: DialectComparison[] = [
   { sorani: "لە کوێوە؟", kurmanji: "ji ku ve?", category: "دەربڕین", notes: "From where?" },
   { sorani: "بۆ کوێ؟", kurmanji: "bo ku?", category: "دەربڕین", notes: "To where?" },
   { sorani: "لەگەڵ کێ؟", kurmanji: "ligel kê?", category: "دەربڕین", notes: "With whom?" },
-  { sorani: "بە چی؟", kurmanji: "bi çî?", category: "دەربڕین", notes: "With what?" }
+  { sorani: "بە چی؟", kurmanji: "bi çî?", category: "دەربڕین", notes: "With what?" },
+
+  // Extended Numbers - ژمارە فراوان
+  { sorani: "سێزدە", kurmanji: "sêzde", category: "ژمارە" },
+  { sorani: "چواردە", kurmanji: "çarde", category: "ژمارە" },
+  { sorani: "پازدە", kurmanji: "pazde", category: "ژمارە" },
+  { sorani: "شازدە", kurmanji: "şazde", category: "ژمارە" },
+  { sorani: "حەڤدە", kurmanji: "hevde", category: "ژمارە" },
+  { sorani: "هەژدە", kurmanji: "hejde", category: "ژمارە" },
+  { sorani: "نۆزدە", kurmanji: "nozde", category: "ژمارە" },
+  { sorani: "چل", kurmanji: "çil", category: "ژمارە" },
+  { sorani: "پەنجا", kurmanji: "pêncî", category: "ژمارە" },
+  { sorani: "شەست", kurmanji: "şêst", category: "ژمارە" },
+  { sorani: "حەفتا", kurmanji: "heftê", category: "ژمارە" },
+  { sorani: "هەشتا", kurmanji: "heştê", category: "ژمارە" },
+  { sorani: "نەوەد", kurmanji: "newed", category: "ژمارە" },
+  { sorani: "سەد", kurmanji: "sed", category: "ژمارە" },
+  { sorani: "هەزار", kurmanji: "hezar", category: "ژمارە" },
+  { sorani: "ملیۆن", kurmanji: "mîlyon", category: "ژمارە" },
+
+  // Colors - ڕەنگ
+  { sorani: "سوور", kurmanji: "sor", category: "ڕەنگ" },
+  { sorani: "شین", kurmanji: "şîn", category: "ڕەنگ" },
+  { sorani: "زەرد", kurmanji: "zer", category: "ڕەنگ" },
+  { sorani: "سەوز", kurmanji: "kesk", category: "ڕەنگ" },
+  { sorani: "ڕەش", kurmanji: "reş", category: "ڕەنگ" },
+  { sorani: "سپی", kurmanji: "spî", category: "ڕەنگ" },
+  { sorani: "پەمەیی", kurmanji: "pembe", category: "ڕەنگ" },
+  { sorani: "مۆر", kurmanji: "mor", category: "ڕەنگ" },
+  { sorani: "نارەنجی", kurmanji: "narincî", category: "ڕەنگ" },
+  { sorani: "قاوەیی", kurmanji: "qehweyî", category: "ڕەنگ" },
+  { sorani: "خۆڵەمێشی", kurmanji: "xolêmêş", category: "ڕەنگ" },
+  { sorani: "بەتایی", kurmanji: "beta", category: "ڕەنگ" },
+
+  // Body Parts - ئەندامەکانی لەش
+  { sorani: "سەر", kurmanji: "ser", category: "لەش" },
+  { sorani: "چاو", kurmanji: "çav", category: "لەش" },
+  { sorani: "لووت", kurmanji: "lût", category: "لەش" },
+  { sorani: "دەم", kurmanji: "dev", category: "لەش" },
+  { sorani: "دەست", kurmanji: "dest", category: "لەش" },
+  { sorani: "پێ", kurmanji: "pî", category: "لەش" },
+  { sorani: "ملاو", kurmanji: "milav", category: "لەش" },
+  { sorani: "سنگ", kurmanji: "sing", category: "لەش" },
+  { sorani: "پشت", kurmanji: "pişt", category: "لەش" },
+  { sorani: "زگ", kurmanji: "zik", category: "لەش" },
+  { sorani: "دڵ", kurmanji: "dil", category: "لەش" },
+  { sorani: "سییەکان", kurmanji: "sihîk", category: "لەش" },
+  { sorani: "گورچیلە", kurmanji: "guh", category: "لەش" },
+  { sorani: "لێوی", kurmanji: "lêv", category: "لەش" },
+  { sorani: "ددان", kurmanji: "diran", category: "لەش" },
+  { sorani: "زمان", kurmanji: "ziman", category: "لەش" },
+  { sorani: "قژ", kurmanji: "por", category: "لەش" },
+  { sorani: "رووخسار", kurmanji: "rû", category: "لەش" },
+  { sorani: "پەنجە", kurmanji: "tilî", category: "لەش" },
+  { sorani: "نینۆک", kurmanji: "nînok", category: "لەش" },
+
+  // Animals - ئاژەڵ
+  { sorani: "سەگ", kurmanji: "kûçik", category: "ئاژەڵ" },
+  { sorani: "پشیلە", kurmanji: "pisîk", category: "ئاژەڵ" },
+  { sorani: "ئەسپ", kurmanji: "hesp", category: "ئاژەڵ" },
+  { sorani: "مانگا", kurmanji: "çêlek", category: "ئاژەڵ" },
+  { sorani: "بزن", kurmanji: "bizin", category: "ئاژەڵ" },
+  { sorani: "مەڕ", kurmanji: "mî", category: "ئاژەڵ" },
+  { sorani: "کەروێشک", kurmanji: "kerûşk", category: "ئاژەڵ" },
+  { sorani: "شێر", kurmanji: "şêr", category: "ئاژەڵ" },
+  { sorani: "گورگ", kurmanji: "gur", category: "ئاژەڵ" },
+  { sorani: "ورچ", kurmanji: "beraz", category: "ئاژەڵ" },
+  { sorani: "کوێر", kurmanji: "korr", category: "ئاژەڵ" },
+  { sorani: "بە", kurmanji: "ber", category: "ئاژەڵ" },
+  { sorani: "مش", kurmanji: "mişk", category: "ئاژەڵ" },
+  { sorani: "ماسی", kurmanji: "masî", category: "ئاژەڵ" },
+  { sorani: "باڵندە", kurmanji: "çûçik", category: "ئاژەڵ" },
+  { sorani: "کەوتار", kurmanji: "kevtar", category: "ئاژەڵ" },
+  { sorani: "کوندەپەپوو", kurmanji: "pepûk", category: "ئاژەڵ" },
+  { sorani: "مرج", kurmanji: "mirç", category: "ئاژەڵ" },
+  { sorani: "شانۆ", kurmanji: "şano", category: "ئاژەڵ" },
+
+  // Food - خواردن
+  { sorani: "نان", kurmanji: "nan", category: "خواردن" },
+  { sorani: "ئاو", kurmanji: "av", category: "خواردن" },
+  { sorani: "شیر", kurmanji: "şîr", category: "خواردن" },
+  { sorani: "گۆشت", kurmanji: "goşt", category: "خواردن" },
+  { sorani: "مەیوە", kurmanji: "fêkî", category: "خواردن" },
+  { sorani: "سبزە", kurmanji: "sebze", category: "خواردن" },
+  { sorani: "برنج", kurmanji: "birinc", category: "خواردن" },
+  { sorani: "بەرق", kurmanji: "berq", category: "خواردن" },
+  { sorani: "پەنیر", kurmanji: "penîr", category: "خواردن" },
+  { sorani: "هێلکە", kurmanji: "hêlke", category: "خواردن" },
+  { sorani: "قاوە", kurmanji: "qehwe", category: "خواردن" },
+  { sorani: "چا", kurmanji: "çay", category: "خواردن" },
+  { sorani: "شەکر", kurmanji: "şekir", category: "خواردن" },
+  { sorani: "خوێ", kurmanji: "xwê", category: "خواردن" },
+  { sorani: "سێو", kurmanji: "sêv", category: "خواردن" },
+  { sorani: "گلاس", kurmanji: "glas", category: "خواردن" },
+  { sorani: "هەرمێ", kurmanji: "hirmî", category: "خواردن" },
+  { sorani: "بادەنجان", kurmanji: "badencan", category: "خواردن" },
+  { sorani: "فەلفەل", kurmanji: "biber", category: "خواردن" },
+  { sorani: "پیاز", kurmanji: "pîvaz", category: "خواردن" },
+
+  // Nature - سروشت
+  { sorani: "دار", kurmanji: "dar", category: "سروشت" },
+  { sorani: "گوڵ", kurmanji: "gul", category: "سروشت" },
+  { sorani: "ئاسمان", kurmanji: "ezman", category: "سروشت" },
+  { sorani: "زەوی", kurmanji: "erd", category: "سروشت" },
+  { sorani: "کانی", kurmanji: "kanî", category: "سروشت" },
+  { sorani: "ڕووبار", kurmanji: "çem", category: "سروشت" },
+  { sorani: "چیا", kurmanji: "çiya", category: "سروشت" },
+  { sorani: "دەشت", kurmanji: "deşt", category: "سروشت" },
+  { sorani: "بارانی", kurmanji: "baran", category: "سروشت" },
+  { sorani: "بەفر", kurmanji: "berf", category: "سروشت" },
+  { sorani: "با", kurmanji: "ba", category: "سروشت" },
+  { sorani: "خۆر", kurmanji: "roj", category: "سروشت" },
+  { sorani: "مانگ", kurmanji: "heyv", category: "سروشت" },
+  { sorani: "ئەستێرە", kurmanji: "stêr", category: "سروشت" },
+  { sorani: "هەور", kurmanji: "ewr", category: "سروشت" },
+  { sorani: "ئاگر", kurmanji: "agir", category: "سروشت" },
+  { sorani: "بەرد", kurmanji: "berd", category: "سروشت" },
+  { sorani: "خۆڵ", kurmanji: "ax", category: "سروشت" },
+
+  // Clothing - جل و بەرگ
+  { sorani: "جل", kurmanji: "cil", category: "جل" },
+  { sorani: "کراس", kurmanji: "kiras", category: "جل" },
+  { sorani: "پانتۆڵ", kurmanji: "pantol", category: "جل" },
+  { sorani: "پێڵاو", kurmanji: "pêlav", category: "جل" },
+  { sorani: "کڵاو", kurmanji: "kulav", category: "جل" },
+  { sorani: "کۆت", kurmanji: "kote", category: "جل" },
+  { sorani: "فانیلە", kurmanji: "fanîle", category: "جل" },
+  { sorani: "شاڵ", kurmanji: "şal", category: "جل" },
+  { sorani: "دەستکش", kurmanji: "destkêş", category: "جل" },
+  { sorani: "جوراب", kurmanji: "gorav", category: "جل" },
+  { sorani: "پشتێن", kurmanji: "piştin", category: "جل" },
+  { sorani: "قەپوت", kurmanji: "qeput", category: "جل" },
+
+  // Transportation - گواستنەوە
+  { sorani: "ئۆتۆمبێل", kurmanji: "otomobîl", category: "گواستنەوە" },
+  { sorani: "پاسکیل", kurmanji: "bisîklet", category: "گواستنەوە" },
+  { sorani: "فڕۆکە", kurmanji: "balafir", category: "گواستنەوە" },
+  { sorani: "کەشتی", kurmanji: "keştî", category: "گواستنەوە" },
+  { sorani: "شەمەندەفەر", kurmanji: "şemendefer", category: "گواستنەوە" },
+  { sorani: "پاس", kurmanji: "otobûs", category: "گواستنەوە" },
+
+  // Buildings - بینا
+  { sorani: "ماڵ", kurmanji: "mal", category: "بینا" },
+  { sorani: "مزگەوت", kurmanji: "mizgeft", category: "بینا" },
+  { sorani: "قوتابخانە", kurmanji: "dibistan", category: "بینا" },
+  { sorani: "نەخۆشخانە", kurmanji: "nexweşxane", category: "بینا" },
+  { sorani: "بازاڕ", kurmanji: "bazar", category: "بینا" },
+  { sorani: "دووکان", kurmanji: "dukan", category: "بینا" },
+  { sorani: "کتێبخانە", kurmanji: "pirtûkxane", category: "بینا" },
+  { sorani: "پارک", kurmanji: "park", category: "بینا" },
+  { sorani: "دەرگا", kurmanji: "derî", category: "بینا" },
+  { sorani: "پەنجەرە", kurmanji: "pace", category: "بینا" },
+  { sorani: "بان", kurmanji: "ban", category: "بینا" },
+  { sorani: "باخچە", kurmanji: "baxçe", category: "بینا" },
+
+  // Professions - پیشە
+  { sorani: "پزیشک", kurmanji: "doktor", category: "پیشە" },
+  { sorani: "مامۆستا", kurmanji: "mamoste", category: "پیشە" },
+  { sorani: "ئەندازیار", kurmanji: "endazyar", category: "پیشە" },
+  { sorani: "یاساناس", kurmanji: "parêzer", category: "پیشە" },
+  { sorani: "کارگەر", kurmanji: "karker", category: "پیشە" },
+  { sorani: "جوتیار", kurmanji: "çêker", category: "پیشە" },
+  { sorani: "شۆفێر", kurmanji: "ajovan", category: "پیشە" },
+  { sorani: "ئاشپێژ", kurmanji: "aşpêj", category: "پیشە" },
+  { sorani: "دەرزی", kurmanji: "derzî", category: "پیشە" },
+  { sorani: "پۆلیس", kurmanji: "polîs", category: "پیشە" },
+  { sorani: "سەرباز", kurmanji: "leşker", category: "پیشە" },
+  { sorani: "بازرگان", kurmanji: "bazirgan", category: "پیشە" },
+
+  // Technology - تەکنەلۆژیا
+  { sorani: "کۆمپیوتەر", kurmanji: "komputer", category: "تەکنەلۆژیا" },
+  { sorani: "مۆبایل", kurmanji: "mobîl", category: "تەکنەلۆژیا" },
+  { sorani: "ئینتەرنێت", kurmanji: "înternet", category: "تەکنەلۆژیا" },
+  { sorani: "تەلەفۆن", kurmanji: "têlefon", category: "تەکنەلۆژیا" },
+  { sorani: "تەلەفیزیۆن", kurmanji: "televizyon", category: "تەکنەلۆژیا" },
+  { sorani: "ڕادیۆ", kurmanji: "radyo", category: "تەکنەلۆژیا" },
+
+  // Weather - کەشوهەوا
+  { sorani: "گەرم", kurmanji: "germ", category: "کەشوهەوا" },
+  { sorani: "سارد", kurmanji: "sar", category: "کەشوهەوا" },
+  { sorani: "ڕوون", kurmanji: "zelal", category: "کەشوهەوا" },
+  { sorani: "هەوری", kurmanji: "ewrî", category: "کەشوهەوا" },
+  { sorani: "باراونی", kurmanji: "baranî", category: "کەشوهەوا" },
+  { sorani: "بەفراوی", kurmanji: "berfî", category: "کەشوهەوا" },
+
+  // Emotions - هەست
+  { sorani: "دڵخۆش", kurmanji: "kêfxweş", category: "هەست" },
+  { sorani: "خەمبار", kurmanji: "xembar", category: "هەست" },
+  { sorani: "تووڕە", kurmanji: "jê re", category: "هەست" },
+  { sorani: "ترسنۆک", kurmanji: "tirsok", category: "هەست" },
+  { sorani: "سەرسام", kurmanji: "sersam", category: "هەست" },
+  { sorani: "شاد", kurmanji: "şad", category: "هەست" },
+  { sorani: "نیگەران", kurmanji: "xem", category: "هەست" },
+
+  // Common Adjectives - ناو لاوان
+  { sorani: "گەورە", kurmanji: "mezin", category: "ناولاو" },
+  { sorani: "بچووک", kurmanji: "piçûk", category: "ناولاو" },
+  { sorani: "درێژ", kurmanji: "dirêj", category: "ناولاو" },
+  { sorani: "کورت", kurmanji: "kurt", category: "ناولاو" },
+  { sorani: "بەرز", kurmanji: "bilind", category: "ناولاو" },
+  { sorani: "نزم", kurmanji: "nizm", category: "ناولاو" },
+  { sorani: "چاک", kurmanji: "baş", category: "ناولاو" },
+  { sorani: "خراپ", kurmanji: "xirab", category: "ناولاو" },
+  { sorani: "نوێ", kurmanji: "nû", category: "ناولاو" },
+  { sorani: "کۆن", kurmanji: "kevn", category: "ناولاو" },
+  { sorani: "زۆر", kurmanji: "gelek", category: "ناولاو" },
+  { sorani: "کەم", kurmanji: "kêm", category: "ناولاو" },
+  { sorani: "هەموو", kurmanji: "hemû", category: "ناولاو" },
+  { sorani: "هیچ", kurmanji: "tu", category: "ناولاو" },
+
+  // Directions - ئاراستە
+  { sorani: "باکوور", kurmanji: "bakur", category: "ئاراستە" },
+  { sorani: "باشوور", kurmanji: "başûr", category: "ئاراستە" },
+  { sorani: "ڕۆژهەڵات", kurmanji: "rojhilat", category: "ئاراستە" },
+  { sorani: "ڕۆژئاوا", kurmanji: "rojava", category: "ئاراستە" },
+  { sorani: "ڕاست", kurmanji: "rast", category: "ئاراستە" },
+  { sorani: "چەپ", kurmanji: "çep", category: "ئاراستە" },
+  { sorani: "سەرەوە", kurmanji: "jor", category: "ئاراستە" },
+  { sorani: "خوارەوە", kurmanji: "jêr", category: "ئاراستە" },
+  { sorani: "پێشەوە", kurmanji: "pêş", category: "ئاراستە" },
+  { sorani: "دواوە", kurmanji: "paş", category: "ئاراستە" },
+
+  // School subjects - بابەتە خوێندنەکان
+  { sorani: "بیرکاری", kurmanji: "matematîk", category: "خوێندن" },
+  { sorani: "زانست", kurmanji: "zanist", category: "خوێندن" },
+  { sorani: "مێژوو", kurmanji: "dîrok", category: "خوێندن" },
+  { sorani: "جوگرافیا", kurmanji: "erdnasî", category: "خوێندن" },
+  { sorani: "زمان", kurmanji: "ziman", category: "خوێندن" },
+  { sorani: "ئەدەبیات", kurmanji: "edebîyat", category: "خوێندن" },
+  { sorani: "وێنە", kurmanji: "resim", category: "خوێندن" },
+  { sorani: "مۆزیک", kurmanji: "mûzîk", category: "خوێندن" },
+  { sorani: "وەرزش", kurmanji: "werziş", category: "خوێندن" },
+
+  // Extended Numbers - ژمارە زیاتر
+  { sorani: "سێزدە", kurmanji: "sêzde", category: "ژمارە" },
+  { sorani: "چواردە", kurmanji: "çarde", category: "ژمارە" },
+  { sorani: "پازدە", kurmanji: "pazde", category: "ژمارە" },
+  { sorani: "شازدە", kurmanji: "şazde", category: "ژمارە" },
+  { sorani: "حەڤدە", kurmanji: "hevde", category: "ژمارە" },
+  { sorani: "هەژدە", kurmanji: "hejde", category: "ژمارە" },
+  { sorani: "نۆزدە", kurmanji: "nozde", category: "ژمارە" },
+  { sorani: "حەفتا", kurmanji: "heftê", category: "ژمارە" },
+  { sorani: "هەشتا", kurmanji: "heştê", category: "ژمارە" },
+  { sorani: "نەوەد", kurmanji: "newed", category: "ژمارە" },
+  { sorani: "ملیۆن", kurmanji: "mîlyon", category: "ژمارە" },
+  { sorani: "ملیار", kurmanji: "mîlyar", category: "ژمارە" },
+
+  // Extended Colors - ڕەنگ زیاتر
+  { sorani: "خۆڵەمێشی", kurmanji: "xolêmêş", category: "ڕەنگ" },
+  { sorani: "بەتایی", kurmanji: "beta", category: "ڕەنگ" },
+  { sorani: "تۆخی", kurmanji: "toxî", category: "ڕەنگ" },
+  { sorani: "گولاوی", kurmanji: "gulawî", category: "ڕەنگ" },
+  { sorani: "شیلەیی", kurmanji: "şîleî", category: "ڕەنگ" },
+  { sorani: "ئەرخەوانی", kurmanji: "erxewanî", category: "ڕەنگ" },
+  { sorani: "بادەمجانی", kurmanji: "bademcanî", category: "ڕەنگ" },
+
+  // Extended Body Parts - لەش زیاتر
+  { sorani: "ملاو", kurmanji: "milav", category: "لەش" },
+  { sorani: "سنگ", kurmanji: "sing", category: "لەش" },
+  { sorani: "پشت", kurmanji: "pişt", category: "لەش" },
+  { sorani: "زگ", kurmanji: "zik", category: "لەش" },
+  { sorani: "سییەکان", kurmanji: "sihîk", category: "لەش" },
+  { sorani: "لێوی", kurmanji: "lêv", category: "لەش" },
+  { sorani: "زمان", kurmanji: "ziman", category: "لەش" },
+  { sorani: "قژ", kurmanji: "por", category: "لەش" },
+  { sorani: "رووخسار", kurmanji: "rû", category: "لەش" },
+  { sorani: "نینۆک", kurmanji: "nînok", category: "لەش" },
+  { sorani: "ناخن", kurmanji: "naxin", category: "لەش" },
+  { sorani: "قۆڵ", kurmanji: "qol", category: "لەش" },
+  { sorani: "ناوق", kurmanji: "naoq", category: "لەش" },
+  { sorani: "سک", kurmanji: "sik", category: "لەش" },
+  { sorani: "هەناو", kurmanji: "henav", category: "لەش" },
+
+  // Extended Food Items - خۆراک زیاتر
+  { sorani: "سێو", kurmanji: "sêv", category: "خۆراک" },
+  { sorani: "هەرمێ", kurmanji: "hirmî", category: "خۆراک" },
+  { sorani: "ئەنجیر", kurmanji: "encîr", category: "خۆراک" },
+  { sorani: "هێلکە", kurmanji: "hêlke", category: "خۆراک" },
+  { sorani: "گەنم", kurmanji: "genim", category: "خۆراک" },
+  { sorani: "جۆ", kurmanji: "co", category: "خۆراک" },
+  { sorani: "پیاز", kurmanji: "pîvaz", category: "خۆراک" },
+  { sorani: "فەلفەل", kurmanji: "biber", category: "خۆراک" },
+  { sorani: "بادنجان", kurmanji: "badencan", category: "خۆراک" },
+  { sorani: "خیار", kurmanji: "xiyar", category: "خۆراک" },
+  { sorani: "بامیە", kurmanji: "bamye", category: "خۆراک" },
+  { sorani: "لۆبیا", kurmanji: "lobya", category: "خۆراک" },
+  { sorani: "نۆخود", kurmanji: "noxod", category: "خۆراک" },
+  { sorani: "کەوەنگی", kurmanji: "kewengî", category: "خۆراک" },
+  { sorani: "خورما", kurmanji: "xurma", category: "خۆراک" },
+  { sorani: "کیشمیش", kurmanji: "kişmîş", category: "خۆراک" },
+  { sorani: "بادام", kurmanji: "badam", category: "خۆراک" },
+  { sorani: "گوێز", kurmanji: "gwêz", category: "خۆراک" },
+  { sorani: "فستق", kurmanji: "fistiq", category: "خۆراک" },
+  { sorani: "هەندەوانە", kurmanji: "hendewane", category: "خۆراک" },
+  { sorani: "خەربووزە", kurmanji: "xerbuze", category: "خۆراک" },
+  { sorani: "شەکر", kurmanji: "şekir", category: "خۆراک" },
+
+  // Extended Animals - ئاژەڵ زیاتر
+  { sorani: "ورچ", kurmanji: "beraz", category: "ئاژەڵ" },
+  { sorani: "شێر", kurmanji: "şêr", category: "ئاژەڵ" },
+  { sorani: "گورگ", kurmanji: "gur", category: "ئاژەڵ" },
+  { sorani: "مانگا", kurmanji: "çêlek", category: "ئاژەڵ" },
+  { sorani: "کەروێشک", kurmanji: "kerûşk", category: "ئاژەڵ" },
+  { sorani: "مش", kurmanji: "mişk", category: "ئاژەڵ" },
+  { sorani: "ماسی", kurmanji: "masî", category: "ئاژەڵ" },
+  { sorani: "کوندەپەپوو", kurmanji: "pepûk", category: "ئاژەڵ" },
+  { sorani: "کوێر", kurmanji: "korr", category: "ئاژەڵ" },
+  { sorani: "باڵندە", kurmanji: "çûçik", category: "ئاژەڵ" },
+  { sorani: "کەوتار", kurmanji: "kevtar", category: "ئاژەڵ" },
+  { sorani: "بە", kurmanji: "ber", category: "ئاژەڵ" },
+  { sorani: "مرج", kurmanji: "mirç", category: "ئاژەڵ" },
+  { sorani: "کۆتر", kurmanji: "koter", category: "ئاژەڵ" },
+  { sorani: "قاز", kurmanji: "qaz", category: "ئاژەڵ" },
+  { sorani: "بات", kurmanji: "bat", category: "ئاژەڵ" },
+  { sorani: "مەلی", kurmanji: "melî", category: "ئاژەڵ" },
+  { sorani: "ئەردەک", kurmanji: "erdek", category: "ئاژەڵ" },
+
+  // Clothing Extended - جل و بەرگ زیاتر
+  { sorani: "چارک", kurmanji: "çarik", category: "جل" },
+  { sorani: "کەمەر", kurmanji: "kemer", category: "جل" },
+  { sorani: "ساعات", kurmanji: "saat", category: "جل" },
+  { sorani: "گەردەنی", kurmanji: "gerdenî", category: "جل" },
+  { sorani: "خازن", kurmanji: "xazin", category: "جل" },
+
+  // Weather Extended - کەشوهەوا
+  { sorani: "باراونی", kurmanji: "baranî", category: "کەشوهەوا" },
+  { sorani: "بەفراوی", kurmanji: "berfî", category: "کەشوهەوا" },
+  { sorani: "هەوری", kurmanji: "ewrî", category: "کەشوهەوا" },
+  { sorani: "بەهارانی", kurmanji: "beharanî", category: "کەشوهەوا" },
+  { sorani: "هاوینانی", kurmanji: "hawînanî", category: "کەشوهەوا" },
+  { sorani: "پاییزانی", kurmanji: "payîzanî", category: "کەشوهەوا" },
+  { sorani: "زستانی", kurmanji: "zistanî", category: "کەشوهەوا" },
+  { sorani: "رووەک", kurmanji: "riwek", category: "کەشوهەوا" },
+  { sorani: "ڕوون", kurmanji: "zelal", category: "کەشوهەوا" },
+  { sorani: "مامز", kurmanji: "mamz", category: "کەشوهەوا" },
+  { sorani: "تیژ", kurmanji: "tîj", category: "کەشوهەوا" },
+  { sorani: "نەرم", kurmanji: "nerm", category: "کەشوهەوا" },
+
+  // Professions Extended - پیشە
+  { sorani: "یاساناس", kurmanji: "parêzer", category: "پیشە" },
+  { sorani: "کارگەر", kurmanji: "karker", category: "پیشە" },
+  { sorani: "جوتیار", kurmanji: "çêker", category: "پیشە" },
+  { sorani: "شۆفێر", kurmanji: "ajovan", category: "پیشە" },
+  { sorani: "سەرباز", kurmanji: "leşker", category: "پیشە" },
+  { sorani: "پۆلیس", kurmanji: "polîs", category: "پیشە" },
+  { sorani: "بازرگان", kurmanji: "bazirgan", category: "پیشە" },
+  { sorani: "ئاشپێژ", kurmanji: "aşpêj", category: "پیشە" },
+  { sorani: "دەرزی", kurmanji: "derzî", category: "پیشە" },
+  { sorani: "جەوهەری", kurmanji: "cewherî", category: "پیشە" },
+  { sorani: "کتێبفرۆش", kurmanji: "pirtûkfiroş", category: "پیشە" },
+  { sorani: "وەکیل", kurmanji: "wakîl", category: "پیشە" },
+  { sorani: "حەکیم", kurmanji: "hekîm", category: "پیشە" },
+  { sorani: "نەخۆشپارێز", kurmanji: "nexweşparêz", category: "پیشە" },
+
+  // Buildings Extended - بیناسازی
+  { sorani: "بانک", kurmanji: "bank", category: "بیناسازی" },
+  { sorani: "مزگەوت", kurmanji: "mizgeft", category: "بیناسازی" },
+  { sorani: "کتێبخانە", kurmanji: "pirtûkxane", category: "بیناسازی" },
+  { sorani: "پارک", kurmanji: "park", category: "بیناسازی" },
+  { sorani: "باخچە", kurmanji: "baxçe", category: "بیناسازی" },
+  { sorani: "پەنجەرە", kurmanji: "pace", category: "بیناسازی" },
+  { sorani: "دەرگا", kurmanji: "derî", category: "بیناسازی" },
+  { sorani: "قەسر", kurmanji: "qesr", category: "بیناسازی" },
+  { sorani: "کۆشک", kurmanji: "koşk", category: "بیناسازی" },
+  { sorani: "قوللە", kurmanji: "qulle", category: "بیناسازی" },
+  { sorani: "هۆتێل", kurmanji: "hotêl", category: "بیناسازی" },
+  { sorani: "چێشتخانە", kurmanji: "çêştxane", category: "بیناسازی" },
+
+  // Nature Extended - سروشت زیاتر
+  { sorani: "ئاسمان", kurmanji: "ezman", category: "سروشت" },
+  { sorani: "زەوی", kurmanji: "erd", category: "سروشت" },
+  { sorani: "دەریا", kurmanji: "beher", category: "سروشت" },
+  { sorani: "گۆل", kurmanji: "gol", category: "سروشت" },
+  { sorani: "دۆڵ", kurmanji: "dol", category: "سروشت" },
+  { sorani: "گرد", kurmanji: "gird", category: "سروشت" },
+  { sorani: "جەم", kurmanji: "cem", category: "سروشت" },
+  { sorani: "کانزا", kurmanji: "kanza", category: "سروشت" },
+
+  // Technology Extended - تەکنەلۆژیا زیاتر
+  { sorani: "تەلەفۆن", kurmanji: "têlefon", category: "تەکنەلۆژیا" },
+  { sorani: "تەلەفیزیۆن", kurmanji: "televizyon", category: "تەکنەلۆژیا" },
+  { sorani: "ڕادیۆ", kurmanji: "radyo", category: "تەکنەلۆژیا" },
+  { sorani: "کامێرا", kurmanji: "kamera", category: "تەکنەلۆژیا" },
+  { sorani: "کۆمپیوتەری سەردەست", kurmanji: "laptopî", category: "تەکنەلۆژیا" },
+  { sorani: "تابلێت", kurmanji: "tablet", category: "تەکنەلۆژیا" },
+  { sorani: "مۆدێم", kurmanji: "modem", category: "تەکنەلۆژیا" },
+  { sorani: "پڕینتەر", kurmanji: "printer", category: "تەکنەلۆژیا" },
+
+  // Academic Subjects Extended - خوێندن زیاتر
+  { sorani: "بیرکاری", kurmanji: "matematîk", category: "خوێندن" },
+  { sorani: "فیزیا", kurmanji: "fîzya", category: "خوێندن" },
+  { sorani: "کیمیا", kurmanji: "kîmya", category: "خوێندن" },
+  { sorani: "بایۆلۆجی", kurmanji: "bîyolojî", category: "خوێندن" },
+
+  // Sports Extended - وەرزش زیاتر
+  { sorani: "تۆپی پێ", kurmanji: "futbol", category: "وەرزش" },
+  { sorani: "باسکتبۆڵ", kurmanji: "basketbol", category: "وەرزش" },
+  { sorani: "تێنس", kurmanji: "tenîs", category: "وەرزش" },
+  { sorani: "یاری", kurmanji: "lîstik", category: "وەرزش" },
+  { sorani: "پاڵەوان", kurmanji: "qahreman", category: "وەرزش" },
+  { sorani: "یاریگا", kurmanji: "stadium", category: "وەرزش" },
+  { sorani: "بۆکس", kurmanji: "boks", category: "وەرزش" },
+  { sorani: "کوشتی", kurmanji: "kuştî", category: "وەرزش" },
+
+  // Health Extended - تەندروستی
+  { sorani: "تەندروستی", kurmanji: "tendirustî", category: "تەندروستی" },
+  { sorani: "نەخۆش", kurmanji: "nexweş", category: "تەندروستی" },
+  { sorani: "دەرمان", kurmanji: "derman", category: "تەندروستی" },
+  { sorani: "ئازار", kurmanji: "azar", category: "تەندروستی" },
+  { sorani: "درد", kurmanji: "êş", category: "تەندروستی" },
+  { sorani: "چاکبوونەوە", kurmanji: "çakbûn", category: "تەندروستی" },
+  { sorani: "برین", kurmanji: "birîn", category: "تەندروستی" },
+
+  // Emotions Extended - هەست
+  { sorani: "خۆشەویستی", kurmanji: "evîn", category: "هەست" },
+  { sorani: "دڵخۆشی", kurmanji: "kêf", category: "هەست" },
+  { sorani: "خەمۆکی", kurmanji: "xemgînî", category: "هەست" },
+  { sorani: "ترس", kurmanji: "tirs", category: "هەست" },
+  { sorani: "توڕەیی", kurmanji: "hêrs", category: "هەست" },
+  { sorani: "ئومێد", kurmanji: "hêvî", category: "هەست" },
+  { sorani: "نائومێدی", kurmanji: "bêhêvî", category: "هەست" },
+  { sorani: "سەرسوڕمان", kurmanji: "ecêb", category: "هەست" },
+  { sorani: "ئارامی", kurmanji: "aramî", category: "هەست" },
+  { sorani: "شانازی", kurmanji: "şanazî", category: "هەست" },
+
+  // Business Extended - بازرگانی
+  { sorani: "بازرگانی", kurmanji: "bazirganî", category: "بازرگانی" },
+  { sorani: "کارمەند", kurmanji: "karker", category: "بازرگانی" },
+  { sorani: "کارخانە", kurmanji: "fabrika", category: "بازرگانی" },
+  { sorani: "فرۆشگا", kurmanji: "firotge", category: "بازرگانی" },
+  { sorani: "نرخ", kurmanji: "nirx", category: "بازرگانی" },
+  { sorani: "فرۆشتن", kurmanji: "firotin", category: "بازرگانی" },
+  { sorani: "کڕین", kurmanji: "kirîn", category: "بازرگانی" },
+  { sorani: "قازانج", kurmanji: "qezenc", category: "بازرگانی" },
+  { sorani: "زیان", kurmanji: "ziyan", category: "بازرگانی" },
+  { sorani: "حیساب", kurmanji: "hîsab", category: "بازرگانی" },
+  { sorani: "قەرز", kurmanji: "qerz", category: "بازرگانی" },
+  { sorani: "سوود", kurmanji: "sûd", category: "بازرگانی" },
+
+  // Kitchen Extended - چێشتخانە
+  { sorani: "مێز", kurmanji: "mêz", category: "چێشتخانە" },
+  { sorani: "کورسی", kurmanji: "kursî", category: "چێشتخانە" },
+  { sorani: "قاپ", kurmanji: "qab", category: "چێشتخانە" },
+  { sorani: "چنگاڵ", kurmanji: "çingal", category: "چێشتخانە" },
+  { sorani: "کێشک", kurmanji: "kevçî", category: "چێشتخانە" },
+  { sorani: "چاقو", kurmanji: "kêr", category: "چێشتخانە" },
+  { sorani: "تاس", kurmanji: "tas", category: "چێشتخانە" },
+  { sorani: "گڵاس", kurmanji: "glas", category: "چێشتخانە" },
+  { sorani: "کەتڵ", kurmanji: "ketel", category: "چێشتخانە" },
+  { sorani: "تاوە", kurmanji: "tawe", category: "چێشتخانە" },
+
+  // Geographic Terms - جوگرافیا
+  { sorani: "وڵات", kurmanji: "welat", category: "جوگرافیا" },
+  { sorani: "نیشتمان", kurmanji: "niştiman", category: "جوگرافیا" },
+  { sorani: "سنوور", kurmanji: "sînor", category: "جوگرافیا" },
+  { sorani: "پایتەخت", kurmanji: "paytext", category: "جوگرافیا" },
+  { sorani: "شارستان", kurmanji: "parêzge", category: "جوگرافیا" },
+
+  // Religious Terms - ئایین
+  { sorani: "خودا", kurmanji: "Xwedê", category: "ئایین" },
+  { sorani: "نوێژ", kurmanji: "nimêj", category: "ئایین" },
+  { sorani: "قورئان", kurmanji: "Quran", category: "ئایین" },
+  { sorani: "ڕۆژوو", kurmanji: "rojî", category: "ئایین" },
+  { sorani: "حەج", kurmanji: "hec", category: "ئایین" },
+  { sorani: "زەکات", kurmanji: "zekat", category: "ئایین" },
+  { sorani: "دوعا", kurmanji: "dua", category: "ئایین" },
+  { sorani: "حەلاڵ", kurmanji: "helal", category: "ئایین" },
+  { sorani: "حەرام", kurmanji: "heram", category: "ئایین" },
+
+  // Adjectives Extended - ناولاو
+  { sorani: "بەرز", kurmanji: "bilind", category: "ناولاو" },
+  { sorani: "نزم", kurmanji: "nizm", category: "ناولاو" },
+  { sorani: "درێژ", kurmanji: "dirêj", category: "ناولاو" },
+  { sorani: "کورت", kurmanji: "kurt", category: "ناولاو" },
+  { sorani: "نوێ", kurmanji: "nû", category: "ناولاو" },
+  { sorani: "کۆن", kurmanji: "kevn", category: "ناولاو" },
+  { sorani: "تایبەت", kurmanji: "taybet", category: "ناولاو" },
+
+  // Advanced Verbs - کردارە پێشکەوتووەکان
+  { sorani: "پێکردن", kurmanji: "pê kirin", category: "کردارە پێشکەوتووەکان" },
+  { sorani: "تێگەیشتن", kurmanji: "fêm kirin", category: "کردارە پێشکەوتووەکان" },
+  { sorani: "فێربوون", kurmanji: "hîn bûn", category: "کردارە پێشکەوتووەکان" },
+  { sorani: "فێرکردن", kurmanji: "hîn kirin", category: "کردارە پێشکەوتووەکان" },
+  { sorani: "بیرکردنەوە", kurmanji: "bîr kirin", category: "کردارە پێشکەوتووەکان" },
+  { sorani: "بڕیاردان", kurmanji: "biryar dan", category: "کردارە پێشکەوتووەکان" },
+  { sorani: "پلاندانان", kurmanji: "plan danîn", category: "کردارە پێشکەوتووەکان" },
+  { sorani: "ئامادەکردن", kurmanji: "amade kirin", category: "کردارە پێشکەوتووەکان" },
+
+  // Complex Phrases - دەربڕینە ئاڵۆزەکان
+  { sorani: "چ خەبەر؟", kurmanji: "çi nû ye?", category: "دەربڕینە ئاڵۆزەکان" },
+  { sorani: "کوا دەچی؟", kurmanji: "ku diçî?", category: "دەربڕینە ئاڵۆزەکان" },
+  { sorani: "چی دەکەی؟", kurmanji: "çi dikî?", category: "دەربڕینە ئاڵۆزەکان" },
+  { sorani: "کەی دێیتەوە؟", kurmanji: "kengî tê?", category: "دەربڕینە ئاڵۆزەکان" },
+  { sorani: "بۆچی؟", kurmanji: "çima?", category: "دەربڕینە ئاڵۆزەکان" },
+  { sorani: "چەند؟", kurmanji: "çend?", category: "دەربڕینە ئاڵۆزەکان" },
+
+  // Transportation Extended - گواستنەوە زیاتر
+  { sorani: "پاسکیل", kurmanji: "bisîklet", category: "گواستنەوە" },
+  { sorani: "فڕۆکە", kurmanji: "balafir", category: "گواستنەوە" },
+  { sorani: "کەشتی", kurmanji: "keştî", category: "گواستنەوە" },
+  { sorani: "شەمەندەفەر", kurmanji: "şemendefer", category: "گواستنەوە" },
+  { sorani: "پاس", kurmanji: "otobûs", category: "گواستنەوە" },
+  { sorani: "تاکسی", kurmanji: "taksî", category: "گواستنەوە" },
+  { sorani: "تریلەر", kurmanji: "kamyon", category: "گواستنەوە" },
+  { sorani: "مۆتۆر", kurmanji: "motor", category: "گواستنەوە" },
+  { sorani: "هەلیکۆپتەر", kurmanji: "helîkopter", category: "گواستنەوە" },
+  { sorani: "ترەن", kurmanji: "tren", category: "گواستنەوە" },
+  { sorani: "مەترۆ", kurmanji: "metro", category: "گواستنەوە" },
+
+  // More Food Items - خۆراک تر
+  { sorani: "خوێ", kurmanji: "xwê", category: "خۆراک" },
+  { sorani: "مەست", kurmanji: "mest", category: "خۆراک" },
+  { sorani: "نۆک", kurmanji: "nok", category: "خۆراک" },
+  { sorani: "بەرق", kurmanji: "berq", category: "خۆراک" },
+  { sorani: "رەوەن", kurmanji: "rewen", category: "خۆراک" },
+  { sorani: "کەرەوێز", kurmanji: "kerewêz", category: "خۆراک" },
+  { sorani: "ترە", kurmanji: "tire", category: "خۆراک" },
+  { sorani: "شوید", kurmanji: "şiwîd", category: "خۆراک" },
+  { sorani: "کزبرە", kurmanji: "kizbere", category: "خۆراک" },
+  { sorani: "نەعنا", kurmanji: "pûng", category: "خۆراک" },
+  { sorani: "ڕێحان", kurmanji: "rêhan", category: "خۆراک" },
+  { sorani: "کەتێلە", kurmanji: "ketêle", category: "خۆراک" },
+  { sorani: "رەشە", kurmanji: "reşe", category: "خۆراک" },
+  { sorani: "هەڵو", kurmanji: "helû", category: "خۆراک" },
+  { sorani: "گژۆگ", kurmanji: "gijog", category: "خۆراک" },
+
+  // More Animals - ئاژەڵی تر
+  { sorani: "تیشک", kurmanji: "tîşk", category: "ئاژەڵ" },
+  { sorani: "مارەدار", kurmanji: "maredar", category: "ئاژەڵ" },
+  { sorani: "کەرەکورە", kurmanji: "kerekure", category: "ئاژەڵ" },
+  { sorani: "هەیوان", kurmanji: "heywan", category: "ئاژەڵ" },
+  { sorani: "ڕەشەوە", kurmanji: "reşewe", category: "ئاژەڵ" },
+  { sorani: "وەرە", kurmanji: "were", category: "ئاژەڵ" },
+  { sorani: "شپشە", kurmanji: "şipşe", category: "ئاژەڵ" },
+  { sorani: "مێش", kurmanji: "mêş", category: "ئاژەڵ" },
+  { sorani: "هەنگ", kurmanji: "heng", category: "ئاژەڵ" },
+  { sorani: "کەرم", kurmanji: "kerm", category: "ئاژەڵ" },
+  { sorani: "پەپوولە", kurmanji: "pepûle", category: "ئاژەڵ" },
+  { sorani: "مەگەس", kurmanji: "meges", category: "ئاژەڵ" },
+  { sorani: "مور", kurmanji: "mêrû", category: "ئاژەڵ" },
+  { sorani: "کارکوت", kurmanji: "karkût", category: "ئاژەڵ" },
+
+  // More Body Parts - لەشی تر
+  { sorani: "گوپشە", kurmanji: "gopşe", category: "لەش" },
+  { sorani: "پاژنە", kurmanji: "pajin", category: "لەش" },
+  { sorani: "پشتی پێ", kurmanji: "pişt pê", category: "لەش" },
+  { sorani: "لەپی پێ", kurmanji: "lep pê", category: "لەش" },
+  { sorani: "ڕان", kurmanji: "ran", category: "لەش" },
+  { sorani: "چۆک", kurmanji: "çok", category: "لەش" },
+  { sorani: "ناو چاو", kurmanji: "nav çav", category: "لەش" },
+  { sorani: "برۆ", kurmanji: "birû", category: "لەش" },
+  { sorani: "ملچە", kurmanji: "milçe", category: "لەش" },
+  { sorani: "سپەندار", kurmanji: "spêndar", category: "لەش" },
+
+  // Kitchen Items Extended - چێشتخانەی تر
+  { sorani: "جانتا", kurmanji: "çanta", category: "چێشتخانە" },
+  { sorani: "مەنجەڵ", kurmanji: "mencel", category: "چێشتخانە" },
+  { sorani: "قاپی چێشت", kurmanji: "qabî çêşt", category: "چێشتخانە" },
+  { sorani: "دەستەشۆر", kurmanji: "desteşor", category: "چێشتخانە" },
+  { sorani: "مەلەقە", kurmanji: "meleqe", category: "چێشتخانە" },
+  { sorani: "قەدەح", kurmanji: "qedeh", category: "چێشتخانە" },
+  { sorani: "جام", kurmanji: "cam", category: "چێشتخانە" },
+  { sorani: "کاسە", kurmanji: "kase", category: "چێشتخانە" },
+  { sorani: "بوتڵ", kurmanji: "şûşe", category: "چێشتخانە" },
+  { sorani: "قوتو", kurmanji: "quto", category: "چێشتخانە" },
+
+  // More Weather Terms - کەشوهەوای تر
+  { sorani: "بەردەم", kurmanji: "berdem", category: "کەشوهەوا" },
+  { sorani: "بایەک", kurmanji: "bayeк", category: "کەشوهەوا" },
+  { sorani: "ڕەشەبا", kurmanji: "reşeba", category: "کەشوهەوا" },
+  { sorani: "گەرمایی", kurmanji: "germahî", category: "کەشوهەوا" },
+  { sorani: "سارایی", kurmanji: "sarahî", category: "کەشوهەوا" },
+  { sorani: "شەپۆل", kurmanji: "şepol", category: "کەشوهەوا" },
+  { sorani: "میژوو", kurmanji: "mij", category: "کەشوهەوا" },
+  { sorani: "تەڕی", kurmanji: "nemî", category: "کەشوهەوا" },
+  { sorani: "وشکایی", kurmanji: "wuşkahî", category: "کەشوهەوا" },
+
+  // More Technology - تەکنەلۆژیای تر
+  { sorani: "وێبکام", kurmanji: "webkam", category: "تەکنەلۆژیا" },
+  { sorani: "سکانەر", kurmanji: "skaner", category: "تەکنەلۆژیا" },
+  { sorani: "فاکس", kurmanji: "faks", category: "تەکنەلۆژیا" },
+  { sorani: "کیبۆرد", kurmanji: "klavye", category: "تەکنەلۆژیا" },
+  { sorani: "ماوس", kurmanji: "fare", category: "تەکنەلۆژیا" },
+  { sorani: "مۆنیتەر", kurmanji: "ekran", category: "تەکنەلۆژیا" },
+  { sorani: "سپیکەر", kurmanji: "hoparlör", category: "تەکنەلۆژیا" },
+  { sorani: "مایکرۆفۆن", kurmanji: "mîkrofon", category: "تەکنەلۆژیا" },
+  { sorani: "ڕۆوتەر", kurmanji: "router", category: "تەکنەلۆژیا" },
+  { sorani: "وایفای", kurmanji: "wîfî", category: "تەکنەلۆژیا" },
+
+  // More Buildings - بیناسازی تر
+  { sorani: "بەربەرخانە", kurmanji: "berberxane", category: "بیناسازی" },
+  { sorani: "نانەواخانە", kurmanji: "nanewaxane", category: "بیناسازی" },
+  { sorani: "خانووبەرە", kurmanji: "xanûbere", category: "بیناسازی" },
+  { sorani: "پرد", kurmanji: "pird", category: "بیناسازی" },
+  { sorani: "بان", kurmanji: "ban", category: "بیناسازی" },
+  { sorani: "پاڵانگا", kurmanji: "palanga", category: "بیناسازی" },
+  { sorani: "سەردەم", kurmanji: "serdem", category: "بیناسازی" },
+  { sorani: "ئاسانسۆر", kurmanji: "asansör", category: "بیناسازی" },
+  { sorani: "پلەکان", kurmanji: "pelekan", category: "بیناسازی" },
+  { sorani: "هۆڵ", kurmanji: "hol", category: "بیناسازی" },
+
+  // More Emotions - هەستی تر
+  { sorani: "ترسنۆک", kurmanji: "tirsok", category: "هەست" },
+  { sorani: "تووڕە", kurmanji: "jê re", category: "هەست" },
+  { sorani: "دڵخۆش", kurmanji: "kêfxweş", category: "هەست" },
+  { sorani: "خەمبار", kurmanji: "xembar", category: "هەست" },
+  { sorani: "سەرسام", kurmanji: "sersam", category: "هەست" },
+  { sorani: "نیگەران", kurmanji: "xem", category: "هەست" },
+  { sorani: "شاد", kurmanji: "şad", category: "هەست" },
+  { sorani: "دەستپاک", kurmanji: "destpak", category: "هەست" },
+  { sorani: "بێ ئەندازە", kurmanji: "bê endaze", category: "هەست" },
+  { sorani: "سەروەری", kurmanji: "serwerî", category: "هەست" },
+
+  // More Adjectives - ناولاوی تر
+  { sorani: "هەموو", kurmanji: "hemû", category: "ناولاو" },
+  { sorani: "هیچ", kurmanji: "tu", category: "ناولاو" },
+  { sorani: "پاک", kurmanji: "paqij", category: "ناولاو" },
+  { sorani: "پیس", kurmanji: "pîs", category: "ناولاو" },
+  { sorani: "خۆش", kurmanji: "xweş", category: "ناولاو" },
+  { sorani: "ناخۆش", kurmanji: "nexweş", category: "ناولاو" },
+  { sorani: "قورس", kurmanji: "hişk", category: "ناولاو" },
+  { sorani: "نەرم", kurmanji: "nerm", category: "ناولاو" },
+  { sorani: "گرم", kurmanji: "germ", category: "ناولاو" },
+  { sorani: "سارد", kurmanji: "sar", category: "ناولاو" },
+  { sorani: "تازە", kurmanji: "taze", category: "ناولاو" },
+  { sorani: "کۆن", kurmanji: "kevin", category: "ناولاو" },
+
+  // Days of Week - ڕۆژەکانی هەفتە
+  { sorani: "یەکشەممە", kurmanji: "yekşem", category: "کات" },
+  { sorani: "دووشەممە", kurmanji: "duşem", category: "کات" },
+  { sorani: "سێشەممە", kurmanji: "sêşem", category: "کات" },
+  { sorani: "چوارشەممە", kurmanji: "çarşem", category: "کات" },
+  { sorani: "پێنجشەممە", kurmanji: "pêncşem", category: "کات" },
+  { sorani: "هەینی", kurmanji: "în", category: "کات" },
+  { sorani: "شەممە", kurmanji: "şemî", category: "کات" },
+
+  // Months - مانگەکان
+  { sorani: "ڕێبەندان", kurmanji: "rêbendan", category: "کات" },
+  { sorani: "ڕەشەمە", kurmanji: "reşeme", category: "کات" },
+  { sorani: "نەورۆز", kurmanji: "newroz", category: "کات" },
+  { sorani: "گوڵان", kurmanji: "gulan", category: "کات" },
+  { sorani: "جۆزەردان", kurmanji: "cozerdan", category: "کات" },
+  { sorani: "پووشپەڕ", kurmanji: "pûşper", category: "کات" },
+  { sorani: "گەلاوێژ", kurmanji: "gelawêj", category: "کات" },
+  { sorani: "خەرمانان", kurmanji: "xermanan", category: "کات" },
+  { sorani: "ڕەزبەر", kurmanji: "rezber", category: "کات" },
+  { sorani: "گەڵاڕێزان", kurmanji: "gelarêzan", category: "کات" },
+  { sorani: "سەرماوەز", kurmanji: "sermawez", category: "کات" },
+  { sorani: "بەفرانبار", kurmanji: "befranbar", category: "کات" },
+
+  // More Verbs - کرداری تر
+  { sorani: "پەیوەندیکردن", kurmanji: "têkilî kirin", category: "کردار" },
+  { sorani: "ئامادەبوون", kurmanji: "amade bûn", category: "کردار" },
+  { sorani: "دەستپێکردن", kurmanji: "dest pê kirin", category: "کردار" },
+  { sorani: "کۆتاییهێنان", kurmanji: "kotayî hênan", category: "کردار" },
+  { sorani: "بەردەوامبوون", kurmanji: "berdewam bûn", category: "کردار" },
+  { sorani: "وەستان", kurmanji: "westan", category: "کردار" },
+  { sorani: "ڕاوەستان", kurmanji: "rawestan", category: "کردار" },
+  { sorani: "گەیشتن", kurmanji: "gîhîştin", category: "کردار" },
+  { sorani: "ڕۆیشتن", kurmanji: "çûn", category: "کردار" },
+  { sorani: "گەڕانەوە", kurmanji: "vegerîn", category: "کردار" },
+
+  // More Directions - ئاراستەی تر
+  { sorani: "لە کوێوە", kurmanji: "ji ku ve", category: "ئاراستە" },
+  { sorani: "بۆ کوێ", kurmanji: "bo ku", category: "ئاراستە" },
+  { sorani: "لە ناو", kurmanji: "ji nav", category: "ئاراستە" },
+  { sorani: "لە سەر", kurmanji: "li ser", category: "ئاراستە" },
+  { sorani: "لە ژێر", kurmanji: "li jêr", category: "ئاراستە" },
+  { sorani: "لە پێش", kurmanji: "li pêş", category: "ئاراستە" },
+  { sorani: "لە دوا", kurmanji: "li paş", category: "ئاراستە" },
+  { sorani: "لە تەنیشت", kurmanji: "li kêleka", category: "ئاراستە" },
+
+  // Question Words - پرسیار
+  { sorani: "کێ؟", kurmanji: "kî?", category: "پرسیار" },
+  { sorani: "چی؟", kurmanji: "çi?", category: "پرسیار" },
+  { sorani: "کوا؟", kurmanji: "ku?", category: "پرسیار" },
+  { sorani: "کەی؟", kurmanji: "kengî?", category: "پرسیار" },
+  { sorani: "چۆن؟", kurmanji: "çawa?", category: "پرسیار" },
+  { sorani: "بۆچی؟", kurmanji: "çima?", category: "پرسیار" },
+  { sorani: "چەند؟", kurmanji: "çend?", category: "پرسیار" },
+  { sorani: "کام؟", kurmanji: "kîjan?", category: "پرسیار" }
 ];
 
 const KurdishDialectTranslator: React.FC = () => {
@@ -405,6 +1085,25 @@ const KurdishDialectTranslator: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
+
+  // Force purple background by overriding parent styles
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      main[class*="bg-background"] {
+        background: linear-gradient(to bottom right, rgb(243 232 255), rgb(250 245 255), rgb(224 231 255)) !important;
+      }
+      .sidebar-inset-override {
+        background: linear-gradient(to bottom right, rgb(243 232 255), rgb(250 245 255), rgb(224 231 255)) !important;
+        min-height: 100vh !important;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   // Get unique categories
   const categories = [...new Set(dialectDictionary.map(item => item.category))];
@@ -517,7 +1216,7 @@ Translation:`;
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-indigo-100 p-4" dir="rtl">
+    <div className="sidebar-inset-override min-h-screen w-full p-4" dir="rtl">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">

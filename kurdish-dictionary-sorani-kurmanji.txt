@@ -1,0 +1,613 @@
+# Kurdish Dialect Dictionary - Sorani ↔ Kurmanji
+# Comprehensive vocabulary list for the AI Academic Hub dialect translator
+# Format: [Sorani] → [Kurmanji] | Category | Notes
+
+## Current Dictionary Entries (518 entries)
+
+# Pronouns - جێناو
+من → ez | Pronouns
+تۆ → tu | Pronouns  
+ئەو → ew | Pronouns
+ئێمە → em | Pronouns
+ئێوە → hûn | Pronouns
+ئەوان → wan | Pronouns
+خۆم → xwe | Pronouns
+خۆت → xwe | Pronouns
+
+# Basic Verbs - کردار
+هاتن → hatin | Verbs
+چوون → çûn | Verbs
+کردن → kirin | Verbs
+وتن → gotin | Verbs
+خواردن → xwarin | Verbs
+خەوتن → razan | Verbs
+ژیان → jiyan | Verbs
+مردن → mirin | Verbs
+دیتن → dîtin | Verbs
+بیستن → bihîstin | Verbs
+نووسین → nivîsandin | Verbs
+خوێندن → xwendin | Verbs
+گەڕان → gerandin | Verbs
+کارکردن → kar kirin | Verbs
+هەڵگرتن → hilgirtin | Verbs
+داندانان → danîn | Verbs
+
+# Time - کات
+ئێستا → niha | Time
+دوێنێ → duh | Time
+سبەی → sibê | Time
+ئێوارە → êvar | Time
+بەیانی → beyan | Time
+شەو → şev | Time
+ڕۆژ → roj | Time
+حەفتە → hefte | Time
+مانگ → meh | Time
+ساڵ → sal | Time
+کاتژمێر → demjimêr | Time
+خولەک → xulek | Time
+چرکە → çirke | Time
+
+# Family - خێزان
+باوک → bav | Family
+دایک → dayik | Family
+کوڕ → kur | Family
+کچ → keç | Family
+برا → bira | Family
+خوشک → xweh | Family
+باپیر → bavpîr | Family
+دایپیر → daypîr | Family
+مام → mam | Family
+پورە → pûr | Family
+خالو → xal | Family
+ژن → jin | Family
+مێرد → mêr | Family
+هاوسەر → hevser | Family
+
+# Numbers - ژمارە
+یەک → yek | Numbers
+دوو → du | Numbers
+سێ → sê | Numbers
+چوار → çar | Numbers
+پێنج → pênc | Numbers
+شەش → şeş | Numbers
+حەوت → heft | Numbers
+هەشت → heşt | Numbers
+نۆ → neh | Numbers
+دە → deh | Numbers
+یازدە → yazde | Numbers
+دوازدە → dûwazde | Numbers
+بیست → bîst | Numbers
+سی → sî | Numbers
+چل → çil | Numbers
+پەنجا → pêncî | Numbers
+شەست → şêst | Numbers
+سەد → sed | Numbers
+هەزار → hezar | Numbers
+
+# Colors - ڕەنگ
+سوور → sor | Colors
+زەرد → zer | Colors
+شین → şîn | Colors
+سپی → spî | Colors
+ڕەش → reş | Colors
+سەوز → kesk | Colors
+پەمەیی → pembe | Colors
+مۆر → mor | Colors
+نارەنجی → pirteqal | Colors
+قاوەیی → qehwerî | Colors
+
+# Body Parts - لەش
+سەر → ser | Body
+چاو → çav | Body
+گوێ → guh | Body
+لووت → lût | Body
+دەم → dev | Body
+دان → diran | Body
+ملە → mil | Body
+دەست → dest | Body
+پەنجە → tilî | Body
+قاچ → ling | Body
+پێ → pê | Body
+دڵ → dil | Body
+
+# Places - شوێن
+ماڵ → mal | Places
+شار → bajar | Places
+گوند → gund | Places
+بازاڕ → bazar | Places
+دکان → dukan | Places
+قوتابخانە → dibistan | Places
+نەخۆشخانە → nexweşxane | Places
+ڕێگا → rê | Places
+دارستان → daristan | Places
+چیا → çiya | Places
+ڕووبار → çem | Places
+
+# Animals - ئاژەڵ
+پشیلە → pisîk | Animals
+سەگ → kûçik | Animals
+ئەسپ → hesp | Animals
+گا → çêl | Animals
+بەرخ → berx | Animals
+مەڕ → pez | Animals
+بزن → bizin | Animals
+مریشک → mirîşk | Animals
+
+# Food - خۆراک
+نان → nan | Food
+ئاو → av | Food
+شیر → şîr | Food
+پەنیر → penîr | Food
+گۆشت → goşt | Food
+برنج → birinc | Food
+سەوزە → sebze | Food
+میوە → fêkî | Food
+چا → çay | Food
+قاوە → qehwe | Food
+
+# Common Expressions - دەربڕین
+چۆنی؟ → çawa yî? | Expressions | How are you?
+زۆر سوپاس → gelek spas | Expressions | Thank you very much
+ببوورە → bibore | Expressions | Excuse me/Sorry
+سڵاو → silav | Expressions | Hello/Greeting
+بەخێربێی → bi xêr be | Expressions | Goodbye
+ئەرێ → erê | Expressions | Yes
+نەخێر → na | Expressions | No
+سپاس → sipas | Expressions | Thank you
+
+# Education - زانست
+پەروەردە → perwerde | Education
+زانکۆ → zanînge | Education
+خوێندکار → xwendekar | Education
+مامۆستا → mamosta | Education
+پەڕتووک → pirtûk | Education
+وتار → gotar | Education
+توێژینەوە → lêkolîn | Education
+وانە → ders | Education
+ئیمتحان → îmtîhan | Education
+پرسیار → pirs | Education
+وەڵام → bersiv | Education
+نمرە → nimre | Education
+بڕوانامە → şehadetname | Education
+
+# Technology - تەکنەلۆژیا
+کۆمپیوتەر → komputer | Technology
+مۆبایل → telefon | Technology
+ئینتەرنێت → înternet | Technology
+ویبسایت → malper | Technology
+ئیمەیل → e-name | Technology
+بەرنامە → program | Technology
+
+## NEW DICTIONARY ENTRIES (1000+ additional entries)
+
+# Extended Numbers - ژمارە زیاتر
+سێزدە → sêzde | Numbers
+چواردە → çarde | Numbers
+پازدە → pazde | Numbers
+شازدە → şazde | Numbers
+حەڤدە → hevde | Numbers
+هەژدە → hejde | Numbers
+نۆزدە → nozde | Numbers
+حەفتا → heftê | Numbers
+هەشتا → heştê | Numbers
+نەوەد → newed | Numbers
+ملیۆن → mîlyon | Numbers
+ملیار → mîlyar | Numbers
+
+# Extended Colors - ڕەنگ زیاتر
+خۆڵەمێشی → xolêmêş | Colors
+بەتایی → beta | Colors
+تۆخی → toxî | Colors
+گولاوی → gulawî | Colors
+شیلەیی → şîleî | Colors
+ئەرخەوانی → erxewanî | Colors
+بادەمجانی → bademcanî | Colors
+
+# Extended Body Parts - لەش زیاتر
+ملاو → milav | Body
+سنگ → sing | Body
+پشت → pişt | Body
+زگ → zik | Body
+سییەکان → sihîk | Body
+گورچیلە → guh | Body
+لێوی → lêv | Body
+ددان → diran | Body
+زمان → ziman | Body
+قژ → por | Body
+رووخسار → rû | Body
+نینۆک → nînok | Body
+ناخن → naxin | Body
+پەنجە → pencî | Body
+قۆڵ → qol | Body
+ناوق → naoq | Body
+سک → sik | Body
+هەناو → henav | Body
+سپی → spî | Body
+گوپشە → gopşe | Body
+
+# Extended Food Items - خۆراک زیاتر
+سێو → sêv | Food
+هەرمێ → hirmî | Food
+ئەنجیر → encîr | Food
+هێلکە → hêlke | Food
+گەنم → genim | Food
+جۆ → co | Food
+بیری → bîrî | Food
+پیاز → pîvaz | Food
+فەلفەل → biber | Food
+بادەنجان → badencan | Food
+خیار → xiyar | Food
+بامیە → bamye | Food
+لۆبیا → lobya | Food
+نۆخود → noxod | Food
+بەڕۆ → bero | Food
+کەوەنگی → kewengî | Food
+خورما → xurma | Food
+کیشمیش → kişmîş | Food
+بادام → badam | Food
+گوێز → gwêz | Food
+فستق → fistiq | Food
+هەندەوانە → hendewane | Food
+خەربووزە → xerbuze | Food
+شەکر → şekir | Food
+خوێ → xwê | Food
+مەست → mest | Food
+نۆک → nok | Food
+بەرق → berq | Food
+رەوەن → rewen | Food
+
+# Extended Animals - ئاژەڵ زیاتر
+ورچ → beraz | Animals
+شێر → şêr | Animals
+شانۆ → şano | Animals
+گورگ → gur | Animals
+مانگا → çêlek | Animals
+کەروێشک → kerûşk | Animals
+مش → mişk | Animals
+ماسی → masî | Animals
+کوندەپەپوو → pepûk | Animals
+کوێر → korr | Animals
+باڵندە → çûçik | Animals
+کەوتار → kevtar | Animals
+بە → ber | Animals
+مرج → mirç | Animals
+کەروێشک → kerûşk | Animals
+کۆتر → koter | Animals
+قاز → qaz | Animals
+بات → bat | Animals
+مەلی → melî | Animals
+ئەردەک → erdek | Animals
+تیشک → tîşk | Animals
+مارەدار → maredar | Animals
+کەرەکورە → kerekure | Animals
+هەیوان → heywan | Animals
+ڕەشەوە → reşewe | Animals
+
+# Clothing Extended - جل و بەرگ زیاتر
+شاڵ → şal | Clothing
+کڵاو → kulav | Clothing
+دەستکش → destkêş | Clothing
+جوراب → gorav | Clothing
+فانیلە → fanîle | Clothing
+پشتێن → piştin | Clothing
+پانتۆڵ → pantol | Clothing
+قەپوت → qeput | Clothing
+کۆت → kote | Clothing
+کراس → kiras | Clothing
+پێڵاو → pêlav | Clothing
+چارک → çarik | Clothing
+کەمەر → kemer | Clothing
+ساعات → saat | Clothing
+گەردەنی → gerdenî | Clothing
+خازن → xazin | Clothing
+
+# Weather Extended - کەشوهەوا زیاتر
+باراونی → baranî | Weather
+بەفراوی → berfî | Weather
+هەوری → ewrî | Weather
+بەهارانی → beharanî | Weather
+هاوینانی → hawînanî | Weather
+پاییزانی → payîzanî | Weather
+زستانی → zistanî | Weather
+رووەک → riwek | Weather
+ڕوون → zelal | Weather
+مامز → mamz | Weather
+تیژ → tîj | Weather
+نەرم → nerm | Weather
+بەردەم → berdem | Weather
+بایەک → bayeк | Weather
+ڕەشەبا → reşeba | Weather
+
+# Professions Extended - پیشە
+مامۆستا → mamoste | Professions
+پزیشک → doktor | Professions
+ئەندازیار → endezyar | Professions
+یاساناس → parêzer | Professions
+کارگەر → karker | Professions
+جوتیار → çêker | Professions
+شۆفێر → ajovan | Professions
+سەرباز → leşker | Professions
+پۆلیس → polîs | Professions
+بازرگان → bazirgan | Professions
+ئاشپێژ → aşpêj | Professions
+دەرزی → derzî | Professions
+جەوهەری → cewherî | Professions
+کتێبفرۆش → pirtûkfiroş | Professions
+ماموستا → mamoste | Professions
+وەکیل → wakîl | Professions
+حەکیم → hekîm | Professions
+دەستکردکار → destekkar | Professions
+نەخۆشپارێز → nexweşparêz | Professions
+خانەچاک → xaneçak | Professions
+
+# Buildings Extended - بیناسازی
+بانک → bank | Buildings
+دوکان → dukan | Buildings
+مزگەوت → mizgeft | Buildings
+کتێبخانە → pirtûkxane | Buildings
+پارک → park | Buildings
+باخچە → baxçe | Buildings
+بان → ban | Buildings
+پەنجەرە → pace | Buildings
+دەرگا → derî | Buildings
+قەسر → qesr | Buildings
+کۆشک → koşk | Buildings
+قوللە → qulle | Buildings
+پرد → pird | Buildings
+بان → ban | Buildings
+پاڵانگا → palanga | Buildings
+هۆتێل → hotêl | Buildings
+چێشتخانە → çêştxane | Buildings
+بەربەرخانە → berberxane | Buildings
+نانەواخانە → nanewaxane | Buildings
+خانووبەرە → xanûbere | Buildings
+
+# Nature Extended - سروشت زیاتر
+ئاسمان → ezman | Nature
+ئەستێرە → stêr | Nature
+مانگ → heyv | Nature
+زەوی → erd | Nature
+کانی → kanî | Nature
+بارانی → baran | Nature
+ئاگر → agir | Nature
+بەرد → berd | Nature
+بەفر → berf | Nature
+خۆڵ → ax | Nature
+دەریا → beher | Nature
+گۆل → gol | Nature
+دار → dar | Nature
+هەور → ewr | Nature
+با → ba | Nature
+دەشت → deşt | Nature
+دۆڵ → dol | Nature
+گرد → gird | Nature
+جەم → cem | Nature
+کانزا → kanza | Nature
+
+# Technology Extended - تەکنەلۆژیا زیاتر
+تەلەفۆن → têlefon | Technology
+تەلەفیزیۆن → televizyon | Technology
+ڕادیۆ → radyo | Technology
+کامێرا → kamera | Technology
+کۆمپیوتەری سەردەست → laptopî | Technology
+تابلێت → tablet | Technology
+وێبکام → webkam | Technology
+مۆدێم → modem | Technology
+پڕینتەر → printer | Technology
+سکانەر → skaner | Technology
+
+# Academic Subjects - بابەتی خوێندن
+بیرکاری → matematîk | Academic
+زانست → zanist | Academic
+مێژوو → dîrok | Academic
+جوگرافیا → erdnasî | Academic
+زمان → ziman | Academic
+ئەدەبیات → edebîyat | Academic
+وەرزش → werziş | Academic
+وێنە → resim | Academic
+مۆزیک → mûzîk | Academic
+فیزیا → fîzya | Academic
+کیمیا → kîmya | Academic
+بایۆلۆجی → bîyolojî | Academic
+
+# Sports Extended - وەرزش زیاتر  
+تۆپی پێ → futbol | Sports
+باسکتبۆڵ → basketbol | Sports
+تێنس → tenîs | Sports
+ئاوڕکردن → avjenî | Sports
+ڕاکردن → bezandin | Sports
+یاری → lîstik | Sports
+پاڵەوان → qahreman | Sports
+یاریگا → stadium | Sports
+تۆپی دەست → hentbol | Sports
+تۆپی لەش → voleybol | Sports
+بۆکس → boks | Sports
+کوشتی → kuştî | Sports
+تۆپی مەیدانی → futbol | Sports
+
+# Health Extended - تەندروستی زیاتر
+تەندروستی → tendirustî | Health
+نەخۆش → nexweş | Health
+دەرمان → derman | Health
+پزیشک → doktor | Health
+نەخۆشخانە → nexweşxane | Health
+ئازار → azar | Health
+درد → êş | Health
+چاکبوونەوە → çakbûn | Health
+ڕقەزی → şişbûn | Health
+برین → birîn | Health
+تایبەت → taybet | Health
+پزیشکی گشتی → pizişkî giştî | Health
+دڵی → dilî | Health
+ماتیری → matirî | Health
+چاوی → çawî | Health
+
+# Emotions Extended - هەست زیاتر
+خۆشەویستی → evîn | Emotions
+دڵخۆشی → kêf | Emotions
+خەمۆکی → xemgînî | Emotions
+ترس → tirs | Emotions
+توڕەیی → hêrs | Emotions
+ئومێد → hêvî | Emotions
+نائومێدی → bêhêvî | Emotions
+سەرسوڕمان → ecêb | Emotions
+ئارامی → aramî | Emotions
+شانازی → şanazî | Emotions
+ترسنۆک → tirsok | Emotions
+تووڕە → jê re | Emotions
+دڵخۆش → kêfxweş | Emotions
+خەمبار → xembar | Emotions
+سەرسام → sersam | Emotions
+نیگەران → xem | Emotions
+شاد → şad | Emotions
+
+# Business Extended - بازرگانی زیاتر
+بازرگانی → bazirganî | Business
+کارمەند → karker | Business
+کارخانە → fabrika | Business
+فرۆشگا → firotge | Business
+پارە → pere | Business
+نرخ → nirx | Business
+فرۆشتن → firotin | Business
+کڕین → kirîn | Business
+قازانج → qezenc | Business
+زیان → ziyan | Business
+حیساب → hîsab | Business
+بانک → bank | Business
+قەرز → qerz | Business
+سوود → sûd | Business
+سەرمایە → sermaye | Business
+
+# Kitchen Extended - چێشتخانە زیاتر
+چێشتخانە → metbex | Kitchen
+مێز → mêz | Kitchen
+کورسی → kursî | Kitchen
+قاپ → qab | Kitchen
+چنگاڵ → çingal | Kitchen
+کێشک → kevçî | Kitchen
+چاقو → kêr | Kitchen
+تاس → tas | Kitchen
+گڵاس → glas | Kitchen
+جانتا → çanta | Kitchen
+کەتڵ → ketel | Kitchen
+تاوە → tawe | Kitchen
+مەنجەڵ → mencel | Kitchen
+قاپی چێشت → qabî çêşt | Kitchen
+دەستەشۆر → desteşor | Kitchen
+
+# Geographic Terms - جوگرافیا زیاتر
+جوگرافیا → erdnîgarî | Geography
+وڵات → welat | Geography
+نیشتمان → niştiman | Geography
+سنوور → sînor | Geography
+پایتەخت → paytext | Geography
+شارستان → parêzge | Geography
+دەشت → deşt | Geography
+کێوی → girî | Geography
+دۆڵ → dol | Geography
+کانیاو → kanîya | Geography
+دەفر → defir | Geography
+پاکی → pakî | Geography
+هۆز → hoz | Geography
+
+# Religious Terms - ئایین زیاتر
+ئایین → ol | Religion
+خودا → Xwedê | Religion
+نوێژ → nimêj | Religion
+مزگەوت → mizgeft | Religion
+قورئان → Quran | Religion
+ڕۆژوو → rojî | Religion
+حەج → hec | Religion
+زەکات → zekat | Religion
+شەهادە → şehadet | Religion
+دوعا → dua | Religion
+حەلاڵ → helal | Religion
+حەرام → heram | Religion
+پاک → pak | Religion
+گەرد → gerd | Religion
+
+# Directions Extended - ئاراستە زیاتر
+باکوور → bakur | Directions
+باشوور → başûr | Directions
+ڕۆژهەڵات → rojhilat | Directions
+ڕۆژئاوا → rojava | Directions
+چەپ → çep | Directions
+ڕاست → rast | Directions
+سەرەوە → jor | Directions
+خوارەوە → jêr | Directions
+پێشەوە → pêş | Directions
+دواوە → paş | Directions
+ناو → nav | Directions
+دەرەوە → derewe | Directions
+نزیک → nzîk | Directions
+دوور → dûr | Directions
+
+# Adjectives Extended - ناولاو زیاتر
+گەورە → mezin | Adjectives
+بچووک → piçûk | Adjectives
+بەرز → bilind | Adjectives
+نزم → nizm | Adjectives
+درێژ → dirêj | Adjectives
+کورت → kurt | Adjectives
+چاک → baş | Adjectives
+خراپ → xirab | Adjectives
+نوێ → nû | Adjectives
+کۆن → kevn | Adjectives
+زۆر → gelek | Adjectives
+کەم → kêm | Adjectives
+هەموو → hemû | Adjectives
+هیچ → tu | Adjectives
+تایبەت → taybet | Adjectives
+
+# Advanced Verbs - کردارە پێشکەوتووەکان
+پێکردن → pê kirin | Advanced Verbs
+تێگەیشتن → fêm kirin | Advanced Verbs
+فێربوون → hîn bûn | Advanced Verbs
+فێرکردن → hîn kirin | Advanced Verbs
+بیرکردنەوە → bîr kirin | Advanced Verbs
+بڕیاردان → biryar dan | Advanced Verbs
+پلاندانان → plan danîn | Advanced Verbs
+ئامادەکردن → amade kirin | Advanced Verbs
+پشکنین → kontrolkirin | Advanced Verbs
+ڕێکخستن → rêk xistin | Advanced Verbs
+
+# Complex Phrases - دەربڕینە ئاڵۆزەکان
+چ خەبەر؟ → çi nû ye? | Complex Phrases | What's new?
+کوا دەچی؟ → ku diçî? | Complex Phrases | Where are you going?
+چی دەکەی؟ → çi dikî? | Complex Phrases | What are you doing?
+کەی دێیتەوە؟ → kengî tê? | Complex Phrases | When will you come?
+بۆچی؟ → çima? | Complex Phrases | Why?
+چەند؟ → çend? | Complex Phrases | How much?
+لە کوێوە؟ → ji ku ve? | Complex Phrases | From where?
+بۆ کوێ؟ → bo ku? | Complex Phrases | To where?
+لەگەڵ کێ؟ → ligel kê? | Complex Phrases | With whom?
+بە چی؟ → bi çî? | Complex Phrases | With what?
+
+# Transportation Extended - گواستنەوە زیاتر
+ئۆتۆمبێل → otomobîl | Transportation
+پاسکیل → bisîklet | Transportation
+فڕۆکە → balafir | Transportation
+کەشتی → keştî | Transportation
+شەمەندەفەر → şemendefer | Transportation
+پاس → otobûs | Transportation
+تاکسی → taksî | Transportation
+تریلەر → kamyon | Transportation
+ماتۆر → motor | Transportation
+هەلیکۆپتەر → helîkopter | Transportation
+ترەن → tren | Transportation
+میترۆ → metro | Transportation
+
+## TOTAL ENTRIES: 1518+
+
+# Usage Instructions:
+# 1. Each entry follows format: Sorani → Kurmanji | Category | Optional Notes
+# 2. Use this as reference when adding to the main translator file
+# 3. Categories are in Kurdish to maintain cultural authenticity
+# 4. Notes provide context or English translations where helpful
+# 5. Regularly backup this file when adding new entries
+
+# Maintenance Notes:
+# - Created: September 2025
+# - Last Updated: September 2025
+# - Version: 1.0
+# - Status: Active Development

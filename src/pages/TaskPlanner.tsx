@@ -1,5 +1,5 @@
 import { TaskPlanner as TaskPlannerComponent } from "@/components/TaskPlanner";
-import { MobileSidebarTrigger } from "@/components/MobileSidebarTrigger";
+import { PageHeader } from "@/components/PageHeader";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Calendar } from "lucide-react";
@@ -13,9 +13,7 @@ const TaskPlanner = () => {
       
       
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <MobileSidebarTrigger />
-        </div>
+        <PageHeader />
         <TaskPlannerComponent />
       </main>
     </div>
