@@ -64,7 +64,6 @@
     "i18next-browser-languagedetector": "^8.2.0",
     "input-otp": "^1.4.2",
     "jspdf": "^3.0.2",
-    "jspdf-customfonts": "^0.0.4-rc.4",
     "jspdf-fonts": "^0.0.2",
     "jszip": "^3.10.1",
     "lucide-react": "^0.462.0",
