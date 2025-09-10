@@ -109,6 +109,9 @@ suggestion,
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Mobile Navigation */
+    --mobile-bottom-nav-height: 4rem;
   }
 
   .dark {
@@ -534,18 +537,23 @@ suggestion,
 
 /* Mobile Bottom Navigation Styles */
 .safe-area-pb {
-  padding-bottom: env(safe-area-inset-bottom);
+  /* Baseline padding for older browsers */
+  padding-bottom: 0px;
+  /* Legacy WebKit fallback for older iOS Safari */
+  padding-bottom: constant(safe-area-inset-bottom);
+  /* Modern browsers with env() support */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Ensure mobile content doesn't get hidden behind bottom nav */
 @media (max-width: 768px) {
   body {
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   
   /* Add extra padding to prevent content from being hidden */
   .mobile-safe-content {
-    padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+    padding-bottom: calc(var(--mobile-bottom-nav-height, 4rem) + env(safe-area-inset-bottom, 0px));
   }
   
   /* Mobile bottom navigation z-index */

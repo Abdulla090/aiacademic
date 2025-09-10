@@ -28,7 +28,7 @@ import {
   Bot
 } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader"; 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ArticleWriter } from "@/components/ArticleWriter";
 import { GrammarChecker } from "@/components/GrammarChecker";
@@ -42,6 +42,15 @@ const Index = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [currentTool, setCurrentTool] = useState<string | null>(null);
+
+  // Handle URL parameters for category filtering
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoryParam = urlParams.get('category');
+    if (categoryParam && categoryParam !== 'all') {
+      setSelectedCategory(categoryParam);
+    }
+  }, []);
 
   interface AcademicTool {
     title: string;

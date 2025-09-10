@@ -29,7 +29,9 @@ import {
   LogOut,
   FileUp,
   Image,
-  Minimize
+  Minimize,
+  PenTool,
+  CheckSquare
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -42,7 +44,7 @@ import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useState, useEffect } from "react";
 
-// Define the menu items
+// Define the menu items - organized by categories
 const menuItems = [
   {
     title: "home",
@@ -50,29 +52,40 @@ const menuItems = [
     url: "/dashboard"
   },
   {
-    title: "articleWriter",
-    icon: FileText,
-    url: "/article-writer"
+    title: "writing",
+    icon: PenTool,
+    url: "/dashboard?category=writing",
+    description: "Article writing, reports, supervision"
   },
   {
-    title: "grammarChecker",
+    title: "editing",
+    icon: CheckSquare,
+    url: "/dashboard?category=editing", 
+    description: "Grammar check, summarizer, paraphraser"
+  },
+  {
+    title: "study",
     icon: BookOpen,
-    url: "/grammar-checker"
+    url: "/dashboard?category=study",
+    description: "Flashcards, quizzes, analytics"
   },
   {
-    title: "mindMapGenerator",
+    title: "tools",
+    icon: FileUp,
+    url: "/dashboard?category=tools",
+    description: "Converters, compressors, utilities"
+  },
+  {
+    title: "planning",
     icon: Brain,
-    url: "/mind-map-generator"
+    url: "/dashboard?category=planning",
+    description: "Mind maps, task planner"
   },
   {
-    title: "presentationGenerator",
+    title: "presentation",
     icon: Presentation,
-    url: "/presentation-generator"
-  },
-  {
-    title: "taskPlanner",
-    icon: Calendar,
-    url: "/task-planner"
+    url: "/dashboard?category=presentation",
+    description: "Presentation generator"
   }
 ];
 
@@ -134,65 +147,53 @@ export function CustomSidebar() {
           </SidebarGroup>
           
           <SidebarGroup>
-            <SidebarGroupLabel>{t('tools')}</SidebarGroupLabel>
+            <SidebarGroupLabel>{t('quickActions')}</SidebarGroupLabel>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href="/summarizer-paraphraser">
-                    <BookOpen />
-                    <span>{t('summarizerParaphraser')}</span>
+                  <a href="/article-writer">
+                    <PenTool />
+                    <span>{t('newArticle')}</span>
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href="/flashcard-generator">
-                    <Brain />
-                    <span>{t('flashcardGenerator')}</span>
+                  <a href="/grammar-checker">
+                    <CheckSquare />
+                    <span>{t('checkGrammar')}</span>
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-               <SidebarMenuButton asChild>
-                 <a href="/quiz-generator">
-                   <FileText />
-                   <span>{t('quizGenerator')}</span>
-                 </a>
-               </SidebarMenuButton>
-             </SidebarMenuItem>
-             <SidebarMenuItem>
-               <SidebarMenuButton asChild>
-                 <a href="/file-converter">
-                   <FileUp />
-                   <span>گۆڕینی فۆرماتی فایل</span>
-                 </a>
-               </SidebarMenuButton>
-             </SidebarMenuItem>
-             <SidebarMenuItem>
-               <SidebarMenuButton asChild>
-                 <a href="/image-converter">
-                   <Image />
-                   <span>گۆڕینی فۆرماتی وێنە</span>
-                 </a>
-               </SidebarMenuButton>
-             </SidebarMenuItem>
-             <SidebarMenuItem>
-               <SidebarMenuButton asChild>
-                 <a href="/compressor">
-                   <Minimize />
-                   <span>پەستانەوە</span>
-                 </a>
-               </SidebarMenuButton>
-             </SidebarMenuItem>
-             <SidebarMenuItem>
-               <SidebarMenuButton asChild>
-                 <a href="/citation-generator">
-                   <BookOpen />
-                   <span>دروستکەری بەڵگەنامە</span>
-                 </a>
-               </SidebarMenuButton>
-             </SidebarMenuItem>
-           </SidebarMenu>
+                <SidebarMenuButton asChild>
+                  <a href="/mind-map-generator">
+                    <Brain />
+                    <span>{t('createMindMap')}</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <a href="/task-planner">
+                    <Calendar />
+                    <span>{t('planTasks')}</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroup>
+          
+          <SidebarGroup>
+            <SidebarGroupLabel>{t('recentFiles')}</SidebarGroupLabel>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton disabled>
+                  <FileText />
+                  <span className="text-muted-foreground">{t('noRecentFiles')}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
         

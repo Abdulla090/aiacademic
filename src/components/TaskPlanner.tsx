@@ -123,7 +123,7 @@ export const TaskPlanner = () => {
         taskType,
         currentLevel,
         availableHoursPerDay[0],
-        preferredStudyTimes.map(time => time.label),
+        preferredStudyTimes.map(id => studyTimes.find(t => t.value === id)?.label).filter(Boolean),
         subjects.split(',').map(s => s.trim()).filter(Boolean),
         extractedContent || undefined
       );

@@ -13,355 +13,135 @@ interface DialectComparison {
   sorani: string;
   kurmanji: string;
   category: string;
-  code?: string;
   notes?: string;
 }
 
-// Comprehensive dialect dictionary with 4-digit codes
+// Comprehensive dialect dictionary
 const dialectDictionary: DialectComparison[] = [
-  // Category 1: Pronouns - جێناو (1000-1099)
-  { sorani: "من", kurmanji: "ez", category: "جێناو", code: "1001" },
-  { sorani: "تۆ", kurmanji: "tu", category: "جێناو", code: "1002" },
-  { sorani: "ئەو", kurmanji: "ew", category: "جێناو", code: "1003" },
-  { sorani: "ئێمە", kurmanji: "em", category: "جێناو", code: "1004" },
-  { sorani: "ئێوە", kurmanji: "hûn", category: "جێناو", code: "1005" },
-  { sorani: "ئەوان", kurmanji: "wan", category: "جێناو", code: "1006" },
-  { sorani: "خۆم", kurmanji: "xwe", category: "جێناو", code: "1007" },
-  { sorani: "خۆت", kurmanji: "xwe", category: "جێناو", code: "1008" },
-  { sorani: "ئەم", kurmanji: "ev", category: "جێناو", code: "1009" },
-  { sorani: "ئەو", kurmanji: "wî", category: "جێناو", code: "1010" },
-  { sorani: "کێ", kurmanji: "kî", category: "جێناو", code: "1011" },
-  { sorani: "چی", kurmanji: "çi", category: "جێناو", code: "1012" },
-  { sorani: "کام", kurmanji: "kîjan", category: "جێناو", code: "1013" },
+  // Pronouns - جێناو
+  { sorani: "من", kurmanji: "ez", category: "جێناو" },
+  { sorani: "تۆ", kurmanji: "tu", category: "جێناو" },
+  { sorani: "ئەو", kurmanji: "ew", category: "جێناو" },
+  { sorani: "ئێمە", kurmanji: "em", category: "جێناو" },
+  { sorani: "ئێوە", kurmanji: "hûn", category: "جێناو" },
+  { sorani: "ئەوان", kurmanji: "wan", category: "جێناو" },
+  { sorani: "خۆم", kurmanji: "xwe", category: "جێناو" },
+  { sorani: "خۆت", kurmanji: "xwe", category: "جێناو" },
   
-  // Category 2: Verbs - کردار (2000-2999)
-  // Basic Movement Verbs (2000-2099)
-  { sorani: "هاتن", kurmanji: "hatin", category: "کردار", code: "2001" },
-  { sorani: "چوون", kurmanji: "çûn", category: "کردار", code: "2002" },
-  { sorani: "ڕۆیشتن", kurmanji: "şûn", category: "کردار", code: "2003" },
-  { sorani: "گەڕانەوە", kurmanji: "vegerîn", category: "کردار", code: "2004" },
-  { sorani: "پەڕین", kurmanji: "peřîn", category: "کردار", code: "2005" },
-  { sorani: "فڕین", kurmanji: "firîn", category: "کردار", code: "2006" },
-  { sorani: "وەستان", kurmanji: "rawestan", category: "کردار", code: "2007" },
-  { sorani: "ڕاکشان", kurmanji: "rakirîn", category: "کردار", code: "2008" },
-
-  // Daily Actions (2100-2199)
-  { sorani: "کردن", kurmanji: "kirin", category: "کردار", code: "2101" },
-  { sorani: "وتن", kurmanji: "gotin", category: "کردار", code: "2102" },
-  { sorani: "خواردن", kurmanji: "xwarin", category: "کردار", code: "2103" },
-  { sorani: "خواردنەوە", kurmanji: "vexwarin", category: "کردار", code: "2104" },
-  { sorani: "خەوتن", kurmanji: "razan", category: "کردار", code: "2105" },
-  { sorani: "ژیان", kurmanji: "jiyan", category: "کردار", code: "2106" },
-  { sorani: "مردن", kurmanji: "mirin", category: "کردار", code: "2107" },
-  { sorani: "دیتن", kurmanji: "dîtin", category: "کردار", code: "2108" },
-  { sorani: "بیستن", kurmanji: "bihîstin", category: "کردار", code: "2109" },
-  { sorani: "نووسین", kurmanji: "nivîsandin", category: "کردار", code: "2110" },
-  { sorani: "خوێندن", kurmanji: "xwendin", category: "کردار", code: "2111" },
-  { sorani: "گەڕان", kurmanji: "gerandin", category: "کردار", code: "2112" },
-  { sorani: "کارکردن", kurmanji: "kar kirin", category: "کردار", code: "2113" },
-  { sorani: "هەڵگرتن", kurmanji: "hilgirtin", category: "کردار", code: "2114" },
-  { sorani: "داندانان", kurmanji: "danîn", category: "کردار", code: "2115" },
-  { sorani: "داخستن", kurmanji: "girtîn", category: "کردار", code: "2116" },
-  { sorani: "کردنەوە", kurmanji: "vekirîn", category: "کردار", code: "2117" },
-  { sorani: "شۆردن", kurmanji: "şûştin", category: "کردار", code: "2118" },
-  { sorani: "پاککردنەوە", kurmanji: "paqij kirin", category: "کردار", code: "2119" },
-
-  // Thinking/Learning Verbs (2200-2299)
-  { sorani: "بیرکردنەوە", kurmanji: "bîr kirin", category: "کردار", code: "2201" },
-  { sorani: "فکرکردن", kurmanji: "fikir kirin", category: "کردار", code: "2202" },
-  { sorani: "فێربوون", kurmanji: "hînbûn", category: "کردار", code: "2203" },
-  { sorani: "فێرکردن", kurmanji: "hînkirin", category: "کردار", code: "2204" },
-  { sorani: "تێگەیشتن", kurmanji: "têgihiştin", category: "کردار", code: "2205" },
-  { sorani: "پرسیار کردن", kurmanji: "pirs kirin", category: "کردار", code: "2206" },
-  { sorani: "وەڵامدانەوە", kurmanji: "bersiv dan", category: "کردار", code: "2207" },
-  { sorani: "لێکۆڵینەوە", kurmanji: "lêkolîn", category: "کردار", code: "2208" },
-
-  // Emotional Verbs (2300-2399)
-  { sorani: "خۆشەویستن", kurmanji: "evîn", category: "کردار", code: "2301" },
-  { sorani: "ڕقبوون", kurmanji: "nefret kirin", category: "کردار", code: "2302" },
-  { sorani: "خۆشحاڵبوون", kurmanji: "kêfxweş bûn", category: "کردار", code: "2303" },
-  { sorani: "خەمباربوون", kurmanji: "xemgîn bûn", category: "کردار", code: "2304" },
-  { sorani: "ترسان", kurmanji: "tirsîn", category: "کردار", code: "2305" },
-  { sorani: "دڵخۆشی", kurmanji: "şahî", category: "کردار", code: "2306" },
+  // Verbs - کردار
+  { sorani: "هاتن", kurmanji: "hatin", category: "کردار" },
+  { sorani: "چوون", kurmanji: "çûn", category: "کردار" },
+  { sorani: "کردن", kurmanji: "kirin", category: "کردار" },
+  { sorani: "وتن", kurmanji: "gotin", category: "کردار" },
+  { sorani: "خواردن", kurmanji: "xwarin", category: "کردار" },
+  { sorani: "خەوتن", kurmanji: "razان", category: "کردار" },
+  { sorani: "ژیان", kurmanji: "jiyan", category: "کردار" },
+  { sorani: "مردن", kurmanji: "mirin", category: "کردار" },
+  { sorani: "دیتن", kurmanji: "dîtin", category: "کردار" },
+  { sorani: "بیستن", kurmanji: "bihîstin", category: "کردار" },
+  { sorani: "نووسین", kurmanji: "nivîsandin", category: "کردار" },
+  { sorani: "خوێندن", kurmanji: "xwendin", category: "کردار" },
+  { sorani: "گەڕان", kurmanji: "gerandin", category: "کردار" },
+  { sorani: "دۆزینەوە", kurmanji: "dîtin", category: "کردار" },
+  { sorani: "کار", kurmanji: "kar", category: "کردار" },
+  { sorani: "کارکردن", kurmanji: "kar kirin", category: "کردار" },
+  { sorani: "بینین", kurmanji: "dîtin", category: "کردار" },
+  { sorani: "گوتن", kurmanji: "gotin", category: "کردار" },
+  { sorani: "هەڵگرتن", kurmanji: "hilgirtin", category: "کردار" },
   { sorani: "داندانان", kurmanji: "danîn", category: "کردار" },
   
-  // Time expressions - کات (3000-3999)
-  // Basic Time Units (3001-3099)
-  { sorani: "ئێستا", kurmanji: "niha", category: "کات", code: "3001" },
-  { sorani: "دوێنێ", kurmanji: "duh", category: "کات", code: "3002" },
-  { sorani: "سبەی", kurmanji: "sibê", category: "کات", code: "3003" },
-  { sorani: "پارێزەر", kurmanji: "paşê", category: "کات", code: "3004" },
-  { sorani: "پێشتر", kurmanji: "berê", category: "کات", code: "3005" },
-  { sorani: "ڕۆژ", kurmanji: "roj", category: "کات", code: "3006" },
-  { sorani: "شەو", kurmanji: "şev", category: "کات", code: "3007" },
-  { sorani: "حەفتە", kurmanji: "hefte", category: "کات", code: "3008" },
-  { sorani: "مانگ", kurmanji: "meh", category: "کات", code: "3009" },
-  { sorani: "ساڵ", kurmanji: "sal", category: "کات", code: "3010" },
-  { sorani: "سەدە", kurmanji: "sede", category: "کات", code: "3011" },
-  { sorani: "هەزارساڵ", kurmanji: "hezarsal", category: "کات", code: "3012" },
+  // Time expressions - کات
+  { sorani: "ئێستا", kurmanji: "niha", category: "کات" },
+  { sorani: "دوێنێ", kurmanji: "duh", category: "کات" },
+  { sorani: "سبەی", kurmanji: "sibê", category: "کات" },
+  { sorani: "ئێوارە", kurmanji: "êvar", category: "کات" },
+  { sorani: "بەیانی", kurmanji: "beyan", category: "کات" },
+  { sorani: "شەو", kurmanji: "şev", category: "کات" },
+  { sorani: "ڕۆژ", kurmanji: "roj", category: "کات" },
+  { sorani: "حەفتە", kurmanji: "hefte", category: "کات" },
+  { sorani: "مانگ", kurmanji: "meh", category: "کات" },
+  { sorani: "ساڵ", kurmanji: "sal", category: "کات" },
+  { sorani: "کاتژمێر", kurmanji: "demjimêr", category: "کات" },
+  { sorani: "خولەک", kurmanji: "xulek", category: "کات" },
+  { sorani: "چرکە", kurmanji: "çirke", category: "کات" },
+  { sorani: "ئێوارانی", kurmanji: "êvarî", category: "کات" },
+  { sorani: "نیوەشەو", kurmanji: "nîvşev", category: "کات" },
   
-  // Time Periods (3101-3199)
-  { sorani: "بەیانی", kurmanji: "beyan", category: "کات", code: "3101" },
-  { sorani: "نیوەڕۆ", kurmanji: "nîvroj", category: "کات", code: "3102" },
-  { sorani: "ئێوارە", kurmanji: "êvar", category: "کات", code: "3103" },
-  { sorani: "نیوەشەو", kurmanji: "nîvşev", category: "کات", code: "3104" },
-  { sorani: "بەرەبەیان", kurmanji: "berebeyan", category: "کات", code: "3105" },
-  { sorani: "ئێوارانی", kurmanji: "êvarî", category: "کات", code: "3106" },
-  { sorani: "شەوانی", kurmanji: "şevanî", category: "کات", code: "3107" },
+  // Family - خێزان
+  { sorani: "باوک", kurmanji: "bav", category: "خێزان" },
+  { sorani: "دایک", kurmanji: "dayik", category: "خێزان" },
+  { sorani: "کوڕ", kurmanji: "kur", category: "خێزان" },
+  { sorani: "کچ", kurmanji: "keç", category: "خێزان" },
+  { sorani: "برا", kurmanji: "bira", category: "خێزان" },
+  { sorani: "خوشک", kurmanji: "xweh", category: "خێزان" },
+  { sorani: "باپیر", kurmanji: "bavpîr", category: "خێزان" },
+  { sorani: "دایپیر", kurmanji: "daypîr", category: "خێزان" },
+  { sorani: "مام", kurmanji: "mam", category: "خێزان" },
+  { sorani: "پورە", kurmanji: "pûr", category: "خێزان" },
+  { sorani: "خالو", kurmanji: "xal", category: "خێزان" },
+  { sorani: "ژن", kurmanji: "jin", category: "خێزان" },
+  { sorani: "مێرد", kurmanji: "mêr", category: "خێزان" },
+  { sorani: "هاوسەر", kurmanji: "hevser", category: "خێزان" },
   
-  // Time Measurements (3201-3299)
-  { sorani: "کاتژمێر", kurmanji: "demjimêr", category: "کات", code: "3201" },
-  { sorani: "خولەک", kurmanji: "xulek", category: "کات", code: "3202" },
-  { sorani: "چرکە", kurmanji: "çirke", category: "کات", code: "3203" },
-  { sorani: "چەند چرکەیەک", kurmanji: "çend çirkeyek", category: "کات", code: "3204" },
-  { sorani: "ماوە", kurmanji: "dem", category: "کات", code: "3205" },
-  { sorani: "کات", kurmanji: "wext", category: "کات", code: "3206" },
+  // Numbers - ژمارە
+  { sorani: "یەک", kurmanji: "yek", category: "ژمارە" },
+  { sorani: "دوو", kurmanji: "du", category: "ژمارە" },
+  { sorani: "سێ", kurmanji: "sê", category: "ژمارە" },
+  { sorani: "چوار", kurmanji: "çar", category: "ژمارە" },
+  { sorani: "پێنج", kurmanji: "pênc", category: "ژمارە" },
+  { sorani: "شەش", kurmanji: "şeş", category: "ژمارە" },
+  { sorani: "حەوت", kurmanji: "heft", category: "ژمارە" },
+  { sorani: "هەشت", kurmanji: "heşt", category: "ژمارە" },
+  { sorani: "نۆ", kurmanji: "neh", category: "ژمارە" },
+  { sorani: "دە", kurmanji: "deh", category: "ژمارە" },
+  { sorani: "یازدە", kurmanji: "yazde", category: "ژمارە" },
+  { sorani: "دوازدە", kurmanji: "dûwazde", category: "ژمارە" },
+  { sorani: "بیست", kurmanji: "bîst", category: "ژمارە" },
+  { sorani: "سی", kurmanji: "sî", category: "ژمارە" },
+  { sorani: "چل", kurmanji: "çil", category: "ژمارە" },
+  { sorani: "پەنجا", kurmanji: "pêncî", category: "ژمارە" },
+  { sorani: "شەست", kurmanji: "şêst", category: "ژمارە" },
+  { sorani: "سەد", kurmanji: "sed", category: "ژمارە" },
+  { sorani: "هەزار", kurmanji: "hezar", category: "ژمارە" },
   
-  // Days of Week (3301-3399)
-  { sorani: "یەکشەممە", kurmanji: "yekşem", category: "کات", code: "3301" },
-  { sorani: "دووشەممە", kurmanji: "duşem", category: "کات", code: "3302" },
-  { sorani: "سێشەممە", kurmanji: "sêşem", category: "کات", code: "3303" },
-  { sorani: "چوارشەممە", kurmanji: "çarşem", category: "کات", code: "3304" },
-  { sorani: "پێنجشەممە", kurmanji: "pêncşem", category: "کات", code: "3305" },
-  { sorani: "هەینی", kurmanji: "înî", category: "کات", code: "3306" },
-  { sorani: "شەممە", kurmanji: "şemî", category: "کات", code: "3307" },
+  // Colors - ڕەنگ
+  { sorani: "سوور", kurmanji: "sor", category: "ڕەنگ" },
+  { sorani: "زەرد", kurmanji: "zer", category: "ڕەنگ" },
+  { sorani: "شین", kurmanji: "şîn", category: "ڕەنگ" },
+  { sorani: "سپی", kurmanji: "spî", category: "ڕەنگ" },
+  { sorani: "ڕەش", kurmanji: "reş", category: "ڕەنگ" },
+  { sorani: "سەوز", kurmanji: "kesk", category: "ڕەنگ" },
+  { sorani: "پەمەیی", kurmanji: "pembe", category: "ڕەنگ" },
+  { sorani: "مۆر", kurmanji: "mor", category: "ڕەنگ" },
+  { sorani: "نارەنجی", kurmanji: "pirteqal", category: "ڕەنگ" },
+  { sorani: "قاوەیی", kurmanji: "qehwerî", category: "ڕەنگ" },
   
-  // Seasons (3401-3499)
-  { sorani: "بەهار", kurmanji: "bihar", category: "کات", code: "3401" },
-  { sorani: "هاوین", kurmanji: "havîn", category: "کات", code: "3402" },
-  { sorani: "پاییز", kurmanji: "payîz", category: "کات", code: "3403" },
-  { sorani: "زستان", kurmanji: "zivistan", category: "کات", code: "3404" },
+  // Body parts - ئەندامەکانی لەش
+  { sorani: "سەر", kurmanji: "ser", category: "لەش" },
+  { sorani: "چاو", kurmanji: "çav", category: "لەش" },
+  { sorani: "گوێ", kurmanji: "guh", category: "لەش" },
+  { sorani: "لووت", kurmanji: "lût", category: "لەش" },
+  { sorani: "دەم", kurmanji: "dev", category: "لەش" },
+  { sorani: "دان", kurmanji: "diran", category: "لەش" },
+  { sorani: "ملە", kurmanji: "mil", category: "لەش" },
+  { sorani: "دەست", kurmanji: "dest", category: "لەش" },
+  { sorani: "پەنجە", kurmanji: "tilî", category: "لەش" },
+  { sorani: "قاچ", kurmanji: "ling", category: "لەش" },
+  { sorani: "پێ", kurmanji: "pê", category: "لەش" },
+  { sorani: "دڵ", kurmanji: "dil", category: "لەش" },
   
-  // Family - خێزان (4000-4999)
-  // Parents & Core Family (4001-4099)
-  { sorani: "باوک", kurmanji: "bav", category: "خێزان", code: "4001" },
-  { sorani: "دایک", kurmanji: "dayik", category: "خێزان", code: "4002" },
-  { sorani: "دایبابان", kurmanji: "dêubav", category: "خێزان", code: "4003" },
-  { sorani: "مێرد", kurmanji: "mêr", category: "خێزان", code: "4004" },
-  { sorani: "ژن", kurmanji: "jin", category: "خێزان", code: "4005" },
-  { sorani: "هاوسەر", kurmanji: "hevser", category: "خێزان", code: "4006" },
-  { sorani: "ڕەفیق", kurmanji: "heval", category: "خێزان", code: "4007" },
-  
-  // Children (4101-4199)
-  { sorani: "کوڕ", kurmanji: "kur", category: "خێزان", code: "4101" },
-  { sorani: "کچ", kurmanji: "keç", category: "خێزان", code: "4102" },
-  { sorani: "منداڵ", kurmanji: "zarok", category: "خێزان", code: "4103" },
-  { sorani: "منێ", kurmanji: "zarokê", category: "خێزان", code: "4104" },
-  { sorani: "لاو", kurmanji: "lawik", category: "خێزان", code: "4105" },
-  { sorani: "کچان", kurmanji: "keça", category: "خێزان", code: "4106" },
-  
-  // Siblings (4201-4299)
-  { sorani: "برا", kurmanji: "bira", category: "خێزان", code: "4201" },
-  { sorani: "خوشک", kurmanji: "xweh", category: "خێزان", code: "4202" },
-  { sorani: "براو خوشک", kurmanji: "bira û xweh", category: "خێزان", code: "4203" },
-  { sorani: "برای گەورە", kurmanji: "birayê mezin", category: "خێزان", code: "4204" },
-  { sorani: "برای بچووک", kurmanji: "birayê biçûk", category: "خێزان", code: "4205" },
-  { sorani: "خوشکی گەورە", kurmanji: "xweha mezin", category: "خێزان", code: "4206" },
-  { sorani: "خوشکی بچووک", kurmanji: "xweha biçûk", category: "خێزان", code: "4207" },
-  
-  // Grandparents (4301-4399)
-  { sorani: "باپیر", kurmanji: "bavpîr", category: "خێزان", code: "4301" },
-  { sorani: "دایپیر", kurmanji: "daypîr", category: "خێزان", code: "4302" },
-  { sorani: "دایک و باوکی گەورە", kurmanji: "dê û bavê mezin", category: "خێزان", code: "4303" },
-  
-  // Uncles & Aunts (4401-4499)
-  { sorani: "مام", kurmanji: "mam", category: "خێزان", code: "4401" },
-  { sorani: "پورە", kurmanji: "pûr", category: "خێزان", code: "4402" },
-  { sorani: "خالو", kurmanji: "xal", category: "خێزان", code: "4403" },
-  { sorani: "خاتوو", kurmanji: "xatû", category: "خێزان", code: "4404" },
-  { sorani: "ژنی مام", kurmanji: "jina mam", category: "خێزان", code: "4405" },
-  { sorani: "ژنی خالو", kurmanji: "jina xal", category: "خێزان", code: "4406" },
-  
-  // Extended Family (4501-4599)
-  { sorani: "کوڕی برا", kurmanji: "kurê bira", category: "خێزان", code: "4501" },
-  { sorani: "کچی برا", kurmanji: "keça bira", category: "خێزان", code: "4502" },
-  { sorani: "کوڕی خوشک", kurmanji: "kurê xweh", category: "خێزان", code: "4503" },
-  { sorani: "کچی خوشک", kurmanji: "keça xweh", category: "خێزان", code: "4504" },
-  { sorani: "نەوە", kurmanji: "nevî", category: "خێزان", code: "4505" },
-  { sorani: "نەوەکان", kurmanji: "nevîyan", category: "خێزان", code: "4506" },
-  
-  // Numbers - ژمارە (5000-5999)
-  // Basic Numbers 1-10 (5001-5099)
-  { sorani: "یەک", kurmanji: "yek", category: "ژمارە", code: "5001" },
-  { sorani: "دوو", kurmanji: "du", category: "ژمارە", code: "5002" },
-  { sorani: "سێ", kurmanji: "sê", category: "ژمارە", code: "5003" },
-  { sorani: "چوار", kurmanji: "çar", category: "ژمارە", code: "5004" },
-  { sorani: "پێنج", kurmanji: "pênc", category: "ژمارە", code: "5005" },
-  { sorani: "شەش", kurmanji: "şeş", category: "ژمارە", code: "5006" },
-  { sorani: "حەوت", kurmanji: "heft", category: "ژمارە", code: "5007" },
-  { sorani: "هەشت", kurmanji: "heşt", category: "ژمارە", code: "5008" },
-  { sorani: "نۆ", kurmanji: "neh", category: "ژمارە", code: "5009" },
-  { sorani: "دە", kurmanji: "deh", category: "ژمارە", code: "5010" },
-  
-  // Numbers 11-20 (5101-5199)
-  { sorani: "یازدە", kurmanji: "yazde", category: "ژمارە", code: "5101" },
-  { sorani: "دوازدە", kurmanji: "dûwazde", category: "ژمارە", code: "5102" },
-  { sorani: "سێزدە", kurmanji: "sêzde", category: "ژمارە", code: "5103" },
-  { sorani: "چواردە", kurmanji: "çarde", category: "ژمارە", code: "5104" },
-  { sorani: "پازدە", kurmanji: "pazde", category: "ژمارە", code: "5105" },
-  { sorani: "شازدە", kurmanji: "şazde", category: "ژمارە", code: "5106" },
-  { sorani: "حەڤدە", kurmanji: "hevde", category: "ژمارە", code: "5107" },
-  { sorani: "هەژدە", kurmanji: "hejde", category: "ژمارە", code: "5108" },
-  { sorani: "نۆزدە", kurmanji: "nozde", category: "ژمارە", code: "5109" },
-  { sorani: "بیست", kurmanji: "bîst", category: "ژمارە", code: "5110" },
-  
-  // Tens (5201-5299)
-  { sorani: "سی", kurmanji: "sî", category: "ژمارە", code: "5201" },
-  { sorani: "چل", kurmanji: "çil", category: "ژمارە", code: "5202" },
-  { sorani: "پەنجا", kurmanji: "pêncî", category: "ژمارە", code: "5203" },
-  { sorani: "شەست", kurmanji: "şêst", category: "ژمارە", code: "5204" },
-  { sorani: "حەفتا", kurmanji: "heftê", category: "ژمارە", code: "5205" },
-  { sorani: "هەشتا", kurmanji: "heştê", category: "ژمارە", code: "5206" },
-  { sorani: "نەوەد", kurmanji: "newed", category: "ژمارە", code: "5207" },
-  
-  // Hundreds & Thousands (5301-5399)
-  { sorani: "سەد", kurmanji: "sed", category: "ژمارە", code: "5301" },
-  { sorani: "دووسەد", kurmanji: "dused", category: "ژمارە", code: "5302" },
-  { sorani: "سێسەد", kurmanji: "sêsed", category: "ژمارە", code: "5303" },
-  { sorani: "پێنج سەد", kurmanji: "pênc sed", category: "ژمارە", code: "5304" },
-  { sorani: "هەزار", kurmanji: "hezar", category: "ژمارە", code: "5305" },
-  { sorani: "دە هەزار", kurmanji: "deh hezar", category: "ژمارە", code: "5306" },
-  { sorani: "سەد هەزار", kurmanji: "sed hezar", category: "ژمارə", code: "5307" },
-  { sorani: "ملیۆن", kurmanji: "mîlyon", category: "ژمارە", code: "5308" },
-  
-  // Ordinal Numbers (5401-5499)
-  { sorani: "یەکەم", kurmanji: "yekem", category: "ژمارە", code: "5401" },
-  { sorani: "دووەم", kurmanji: "duyem", category: "ژمارە", code: "5402" },
-  { sorani: "سێیەم", kurmanji: "sêyem", category: "ژمارە", code: "5403" },
-  { sorani: "چوارەم", kurmanji: "çarem", category: "ژمارە", code: "5404" },
-  { sorani: "پێنجەم", kurmanji: "pêncem", category: "ژمارە", code: "5405" },
-  { sorani: "کۆتایی", kurmanji: "dawî", category: "ژمارە", code: "5406" },
-  
-  // Colors - ڕەنگ (6000-6999)
-  // Primary Colors (6001-6099)
-  { sorani: "سوور", kurmanji: "sor", category: "ڕەنگ", code: "6001" },
-  { sorani: "زەرد", kurmanji: "zer", category: "ڕەنگ", code: "6002" },
-  { sorani: "شین", kurmanji: "şîn", category: "ڕەنگ", code: "6003" },
-  { sorani: "سپی", kurmanji: "spî", category: "ڕەنگ", code: "6004" },
-  { sorani: "ڕەش", kurmanji: "reş", category: "ڕەنگ", code: "6005" },
-  { sorani: "سەوز", kurmanji: "kesk", category: "ڕەنگ", code: "6006" },
-  
-  // Secondary Colors (6101-6199)
-  { sorani: "پەمەیی", kurmanji: "pembe", category: "ڕەنگ", code: "6101" },
-  { sorani: "مۆر", kurmanji: "mor", category: "ڕەنگ", code: "6102" },
-  { sorani: "نارەنجی", kurmanji: "pirteqal", category: "ڕەنگ", code: "6103" },
-  { sorani: "قاوەیی", kurmanji: "qehwerî", category: "ڕەنگ", code: "6104" },
-  { sorani: "بۆر", kurmanji: "bor", category: "ڕەنگ", code: "6105" },
-  { sorani: "خاکی", kurmanji: "xakî", category: "ڕەنگ", code: "6106" },
-  { sorani: "زیڤی", kurmanji: "zîvî", category: "ڕەنگ", code: "6107" },
-  { sorani: "زێڕینی", kurmanji: "zêrîn", category: "ڕەنگ", code: "6108" },
-  
-  // Color Shades (6201-6299)
-  { sorani: "ڕووناک", kurmanji: "ronak", category: "ڕەنگ", code: "6201" },
-  { sorani: "تاریک", kurmanji: "tarî", category: "ڕەنگ", code: "6202" },
-  { sorani: "کاڵ", kurmanji: "kal", category: "ڕەنگ", code: "6203" },
-  { sorani: "تونژ", kurmanji: "tûj", category: "ڕەنگ", code: "6204" },
-  
-  // Body parts - ئەندامەکانی لەش (7000-7999)
-  // Head & Face (7001-7099)
-  { sorani: "سەر", kurmanji: "ser", category: "لەش", code: "7001" },
-  { sorani: "سەرئەسک", kurmanji: "serhesk", category: "لەش", code: "7002" },
-  { sorani: "ڕوو", kurmanji: "rû", category: "لەش", code: "7003" },
-  { sorani: "ناوچەوان", kurmanji: "navçavan", category: "لەش", code: "7004" },
-  { sorani: "چاو", kurmanji: "çav", category: "لەش", code: "7005" },
-  { sorani: "برۆ", kurmanji: "birû", category: "لەش", code: "7006" },
-  { sorani: "قژ", kurmanji: "porî", category: "لەش", code: "7007" },
-  { sorani: "گوێ", kurmanji: "guh", category: "لەش", code: "7008" },
-  { sorani: "لووت", kurmanji: "lût", category: "لەش", code: "7009" },
-  { sorani: "دەم", kurmanji: "dev", category: "لەش", code: "7010" },
-  { sorani: "دان", kurmanji: "diran", category: "لەش", code: "7011" },
-  { sorani: "زمان", kurmanji: "ziman", category: "لەش", code: "7012" },
-  { sorani: "سیل", kurmanji: "sil", category: "لەش", code: "7013" },
-  { sorani: "چەناگە", kurmanji: "çenage", category: "لەش", code: "7014" },
-  
-  // Upper Body (7101-7199)
-  { sorani: "ملە", kurmanji: "mil", category: "لەش", code: "7101" },
-  { sorani: "شان", kurmanji: "şan", category: "لەش", code: "7102" },
-  { sorani: "سنگ", kurmanji: "sing", category: "لەش", code: "7103" },
-  { sorani: "پشت", kurmanji: "piştir", category: "لەش", code: "7104" },
-  { sorani: "دەست", kurmanji: "dest", category: "لەش", code: "7105" },
-  { sorani: "بازوو", kurmanji: "bazû", category: "لەش", code: "7106" },
-  { sorani: "ئارەنج", kurmanji: "arinc", category: "لەش", code: "7107" },
-  { sorani: "مەچەک", kurmanji: "meçek", category: "لەش", code: "7108" },
-  { sorani: "پەنجە", kurmanji: "tilî", category: "لەش", code: "7109" },
-  { sorani: "لەپ", kurmanji: "lep", category: "لەش", code: "7110" },
-  
-  // Lower Body (7201-7299)
-  { sorani: "سک", kurmanji: "sk", category: "لەش", code: "7201" },
-  { sorani: "قاچ", kurmanji: "ling", category: "لەش", code: "7202" },
-  { sorani: "ئەژنۆ", kurmanji: "ejirnok", category: "لەش", code: "7203" },
-  { sorani: "پێ", kurmanji: "pê", category: "لەش", code: "7204" },
-  { sorani: "پاژنە", kurmanji: "paşne", category: "لەش", code: "7205" },
-  { sorani: "پەنجەی پێ", kurmanji: "tiliya pê", category: "لەش", code: "7206" },
-  
-  // Internal Organs (7301-7399)
-  { sorani: "دڵ", kurmanji: "dil", category: "لەش", code: "7301" },
-  { sorani: "سیسرچ", kurmanji: "sîserç", category: "لەش", code: "7302" },
-  { sorani: "جگەر", kurmanji: "ciger", category: "لەش", code: "7303" },
-  { sorani: "گورچیلە", kurmanji: "gurçîle", category: "لەش", code: "7304" },
-  { sorani: "مێشک", kurmanji: "mejî", category: "لەش", code: "7305" },
-  { sorani: "خوێن", kurmanji: "xwîn", category: "لەش", code: "7306" },
-  
-  // Places - شوێن (8000-8999)
-  // Buildings & Structures (8001-8099)
-  { sorani: "ماڵ", kurmanji: "mal", category: "شوێن", code: "8001" },
-  { sorani: "خانوو", kurmanji: "xanû", category: "شوێن", code: "8002" },
-  { sorani: "بینا", kurmanji: "avahî", category: "شوێن", code: "8003" },
-  { sorani: "بەشگە", kurmanji: "berxane", category: "شوێن", code: "8004" },
-  { sorani: "کۆشک", kurmanji: "koşk", category: "شوێن", code: "8005" },
-  { sorani: "قوللە", kurmanji: "qule", category: "شوێن", code: "8006" },
-  { sorani: "گەردوون", kurmanji: "gerdûn", category: "شوێن", code: "8007" },
-  { sorani: "پرد", kurmanji: "pird", category: "شوێن", code: "8008" },
-  { sorani: "دیوار", kurmanji: "dîwar", category: "شوێن", code: "8009" },
-  { sorani: "ڕیشە", kurmanji: "rişe", category: "شوێن", code: "8010" },
-  
-  // Urban Areas (8101-8199)
-  { sorani: "شار", kurmanji: "bajar", category: "شوێن", code: "8101" },
-  { sorani: "شارۆچکە", kurmanji: "bajarok", category: "شوێن", code: "8102" },
-  { sorani: "گوند", kurmanji: "gund", category: "شوێن", code: "8103" },
-  { sorani: "گەرەک", kurmanji: "gerek", category: "شوێن", code: "8104" },
-  { sorani: "خەڵک", kurmanji: "gel", category: "شوێن", code: "8105" },
-  { sorani: "مەحەڵە", kurmanji: "mehele", category: "شوێن", code: "8106" },
-  { sorani: "کۆڵان", kurmanji: "kolan", category: "شوێن", code: "8107" },
-  { sorani: "شەقام", kurmanji: "şeqam", category: "شوێن", code: "8108" },
-  { sorani: "ڕێگا", kurmanji: "rê", category: "شوێن", code: "8109" },
-  { sorani: "تەریق", kurmanji: "terîq", category: "شوێن", code: "8110" },
-  
-  // Commercial Places (8201-8299)
-  { sorani: "بازاڕ", kurmanji: "bazar", category: "شوێن", code: "8201" },
-  { sorani: "دکان", kurmanji: "dukan", category: "شوێن", code: "8202" },
-  { sorani: "فرۆشگا", kurmanji: "firoşge", category: "شوێن", code: "8203" },
-  { sorani: "مۆڵ", kurmanji: "mol", category: "شوێن", code: "8204" },
-  { sorani: "بانک", kurmanji: "bank", category: "شوێن", code: "8205" },
-  { sorani: "چایخانە", kurmanji: "çayxane", category: "شوێن", code: "8206" },
-  { sorani: "چێشتخانە", kurmanji: "çêştxane", category: "شوێن", code: "8207" },
-  { sorani: "هوتێل", kurmanji: "hotel", category: "شوێن", code: "8208" },
-  
-  // Educational Institutions (8301-8399)
-  { sorani: "قوتابخانە", kurmanji: "dibistan", category: "شوێن", code: "8301" },
-  { sorani: "ئامادەیی", kurmanji: "amadeî", category: "شوێن", code: "8302" },
-  { sorani: "زانکۆ", kurmanji: "zanînge", category: "شوێن", code: "8303" },
-  { sorani: "کتێبخانە", kurmanji: "pirtûkxane", category: "شوێن", code: "8304" },
-  { sorani: "پۆلینکلینیک", kurmanji: "polîklînîk", category: "شوێن", code: "8305" },
-  { sorani: "کۆلێژ", kurmanji: "kolêj", category: "شوێن", code: "8306" },
-  
-  // Healthcare (8401-8499)
-  { sorani: "نەخۆشخانە", kurmanji: "nexweşxane", category: "شوێن", code: "8401" },
-  { sorani: "کلینک", kurmanji: "klînîk", category: "شوێن", code: "8402" },
-  { sorani: "دەرمانخانە", kurmanji: "dermanxane", category: "شوێن", code: "8403" },
-  { sorani: "دکتۆرخانە", kurmanji: "doktorxane", category: "شوێن", code: "8404" },
-  
-  // Natural Places (8501-8599)
-  { sorani: "دارستان", kurmanji: "daristan", category: "شوێن", code: "8501" },
-  { sorani: "چیا", kurmanji: "çiya", category: "شوێن", code: "8502" },
-  { sorani: "ڕووبار", kurmanji: "çem", category: "شوێن", code: "8503" },
-  { sorani: "دەریا", kurmanji: "derya", category: "شوێن", code: "8504" },
-  { sorani: "گۆل", kurmanji: "gol", category: "شوێن", code: "8505" },
-  { sorani: "دەشت", kurmanji: "deşt", category: "شوێن", code: "8506" },
-  { sorani: "بیابان", kurmanji: "çol", category: "شوێن", code: "8507" },
-  { sorani: "ده‌ڵ", kurmanji: "dal", category: "شوێن", code: "8508" },
-  { sorani: "لۆ", kurmanji: "lo", category: "شوێن", code: "8509" },
-  { sorani: "ئاو", kurmanji: "av", category: "شوێن", code: "8510" },
+  // Common words - وشەی باو
+  { sorani: "ماڵ", kurmanji: "mal", category: "شوێن" },
+  { sorani: "شار", kurmanji: "bajar", category: "شوێن" },
+  { sorani: "گوند", kurmanji: "gund", category: "شوێن" },
+  { sorani: "بازاڕ", kurmanji: "bazar", category: "شوێن" },
+  { sorani: "دکان", kurmanji: "dukan", category: "شوێن" },
+  { sorani: "قوتابخانە", kurmanji: "dibistan", category: "شوێن" },
+  { sorani: "نەخۆشخانە", kurmanji: "nexweşxane", category: "شوێن" },
+  { sorani: "ڕێگا", kurmanji: "rê", category: "شوێن" },
+  { sorani: "دارستان", kurmanji: "daristan", category: "شوێن" },
+  { sorani: "چیا", kurmanji: "çiya", category: "شوێن" },
+  { sorani: "ڕووبار", kurmanji: "çem", category: "شوێن" },
   
   // Animals - ئاژەڵ
   { sorani: "پشیلە", kurmanji: "pisîk", category: "ئاژەڵ" },
@@ -1293,134 +1073,7 @@ const dialectDictionary: DialectComparison[] = [
   { sorani: "چۆن؟", kurmanji: "çawa?", category: "پرسیار" },
   { sorani: "بۆچی؟", kurmanji: "çima?", category: "پرسیار" },
   { sorani: "چەند؟", kurmanji: "çend?", category: "پرسیار" },
-  { sorani: "کام؟", kurmanji: "kîjan?", category: "پرسیار" },
-  
-  // Animals - ئاژەڵەکان (9000-9099)
-  // Domestic Animals (9001-9049)
-  { sorani: "پشیلە", kurmanji: "pisîk", category: "ئاژەڵ", code: "9001" },
-  { sorani: "سەگ", kurmanji: "kûçik", category: "ئاژەڵ", code: "9002" },
-  { sorani: "ئەسپ", kurmanji: "hesp", category: "ئاژەڵ", code: "9003" },
-  { sorani: "گا", kurmanji: "çêl", category: "ئاژەڵ", code: "9004" },
-  { sorani: "مانگا", kurmanji: "manga", category: "ئاژەڵ", code: "9005" },
-  { sorani: "بەرخ", kurmanji: "berx", category: "ئاژەڵ", code: "9006" },
-  { sorani: "مەڕ", kurmanji: "pez", category: "ئاژەڵ", code: "9007" },
-  { sorani: "بزن", kurmanji: "bizin", category: "ئاژەڵ", code: "9008" },
-  { sorani: "مریشک", kurmanji: "mirîşk", category: "ئاژەڵ", code: "9009" },
-  { sorani: "کەر", kurmanji: "ker", category: "ئاژەڵ", code: "9010" },
-  { sorani: "قاز", kurmanji: "qaz", category: "ئاژەڵ", code: "9011" },
-  { sorani: "وردک", kurmanji: "werdek", category: "ئاژەڵ", code: "9012" },
-  { sorani: "کەوتر", kurmanji: "kevok", category: "ئاژەڵ", code: "9013" },
-  
-  // Wild Animals (9050-9099)
-  { sorani: "شێر", kurmanji: "şêr", category: "ئاژەڵ", code: "9050" },
-  { sorani: "هەرس", kurmanji: "hirç", category: "ئاژەڵ", code: "9051" },
-  { sorani: "گوڕ", kurmanji: "gur", category: "ئاژەڵ", code: "9052" },
-  { sorani: "ڕووی", kurmanji: "rûvî", category: "ئاژەڵ", code: "9053" },
-  { sorani: "کەچەڵ", kurmanji: "keçel", category: "ئاژەڵ", code: "9054" },
-  { sorani: "فیل", kurmanji: "fîl", category: "ئاژەڵ", code: "9055" },
-  { sorani: "پیل", kurmanji: "pîl", category: "ئاژەڵ", code: "9056" },
-  { sorani: "ماروو", kurmanji: "mar", category: "ئاژەڵ", code: "9057" },
-  { sorani: "کوورە", kurmanji: "kûvî", category: "ئاژەڵ", code: "9058" },
-  { sorani: "بۆری", kurmanji: "borî", category: "ئاژەڵ", code: "9059" },
-  
-  // Food & Drink - خۆراک و خواردنەوە (9100-9999)
-  // Basic Foods (9100-9199)
-  { sorani: "نان", kurmanji: "nan", category: "خۆراک", code: "9100" },
-  { sorani: "برنج", kurmanji: "birinc", category: "خۆراک", code: "9101" },
-  { sorani: "مکارۆنی", kurmanji: "makarônî", category: "خۆراک", code: "9102" },
-  { sorani: "بورغوڵ", kurmanji: "bulgur", category: "خۆراک", code: "9103" },
-  { sorani: "گەنم", kurmanji: "genim", category: "خۆراک", code: "9104" },
-  { sorani: "جۆ", kurmanji: "cih", category: "خۆراک", code: "9105" },
-  { sorani: "نۆک", kurmanji: "nok", category: "خۆراک", code: "9106" },
-  { sorani: "لۆبیا", kurmanji: "lobya", category: "خۆراک", code: "9107" },
-  { sorani: "عەدەس", kurmanji: "ades", category: "خۆراک", code: "9108" },
-  { sorani: "نخود", kurmanji: "nixûd", category: "خۆراک", code: "9109" },
-  
-  // Meat & Protein (9200-9299)
-  { sorani: "گۆشت", kurmanji: "goşt", category: "خۆراک", code: "9200" },
-  { sorani: "گۆشتی مانگا", kurmanji: "goştê manga", category: "خۆراک", code: "9201" },
-  { sorani: "گۆشتی مەڕ", kurmanji: "goştê pez", category: "خۆراک", code: "9202" },
-  { sorani: "گۆشتی مریشک", kurmanji: "goştê mirîşk", category: "خۆراک", code: "9203" },
-  { sorani: "ماسی", kurmanji: "masî", category: "خۆراک", code: "9204" },
-  { sorani: "هێلکە", kurmanji: "hêlke", category: "خۆراک", code: "9205" },
-  { sorani: "کبابا", kurmanji: "kebab", category: "خۆراک", code: "9206" },
-  { sorani: "کۆفتە", kurmanji: "kofte", category: "خۆراک", code: "9207" },
-  { sorani: "سوجق", kurmanji: "sucux", category: "خۆراک", code: "9208" },
-  
-  // Dairy Products (9300-9399)
-  { sorani: "شیر", kurmanji: "şîr", category: "خۆراک", code: "9300" },
-  { sorani: "پەنیر", kurmanji: "penîr", category: "خۆراک", code: "9301" },
-  { sorani: "ماست", kurmanji: "mast", category: "خۆراک", code: "9302" },
-  { sorani: "کرە", kurmanji: "kere", category: "خۆراک", code: "9303" },
-  { sorani: "قەیماغ", kurmanji: "qeymex", category: "خۆراک", code: "9304" },
-  { sorani: "دۆغ", kurmanji: "doğ", category: "خۆراک", code: "9305" },
-  
-  // Vegetables (9400-9499)
-  { sorani: "سەوزە", kurmanji: "sebze", category: "خۆراک", code: "9400" },
-  { sorani: "پیاز", kurmanji: "pîvaz", category: "خۆراک", code: "9401" },
-  { sorani: "سیر", kurmanji: "sîr", category: "خۆراک", code: "9402" },
-  { sorani: "تەماتە", kurmanji: "fireng", category: "خۆراک", code: "9403" },
-  { sorani: "بادنجان", kurmanji: "bacan", category: "خۆراک", code: "9404" },
-  { sorani: "خیار", kurmanji: "xiyar", category: "خۆراک", code: "9405" },
-  { sorani: "گەزەر", kurmanji: "gizer", category: "خۆراک", code: "9406" },
-  { sorani: "کەلەرم", kurmanji: "kelerm", category: "خۆراک", code: "9407" },
-  { sorani: "کاهو", kurmanji: "kahu", category: "خۆراک", code: "9408" },
-  { sorani: "سپیناخ", kurmanji: "spînax", category: "خۆراک", code: "9409" },
-  { sorani: "شوتاڵە", kurmanji: "şutale", category: "خۆراک", code: "9410" },
-  { sorani: "فڵفڵ", kurmanji: "biber", category: "خۆراک", code: "9411" },
-  { sorani: "بامیە", kurmanji: "bamye", category: "خۆراک", code: "9412" },
-  { sorani: "کووندر", kurmanji: "gûzir", category: "خۆراک", code: "9413" },
-  
-  // Fruits (9500-9599)
-  { sorani: "میوە", kurmanji: "fêkî", category: "خۆراک", code: "9500" },
-  { sorani: "سێو", kurmanji: "sêv", category: "خۆراک", code: "9501" },
-  { sorani: "موز", kurmanji: "moz", category: "خۆراک", code: "9502" },
-  { sorani: "پرتەقاڵ", kurmanji: "pirteqal", category: "خۆراک", code: "9503" },
-  { sorani: "لیمۆ", kurmanji: "lîmo", category: "خۆراک", code: "9504" },
-  { sorani: "ئەنجیر", kurmanji: "hejîr", category: "خۆراک", code: "9505" },
-  { sorani: "ئەنگور", kurmanji: "tirî", category: "خۆراک", code: "9506" },
-  { sorani: "هەندێوانە", kurmanji: "zebeş", category: "خۆراک", code: "9507" },
-  { sorani: "خەربووزە", kurmanji: "qûn", category: "خۆراک", code: "9508" },
-  { sorani: "هەناری", kurmanji: "hinar", category: "خۆراک", code: "9509" },
-  { sorani: "تۆو", kurmanji: "tû", category: "خۆراک", code: "9510" },
-  { sorani: "چەرز", kurmanji: "çerz", category: "خۆراک", code: "9511" },
-  { sorani: "گولاب", kurmanji: "gulab", category: "خۆراک", code: "9512" },
-  { sorani: "ئالووچە", kurmanji: "aluç", category: "خۆراک", code: "9513" },
-  { sorani: "زەردەآلوو", kurmanji: "zerdealu", category: "خۆراک", code: "9514" },
-  
-  // Beverages (9600-9699)
-  { sorani: "ئاو", kurmanji: "av", category: "خۆراک", code: "9600" },
-  { sorani: "چا", kurmanji: "çay", category: "خۆراک", code: "9601" },
-  { sorani: "قاوە", kurmanji: "qehwe", category: "خۆراک", code: "9602" },
-  { sorani: "شەربەت", kurmanji: "şerbet", category: "خۆراک", code: "9603" },
-  { sorani: "کۆکا", kurmanji: "koka", category: "خۆراک", code: "9604" },
-  { sorani: "ئاوی میوە", kurmanji: "avê fêkî", category: "خۆراک", code: "9605" },
-  { sorani: "ئاوی لیمۆ", kurmanji: "avê lîmo", category: "خۆراک", code: "9606" },
-  { sorani: "عەرەق", kurmanji: "eraq", category: "خۆراک", code: "9607" },
-  
-  // Spices & Seasonings (9700-9799)
-  { sorani: "خوێ", kurmanji: "xwê", category: "خۆراک", code: "9700" },
-  { sorani: "بیبەر", kurmanji: "biber", category: "خۆراک", code: "9701" },
-  { sorani: "زەعفەران", kurmanji: "za'feran", category: "خۆراک", code: "9702" },
-  { sorani: "زەیرە", kurmanji: "zêre", category: "خۆراک", code: "9703" },
-  { sorani: "نیعنا", kurmanji: "pûng", category: "خۆراک", code: "9704" },
-  { sorani: "دارچین", kurmanji: "darçîn", category: "خۆراک", code: "9705" },
-  { sorani: "زەردەچۆبە", kurmanji: "zerdeçobe", category: "خۆراک", code: "9706" },
-  { sorani: "کەمون", kurmanji: "kemûn", category: "خۆراک", code: "9707" },
-  { sorani: "گوڵی میخەک", kurmanji: "mixek", category: "خۆراک", code: "9708" },
-  { sorani: "کاردامۆن", kurmanji: "kardamon", category: "خۆراک", code: "9709" },
-  
-  // Sweets & Desserts (9800-9899)
-  { sorani: "شیرینی", kurmanji: "şîrînî", category: "خۆراک", code: "9800" },
-  { sorani: "کێک", kurmanji: "kek", category: "خۆراک", code: "9801" },
-  { sorani: "شۆکلێت", kurmanji: "çokolat", category: "خۆراک", code: "9802" },
-  { sorani: "هەنگوین", kurmanji: "hingiv", category: "خۆراک", code: "9803" },
-  { sorani: "شەکر", kurmanji: "şekir", category: "خۆراک", code: "9804" },
-  { sorani: "بەقلاوا", kurmanji: "beqlawa", category: "خۆراک", code: "9805" },
-  { sorani: "کلۆچە", kurmanji: "kuloçe", category: "خۆراک", code: "9806" },
-  { sorani: "حەلوا", kurmanji: "helwe", category: "خۆراک", code: "9807" },
-  { sorani: "گەز", kurmanji: "gez", category: "خۆراک", code: "9808" },
-  { sorani: "پەستە", kurmanji: "peste", category: "خۆراک", code: "9809" }
+  { sorani: "کام؟", kurmanji: "kîjan?", category: "پرسیار" }
 ];
 
 const KurdishDialectTranslator: React.FC = () => {
@@ -1474,10 +1127,8 @@ const KurdishDialectTranslator: React.FC = () => {
 
     setIsTranslating(true);
     let text = inputText.trim();
-    
-    // Check if it's a single word or multiple words
-    const words = text.split(/[\s،؛۔]+/).filter(word => word.length > 0);
-    const isSingleWord = words.length === 1;
+    let translatedText = text;
+    let matchesFound = 0;
 
     // Create a map for faster lookup
     const translationMap = new Map<string, string>();
@@ -1492,46 +1143,30 @@ const KurdishDialectTranslator: React.FC = () => {
       }
     });
 
-    if (isSingleWord) {
-      // For single word: Try dictionary first, then AI if not found
-      const cleanedWord = text.replace(/[َُِّْ]/g, '');
-      const dictionaryTranslation = translationMap.get(text) || translationMap.get(cleanedWord);
-      
-      if (dictionaryTranslation) {
-        setTranslatedText(dictionaryTranslation);
-        toast.success(`Dictionary translated "${text}" from ${sourceDialect} to ${targetDialect}`);
-      } else {
-        // Single word not found in dictionary, use AI
-        toast.info('Word not found in dictionary. Using AI translation...');
-        try {
-          const aiPrompt = `Translate this single word from ${sourceDialect === 'sorani' ? 'Kurdish Sorani' : 'Kurdish Kurmanji'} to ${targetDialect === 'sorani' ? 'Kurdish Sorani' : 'Kurdish Kurmanji'}. 
+    // Sort by length (longest first) to handle phrases before individual words
+    const sortedKeys = Array.from(translationMap.keys()).sort((a, b) => b.length - a.length);
 
-Word to translate: "${text}"
-
-Guidelines:
-- Provide only the translation without explanations
-- If it's a proper noun, keep it as is
-- Use the most common translation for this word
-
-Translation:`;
-
-          const aiTranslation = await geminiService.translateText(aiPrompt);
-          if (aiTranslation && aiTranslation.trim() !== text) {
-            setTranslatedText(aiTranslation.trim());
-            toast.success(`AI translated word "${text}" from ${sourceDialect} to ${targetDialect}`);
-          } else {
-            setTranslatedText(`[لە فەرهەنگدا نەدۆزرایەوە] ${text}`);
-            toast.warning('AI translation failed for this word. Try checking the spelling.');
-          }
-        } catch (error) {
-          console.error('AI translation error:', error);
-          setTranslatedText(`[لە فەرهەنگدا نەدۆزرایەوە] ${text}`);
-          toast.error('AI translation failed. Check your connection.');
+    // Replace each word/phrase
+    sortedKeys.forEach(originalWord => {
+      const translation = translationMap.get(originalWord);
+      if (translation) {
+        // Create regex that matches the word with word boundaries
+        // Handle Kurdish text properly
+        const escapedWord = originalWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`\\b${escapedWord}\\b|(?<=[\\s،؛۔]|^)${escapedWord}(?=[\\s،؛۔]|$)`, 'gi');
+        
+        const beforeReplace = translatedText;
+        translatedText = translatedText.replace(regex, translation);
+        
+        if (beforeReplace !== translatedText) {
+          matchesFound++;
         }
       }
-    } else {
-      // For sentences (multiple words): Always use AI for better context
-      toast.info('Translating sentence using AI for better context...');
+    });
+
+    // If no dictionary matches found, try AI translation
+    if (matchesFound === 0) {
+      toast.info('Using AI translation...');
       try {
         const aiPrompt = `Translate this text from ${sourceDialect === 'sorani' ? 'Kurdish Sorani' : 'Kurdish Kurmanji'} to ${targetDialect === 'sorani' ? 'Kurdish Sorani' : 'Kurdish Kurmanji'}. 
 
@@ -1543,23 +1178,25 @@ Guidelines:
 - Use proper Kurdish ${targetDialect} dialect conventions
 - Keep proper nouns as they are
 - Preserve punctuation and formatting
-- Ensure natural flow and grammar
 
 Translation:`;
 
         const aiTranslation = await geminiService.translateText(aiPrompt);
         if (aiTranslation && aiTranslation.trim() !== text) {
           setTranslatedText(aiTranslation.trim());
-          toast.success(`AI translated sentence from ${sourceDialect} to ${targetDialect}`);
+          toast.success(`AI translated from ${sourceDialect} to ${targetDialect}`);
         } else {
           setTranslatedText(`[AI translation unavailable] ${text}`);
-          toast.warning('AI translation failed. Try breaking down into smaller parts.');
+          toast.warning('AI translation failed. Try adding more words to the dictionary.');
         }
       } catch (error) {
         console.error('AI translation error:', error);
-        setTranslatedText(`[وەرگێڕان نەکرا] ${text}`);
+        setTranslatedText(`[لە فەرهەنگدا نەدۆزرایەوە] ${text}`);
         toast.error('AI translation failed. Check your connection.');
       }
+    } else {
+      setTranslatedText(translatedText);
+      toast.success(`Dictionary translated ${matchesFound} word${matchesFound > 1 ? 's' : ''} from ${sourceDialect} to ${targetDialect}`);
     }
     
     setIsTranslating(false);
@@ -1755,41 +1392,41 @@ Translation:`;
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredDictionary.map((item, index) => (
-                    <div key={index} className="border border-purple-300 bg-white/90 backdrop-blur rounded-lg p-4 hover:shadow-md hover:bg-purple-50/90 transition-all duration-200">
+                    <div key={index} className="border border-purple-300 bg-purple-100/70 rounded-lg p-4 hover:shadow-md hover:bg-purple-200/80 transition-all duration-200">
                       <div className="space-y-2">
                         <div className="flex justify-between items-start">
-                          <Badge variant="secondary" className="text-xs bg-purple-600 text-white border-purple-600">
+                          <Badge variant="outline" className="text-xs">
                             {item.category}
                           </Badge>
                         </div>
                         <div className="space-y-1">
                           <div className="text-right">
-                            <span className="font-semibold text-purple-700">سۆرانی: </span>
-                            <span className="text-lg text-gray-900 font-medium">{item.sorani}</span>
+                            <span className="font-semibold text-purple-600">سۆرانی: </span>
+                            <span className="text-lg text-gray-800">{item.sorani}</span>
                           </div>
                           <div className="text-right">
-                            <span className="font-semibold text-indigo-700">کورمانجی: </span>
-                            <span className="text-lg text-gray-900 font-medium">{item.kurmanji}</span>
+                            <span className="font-semibold text-indigo-600">کورمانجی: </span>
+                            <span className="text-lg text-gray-800">{item.kurmanji}</span>
                           </div>
                           {item.notes && (
-                            <div className="text-sm text-gray-700 mt-2 bg-gray-100 p-2 rounded">
+                            <div className="text-sm text-gray-600 mt-2">
                               {item.notes}
                             </div>
                           )}
-                          <div className="mt-3 flex gap-2 justify-center">
+                          <div className="mt-2 flex gap-1">
                             <Button
-                              variant="outline"
+                              variant="ghost"
                               size="sm"
                               onClick={() => setInputText(item.sorani)}
-                              className="text-xs h-7 px-3 bg-purple-100 border-purple-300 text-purple-800 hover:bg-purple-200 hover:text-purple-900"
+                              className="text-xs h-6 px-2"
                             >
                               سۆرانی
                             </Button>
                             <Button
-                              variant="outline"
+                              variant="ghost"
                               size="sm"
                               onClick={() => setInputText(item.kurmanji)}
-                              className="text-xs h-7 px-3 bg-indigo-100 border-indigo-300 text-indigo-800 hover:bg-indigo-200 hover:text-indigo-900"
+                              className="text-xs h-6 px-2"
                             >
                               کورمانجی
                             </Button>

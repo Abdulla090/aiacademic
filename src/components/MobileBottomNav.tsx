@@ -36,7 +36,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ onSettingsClic
       labelEn: 'Settings',
       icon: Settings,
       path: '',
-      onClick: onSettingsClick || (() => {})
+      onClick: onSettingsClick,
+      disabled: !onSettingsClick
     }
   ];
 
@@ -60,15 +61,28 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ onSettingsClic
               variant="ghost"
               size="sm"
               onClick={item.onClick}
+              disabled={item.disabled}
               className={`flex flex-col items-center justify-center gap-1 h-auto py-2 px-3 min-w-0 flex-1 ${
-                active 
-                  ? 'text-purple-600 bg-purple-50' 
-                  : 'text-gray-600 hover:text-purple-600 hover:bg-purple-50'
+                item.disabled
+                  ? 'text-gray-400 cursor-not-allowed opacity-50'
+                  : active
+                    ? 'text-purple-600 bg-purple-50'
+                    : 'text-gray-600 hover:text-purple-600 hover:bg-purple-50'
               }`}
             >
-              <IconComponent className={`h-5 w-5 ${active ? 'text-purple-600' : 'text-gray-600'}`} />
+              <IconComponent className={`h-5 w-5 ${
+                item.disabled
+                  ? 'text-gray-400'
+                  : active
+                    ? 'text-purple-600'
+                    : 'text-gray-600'
+              }`} />
               <span className={`text-xs font-medium sorani-text truncate ${
-                active ? 'text-purple-600' : 'text-gray-600'
+                item.disabled
+                  ? 'text-gray-400'
+                  : active
+                    ? 'text-purple-600'
+                    : 'text-gray-600'
               }`}>
                 {item.label}
               </span>
