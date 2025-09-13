@@ -48,6 +48,9 @@ interface FixingOptions {
   fixSpelling: boolean;
 }
 
+type FixingMode = FixingOptions['mode'];
+type FixingLanguage = FixingOptions['language'];
+
 interface FixingResult {
   originalText: string;
   fixedText: string;
@@ -175,6 +178,148 @@ ${text}
     return prompt;
   }, []);
 
+  // Text metrics calculation utilities
+  const calculateTextMetrics = useCallback((text: string) => {
+    if (!text.trim()) return {
+      readabilityScore: 0,
+      avgSentenceLength: 0,
+      sentenceCount: 0,
+      wordCount: 0,
+      grammarIssues: 0,
+      spellingIssues: 0,
+      structuralMarkers: 0
+    };
+
+    const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+    const sentences = text.split(/[.!?]+/).filter(sentence => sentence.trim().length > 0);
+    
+    // Basic readability score (simplified Flesch-like calculation)
+    const avgWordsPerSentence = sentences.length > 0 ? words.length / sentences.length : 0;
+    const avgSyllablesPerWord = words.reduce((sum, word) => {
+      // Simple syllable estimation: count vowel groups
+      const syllables = word.toLowerCase().match(/[aeiouy]+/g)?.length || 1;
+      return sum + Math.max(1, syllables);
+    }, 0) / (words.length || 1);
+    
+    const readabilityScore = Math.max(0, Math.min(100, 
+      206.835 - (1.015 * avgWordsPerSentence) - (84.6 * avgSyllablesPerWord)
+    ));
+
+    // Estimate grammar issues (common patterns)
+    const grammarPatterns = [
+      /\s+,/g, // Space before comma
+      /\.\s*\./g, // Double periods
+      /\s{2,}/g, // Multiple spaces
+      /[a-z]\.[A-Z]/g, // Missing space after period
+      /\b(a|an)\s+(a|an)\b/gi, // Double articles
+    ];
+    const grammarIssues = grammarPatterns.reduce((count, pattern) => 
+      count + (text.match(pattern)?.length || 0), 0
+    );
+
+    // Estimate spelling issues (very basic - repeated characters, common typos)
+    const spellingPatterns = [
+      /\b\w*(.)\1{2,}\w*\b/g, // Words with 3+ repeated characters
+      /\b(teh|adn|nad|hte|recieve|seperate|occured)\b/gi, // Common typos
+    ];
+    const spellingIssues = spellingPatterns.reduce((count, pattern) => 
+      count + (text.match(pattern)?.length || 0), 0
+    );
+
+    // Count structural markers (transition words, conjunctions)
+    const structuralWords = [
+      'however', 'therefore', 'furthermore', 'moreover', 'consequently',
+      'additionally', 'meanwhile', 'nevertheless', 'thus', 'hence',
+      'because', 'since', 'although', 'whereas', 'despite', 'unless'
+    ];
+    const structuralMarkers = structuralWords.reduce((count, word) => 
+      count + (text.toLowerCase().match(new RegExp(`\\b${word}\\b`, 'g'))?.length || 0), 0
+    );
+
+    return {
+      readabilityScore: Math.round(readabilityScore),
+      avgSentenceLength: Math.round(avgWordsPerSentence * 10) / 10,
+      sentenceCount: sentences.length,
+      wordCount: words.length,
+      grammarIssues,
+      spellingIssues,
+      structuralMarkers
+    };
+  }, []);
+
+  const calculateImprovementScore = useCallback((originalText: string, fixedText: string) => {
+    const originalMetrics = calculateTextMetrics(originalText);
+    const fixedMetrics = calculateTextMetrics(fixedText);
+
+    // If no meaningful content, return minimal score
+    if (originalMetrics.wordCount < 3 || fixedMetrics.wordCount < 3) {
+      return 5;
+    }
+
+    // Calculate improvements with weights
+    const metrics = [
+      {
+        name: 'readability',
+        original: originalMetrics.readabilityScore,
+        fixed: fixedMetrics.readabilityScore,
+        weight: 0.25,
+        isHigherBetter: true
+      },
+      {
+        name: 'grammar',
+        original: originalMetrics.grammarIssues,
+        fixed: fixedMetrics.grammarIssues,
+        weight: 0.30,
+        isHigherBetter: false // Fewer issues is better
+      },
+      {
+        name: 'spelling',
+        original: originalMetrics.spellingIssues,
+        fixed: fixedMetrics.spellingIssues,
+        weight: 0.25,
+        isHigherBetter: false
+      },
+      {
+        name: 'structure',
+        original: originalMetrics.structuralMarkers,
+        fixed: fixedMetrics.structuralMarkers,
+        weight: 0.20,
+        isHigherBetter: true
+      }
+    ];
+
+    let totalWeightedImprovement = 0;
+    let totalWeight = 0;
+
+    metrics.forEach(metric => {
+      const { original, fixed, weight, isHigherBetter } = metric;
+      
+      let improvement = 0;
+      if (isHigherBetter) {
+        // Higher values are better (readability, structural markers)
+        improvement = fixed - original;
+      } else {
+        // Lower values are better (grammar/spelling issues)
+        improvement = original - fixed;
+      }
+
+      // Normalize improvement to percentage scale
+      const maxExpectedChange = Math.max(1, Math.abs(original) || 10);
+      const normalizedImprovement = (improvement / maxExpectedChange) * 100;
+      
+      totalWeightedImprovement += normalizedImprovement * weight;
+      totalWeight += weight;
+    });
+
+    // Calculate final score
+    const baseScore = 50; // Baseline score for no change
+    const improvementBonus = totalWeightedImprovement / (totalWeight || 1);
+    const finalScore = Math.round(baseScore + improvementBonus);
+
+    // Clamp to 0-100 range
+    return Math.max(0, Math.min(100, finalScore));
+  }, [calculateTextMetrics]);
+
   const simulateProgressSteps = useCallback((duration: number) => {
     const steps = [
       { progress: 10, message: "Analyzing text structure..." },
@@ -215,7 +360,7 @@ ${text}
 
     try {
       const prompt = generateFixingPrompt(inputText, fixingOptions);
-      const response = await geminiService.fixTextStructure(inputText, fixingOptions);
+      const response = await geminiService.fixTextStructure(prompt);
       
       const processingTime = Date.now() - startTime;
       
@@ -224,7 +369,10 @@ ${text}
       
       setFixedText(fixedTextResult);
       
-      // Create a mock result for demonstration (in a real implementation, you'd parse this from Gemini's response)
+      // Calculate deterministic improvement score based on text metrics
+      const improvementScore = calculateImprovementScore(inputText, fixedTextResult);
+      
+      // Create result with calculated metrics
       const result: FixingResult = {
         originalText: inputText,
         fixedText: fixedTextResult,
@@ -234,7 +382,7 @@ ${text}
           "Some sentences could be split for improved readability",
           "Consider using more formal vocabulary in academic contexts"
         ],
-        improvementScore: Math.round(Math.random() * 30 + 70), // 70-100%
+        improvementScore: improvementScore,
         processingTime: processingTime
       };
       
@@ -354,22 +502,66 @@ ${text}
   const exportToPDF = async () => {
     if (!fixedText) return;
 
+    // Create container div with safe DOM manipulation
     const element = document.createElement('div');
-    element.innerHTML = `
-      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px;">
-        <h1 style="color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 10px;">Fixed Text Document</h1>
-        <div style="margin: 20px 0;">
-          <h3 style="color: #666;">Processing Details:</h3>
-          <p><strong>Mode:</strong> ${fixingOptions.mode}</p>
-          <p><strong>Language:</strong> ${fixingOptions.language}</p>
-          <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-        </div>
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
-          <h3 style="color: #666; margin-top: 0;">Fixed Text:</h3>
-          <div style="white-space: pre-wrap; font-size: 14px;">${fixedText}</div>
-        </div>
-      </div>
-    `;
+    element.style.cssText = 'font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px;';
+
+    // Create title
+    const title = document.createElement('h1');
+    title.style.cssText = 'color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 10px;';
+    title.textContent = 'Fixed Text Document';
+    element.appendChild(title);
+
+    // Create processing details section
+    const detailsDiv = document.createElement('div');
+    detailsDiv.style.cssText = 'margin: 20px 0;';
+    
+    const detailsTitle = document.createElement('h3');
+    detailsTitle.style.cssText = 'color: #666;';
+    detailsTitle.textContent = 'Processing Details:';
+    detailsDiv.appendChild(detailsTitle);
+
+    // Create mode paragraph
+    const modePara = document.createElement('p');
+    const modeStrong = document.createElement('strong');
+    modeStrong.textContent = 'Mode: ';
+    modePara.appendChild(modeStrong);
+    modePara.appendChild(document.createTextNode(String(fixingOptions.mode)));
+    detailsDiv.appendChild(modePara);
+
+    // Create language paragraph
+    const langPara = document.createElement('p');
+    const langStrong = document.createElement('strong');
+    langStrong.textContent = 'Language: ';
+    langPara.appendChild(langStrong);
+    langPara.appendChild(document.createTextNode(String(fixingOptions.language)));
+    detailsDiv.appendChild(langPara);
+
+    // Create date paragraph
+    const datePara = document.createElement('p');
+    const dateStrong = document.createElement('strong');
+    dateStrong.textContent = 'Date: ';
+    datePara.appendChild(dateStrong);
+    datePara.appendChild(document.createTextNode(new Date().toLocaleDateString()));
+    detailsDiv.appendChild(datePara);
+
+    element.appendChild(detailsDiv);
+
+    // Create fixed text section
+    const textDiv = document.createElement('div');
+    textDiv.style.cssText = 'background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;';
+    
+    const textTitle = document.createElement('h3');
+    textTitle.style.cssText = 'color: #666; margin-top: 0;';
+    textTitle.textContent = 'Fixed Text:';
+    textDiv.appendChild(textTitle);
+
+    const textContent = document.createElement('div');
+    textContent.style.cssText = 'white-space: pre-wrap; font-size: 14px;';
+    textContent.textContent = fixedText; // Safe text content assignment
+    textDiv.appendChild(textContent);
+
+    element.appendChild(textDiv);
 
     const opt = {
       margin: 1,
@@ -451,7 +643,7 @@ ${text}
               <label className="text-sm font-medium mb-2 block">{t('fixingMode')}</label>
               <Select
                 value={fixingOptions.mode}
-                onValueChange={(value: any) => setFixingOptions(prev => ({ ...prev, mode: value }))}
+                onValueChange={(value: FixingMode) => setFixingOptions(prev => ({ ...prev, mode: value }))}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -489,7 +681,7 @@ ${text}
               <label className="text-sm font-medium mb-2 block">{t('language')}</label>
               <Select
                 value={fixingOptions.language}
-                onValueChange={(value: any) => setFixingOptions(prev => ({ ...prev, language: value }))}
+                onValueChange={(value: FixingLanguage) => setFixingOptions(prev => ({ ...prev, language: value }))}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -508,11 +700,11 @@ ${text}
               
               {[
                 { key: 'fixGrammar', label: t('grammarPunctuation'), icon: '📝' },
-                { key: 'fixPunctuation', label: 'Punctuation', icon: '❓' },
-                { key: 'fixSpelling', label: 'Spelling', icon: '📖' },
+                { key: 'fixPunctuation', label: t('punctuation'), icon: '❓' },
+                { key: 'fixSpelling', label: t('spelling'), icon: '📖' },
                 { key: 'fixStructure', label: t('sentenceStructure'), icon: '🏗️' },
-                { key: 'fixFlow', label: 'Text Flow', icon: '🌊' },
-                { key: 'improveCohesion', label: 'Cohesion', icon: '🔗' },
+                { key: 'fixFlow', label: t('textFlow'), icon: '🌊' },
+                { key: 'improveCohesion', label: t('cohesion'), icon: '🔗' },
                 { key: 'formatParagraphs', label: t('paragraphOrganization'), icon: '📄' },
                 { key: 'enhanceVocabulary', label: t('vocabularyEnhancement'), icon: '💭' }
               ].map(({ key, label, icon }) => (

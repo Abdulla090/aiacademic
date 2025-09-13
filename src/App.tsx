@@ -29,7 +29,7 @@ import About from "./pages/About";
 import KurdishDialectTranslator from "./pages/KurdishDialectTranslator";
 import StudyAnalyticsDashboard from "./pages/StudyAnalyticsDashboard";
 import AIResearchAssistant from "./pages/AIResearchAssistant";
-import TextStructureFixerPage from "./pages/TextStructureFixer.tsx";
+import TextStructureFixerPage from "./pages/TextStructureFixer";
 import { CustomSidebar } from "./components/CustomSidebar";
 import { SidebarProvider, SidebarInset } from "./components/ui/sidebar";
 import { MobileBottomNav } from "./components/MobileBottomNav";

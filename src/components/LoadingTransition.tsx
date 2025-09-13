@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { BrainCircuit, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -17,12 +17,13 @@ export const LoadingTransition: React.FC<LoadingTransitionProps> = ({
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
 
-  const loadingSteps = [
+  // Memoize loadingSteps to prevent recreating on every render
+  const loadingSteps = useMemo(() => [
     t('loadingAcademicTools'),
     t('loadingImages'),
     t('preparingInterface'),
     t('almostReady')
-  ];
+  ], [t]);
 
   // Preload images during loading (non-blocking)
   useEffect(() => {
@@ -42,40 +43,36 @@ export const LoadingTransition: React.FC<LoadingTransitionProps> = ({
     });
   }, []);
 
-  useEffect(() => {
-    console.log('LoadingTransition: Starting timer');
-    let startTime = Date.now();
+    useEffect(() => {
+      let startTime = Date.now();
 
-    const timer = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const progressPercent = Math.min((elapsed / duration) * 100, 100);
-      const stepIndex = Math.min(Math.floor((elapsed / duration) * loadingSteps.length), loadingSteps.length - 1);
-      
-      setProgress(progressPercent);
-      setCurrentStep(stepIndex);
+      const timer = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const progressPercent = Math.min((elapsed / duration) * 100, 100);
+        const stepIndex = Math.min(Math.floor((elapsed / duration) * loadingSteps.length), loadingSteps.length - 1);
+        
+        setProgress(progressPercent);
+        setCurrentStep(stepIndex);
 
-      if (progressPercent >= 100) {
-        console.log('LoadingTransition: Completing');
+        if (progressPercent >= 100) {
+          clearInterval(timer);
+          setTimeout(() => {
+            onComplete();
+          }, 200);
+        }
+      }, 50);
+
+      // Absolute safety timeout
+      const safetyTimeout = setTimeout(() => {
         clearInterval(timer);
-        setTimeout(() => {
-          console.log('LoadingTransition: Calling onComplete');
-          onComplete();
-        }, 200);
-      }
-    }, 50);
+        onComplete();
+      }, duration + 500);
 
-    // Absolute safety timeout
-    const safetyTimeout = setTimeout(() => {
-      console.log('LoadingTransition: Safety timeout triggered');
-      clearInterval(timer);
-      onComplete();
-    }, duration + 500);
-
-    return () => {
-      clearInterval(timer);
-      clearTimeout(safetyTimeout);
-    };
-  }, [onComplete, duration, loadingSteps.length]);
+      return () => {
+        clearInterval(timer);
+        clearTimeout(safetyTimeout);
+      };
+    }, [onComplete, duration, loadingSteps.length]);  }, [onComplete, duration, loadingSteps.length]);
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center z-50">

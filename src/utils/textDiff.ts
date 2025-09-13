@@ -1,4 +1,4 @@
-interface DiffPart {
+export interface DiffPart {
   type: 'added' | 'removed' | 'changed' | 'unchanged';
   text: string;
   originalText?: string; // For changed parts, store original text
@@ -104,7 +104,7 @@ export class TextDiffGenerator {
   }
   
   private static findNextMatch(words: string[], startIndex: number, targetWord: string, maxLookahead: number): number {
-    for (let i = startIndex + 1; i < Math.min(startIndex + maxLookahead, words.length); i++) {
+    for (let i = startIndex + 1; i < Math.min(startIndex + maxLookahead + 1, words.length); i++) {
       if (words[i] === targetWord) {
         return i;
       }
@@ -175,7 +175,7 @@ export class TextDiffGenerator {
         case 'removed':
           return `<span class="bg-red-100 text-red-800 line-through px-1 rounded">${this.escapeHtml(part.text)}</span>`;
         case 'changed':
-          return `<span class="bg-yellow-100 text-yellow-800 px-1 rounded" title="Changed from: ${this.escapeHtml(part.originalText || '')}">${this.escapeHtml(part.text)}</span>`;
+          return `<span class="bg-yellow-100 text-yellow-800 px-1 rounded" title="Changed from: ${this.escapeHtmlAttribute(part.originalText || '')}">${this.escapeHtml(part.text)}</span>`;
         case 'unchanged':
           return this.escapeHtml(part.text);
         default:
@@ -185,8 +185,23 @@ export class TextDiffGenerator {
   }
   
   private static escapeHtml(text: string): string {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+    const htmlEntityMap: { [key: string]: string } = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#x27;'
+    };
+    
+    return text.replace(/[&<>"']/g, (char) => htmlEntityMap[char]);
+  }
+
+  private static escapeHtmlAttribute(text: string): string {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   }
 }

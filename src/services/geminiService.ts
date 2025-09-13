@@ -1674,54 +1674,7 @@ Query: "${query}"
     }
   }
 
-  async fixTextStructure(text: string, options: any): Promise<{ text: string }> {
-    const modeInstructions = {
-      basic: "Apply basic corrections focusing on grammar, spelling, and simple punctuation fixes.",
-      advanced: "Provide comprehensive text improvement including structure, flow, coherence, and advanced grammar corrections.",
-      academic: "Apply academic writing standards with formal tone, proper citations format preparation, and scholarly language enhancement.",
-      professional: "Enhance text for professional communication with clear, concise, and business-appropriate language."
-    };
-
-    const languageInstructions = {
-      english: "Process as English text following English grammar and style rules.",
-      kurdish: "Process as Kurdish text (Sorani/Kurmanji) following Kurdish grammar and writing conventions.",
-      arabic: "Process as Arabic text following Arabic grammar and writing conventions.",
-      auto: "Automatically detect the language and apply appropriate grammar rules."
-    };
-
-    let prompt = `You are an expert text editor and writing assistant. Your task is to fix and improve the following text according to these specifications:
-
-**Mode**: ${options.mode.toUpperCase()} - ${modeInstructions[options.mode]}
-**Language**: ${options.language.toUpperCase()} - ${languageInstructions[options.language]}
-
-**Corrections to Apply**:`;
-
-    if (options.fixGrammar) prompt += "\n- ✅ Grammar: Fix all grammatical errors and improve sentence construction";
-    if (options.fixPunctuation) prompt += "\n- ✅ Punctuation: Correct punctuation marks, add missing commas, periods, and proper punctuation";
-    if (options.fixSpelling) prompt += "\n- ✅ Spelling: Fix all spelling mistakes and typos";
-    if (options.fixStructure) prompt += "\n- ✅ Structure: Improve sentence and paragraph structure for better readability";
-    if (options.fixFlow) prompt += "\n- ✅ Flow: Enhance text flow and transitions between sentences and paragraphs";
-    if (options.improveCohesion) prompt += "\n- ✅ Cohesion: Improve logical connections and coherence throughout the text";
-    if (options.enhanceVocabulary) prompt += "\n- ✅ Vocabulary: Enhance vocabulary with more appropriate and sophisticated terms";
-    if (options.formatParagraphs) prompt += "\n- ✅ Formatting: Properly format paragraphs and ensure consistent spacing";
-
-    prompt += `
-
-**Instructions**:
-1. Maintain the original meaning and intent of the text
-2. Preserve any technical terms or proper nouns unless they contain errors
-3. Apply improvements according to the selected mode and language
-4. Ensure the output is well-structured and professionally formatted
-5. Keep the same general length unless significant restructuring is needed
-6. For academic mode: Use formal academic language and prepare text for potential citation formatting
-7. For professional mode: Use clear, business-appropriate language
-8. If text contains multiple languages, handle each appropriately
-
-**Original Text**:
-${text}
-
-**Please provide ONLY the corrected and improved text without any explanations or meta-commentary:**`;
-
+  async fixTextStructure(prompt: string): Promise<{ text: string }> {
     try {
       const response = await this.makeRequest(prompt);
       return { text: response.text };
