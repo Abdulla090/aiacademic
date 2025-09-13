@@ -248,7 +248,6 @@ const Sidebar = React.forwardRef<
             data-sidebar="sidebar"
             className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow relative"
           >
-            <SidebarTrigger className="absolute top-2 right-2" />
             {children}
           </div>
         </div>

@@ -25,7 +25,8 @@ import {
   FileImage,
   Globe,
   BarChart3,
-  Bot
+  Bot,
+  Wand2
 } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader"; 
 import { useState, useEffect } from "react";
@@ -86,6 +87,14 @@ const Index = () => {
       image: "/card-images/grammar-fix.jpeg",
       category: "editing",
       path: "/grammar-checker"
+    },
+    {
+      title: "textStructureFixer",
+      description: "textStructureFixerDescription",
+      icon: Wand2,
+      image: "/card-images/grammar-fix.png",
+      category: "editing",
+      path: "/text-structure-fixer"
     },
     {
       title: "mindMapGenerator",

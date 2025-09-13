@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Info, Settings } from 'lucide-react';
+import { Home, Info, Settings, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 
@@ -21,6 +21,14 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ onSettingsClic
       icon: Home,
       path: '/dashboard',
       onClick: () => navigate('/dashboard')
+    },
+    {
+      id: 'textfixer',
+      label: 'چاککەری دەق',
+      labelEn: 'Text Fixer',
+      icon: Wand2,
+      path: '/text-structure-fixer',
+      onClick: () => navigate('/text-structure-fixer')
     },
     {
       id: 'about',

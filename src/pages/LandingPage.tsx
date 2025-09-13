@@ -1,13 +1,25 @@
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle, BrainCircuit } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ArrowRight, CheckCircle, BrainCircuit, Wand2 } from "lucide-react";
+import { useTransition } from "../contexts/TransitionContext";
 
 const LandingPage = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { setShowLoadingTransition } = useTransition();
+
+  const handleNavigateToDashboard = () => {
+    setShowLoadingTransition(true);
+    // Navigate after a short delay to show the loading animation
+    setTimeout(() => {
+      navigate('/dashboard');
+    }, 100);
+  };
 
   const features = [
     { title: t('articleWriter'), description: t('articleWriterDescription'), icon: <BrainCircuit className="h-8 w-8 text-primary" /> },
+    { title: t('textStructureFixer'), description: t('textStructureFixerDescription'), icon: <Wand2 className="h-8 w-8 text-primary" /> },
     { title: t('grammarChecker'), description: t('grammarCheckerDescription'), icon: <CheckCircle className="h-8 w-8 text-primary" /> },
     { title: t('mindMapGenerator'), description: t('mindMapGeneratorDescription'), icon: <BrainCircuit className="h-8 w-8 text-primary" /> },
   ];
@@ -17,9 +29,14 @@ const LandingPage = () => {
       {/* Header */}
       <header className="py-3 sm:py-4 px-4 sm:px-8 flex justify-between items-center border-b border-border">
         <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-primary">{t('appName')}</h1>
-        <Link to="/dashboard">
-          <Button variant="outline" size="sm" className="text-xs sm:text-sm">{t('quickActionsTitle')}</Button>
-        </Link>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="text-xs sm:text-sm"
+          onClick={handleNavigateToDashboard}
+        >
+          {t('quickActionsTitle')}
+        </Button>
       </header>
 
       {/* Hero Section */}
@@ -30,11 +47,13 @@ const LandingPage = () => {
         <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-3xl animate-fade-in-up">
           {t('welcomeDescription')}
         </p>
-        <Link to="/dashboard">
-          <Button size="lg" className="btn-academic-primary group text-sm sm:text-base">
-            {t('quickActionsTitle')} <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:translate-x-1" />
-          </Button>
-        </Link>
+        <Button 
+          size="lg" 
+          className="btn-academic-primary group text-sm sm:text-base"
+          onClick={handleNavigateToDashboard}
+        >
+          {t('quickActionsTitle')} <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:translate-x-1" />
+        </Button>
       </main>
 
       {/* Features Section */}

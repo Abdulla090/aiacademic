@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { LucideIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { OptimizedImage } from "./OptimizedImage";
 
 interface AcademicToolCardProps {
   title: string;
@@ -45,10 +46,12 @@ export const AcademicToolCard = ({
         {image ? (
           <>
             <div className="mb-4 rounded-lg overflow-hidden aspect-video">
-              <img
+              <OptimizedImage
                 src={image}
-                alt={t(title)}
+                alt={title}
                 className="w-full h-full object-cover"
+                placeholderClassName="w-full h-full"
+                lazy={true}
               />
             </div>
             <div className="space-y-2 mb-4">

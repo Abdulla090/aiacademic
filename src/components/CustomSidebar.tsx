@@ -31,7 +31,8 @@ import {
   Image,
   Minimize,
   PenTool,
-  CheckSquare
+  CheckSquare,
+  BrainCircuit
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -116,16 +117,14 @@ export function CustomSidebar() {
   return (
     <Sidebar collapsible="icon">
         <SidebarHeader className="border-b border-sidebar-border">
-          <div className="flex items-center gap-3 p-4">
-            <div className="p-2 bg-gradient-primary rounded-lg text-primary-foreground">
-              <Settings className="h-6 w-6" />
-            </div>
+          <div className="flex items-center justify-between p-4">
             {state === "expanded" && (
               <div>
                 <h2 className="text-lg font-semibold">{t('appName')}</h2>
                 <p className="text-xs text-muted-foreground">{t('appSubtitle')}</p>
               </div>
             )}
+            <SidebarTrigger className="h-8 w-8" />
           </div>
         </SidebarHeader>
         

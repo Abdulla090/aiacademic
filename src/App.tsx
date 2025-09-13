@@ -29,11 +29,14 @@ import About from "./pages/About";
 import KurdishDialectTranslator from "./pages/KurdishDialectTranslator";
 import StudyAnalyticsDashboard from "./pages/StudyAnalyticsDashboard";
 import AIResearchAssistant from "./pages/AIResearchAssistant";
+import TextStructureFixerPage from "./pages/TextStructureFixer.tsx";
 import { CustomSidebar } from "./components/CustomSidebar";
 import { SidebarProvider, SidebarInset } from "./components/ui/sidebar";
 import { MobileBottomNav } from "./components/MobileBottomNav";
 import { MobileSettingsModal } from "./components/MobileSettingsModal";
 import { useIsMobile } from "./hooks/use-mobile";
+import { TransitionProvider, useTransition } from "./contexts/TransitionContext";
+import { LoadingTransition } from "./components/LoadingTransition";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +44,7 @@ const AppContent = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const [showMobileSettings, setShowMobileSettings] = useState(false);
+  const { showLoadingTransition, setShowLoadingTransition } = useTransition();
   const showSidebar = location.pathname !== '/' && !isMobile;
 
   const ArticleWriterWithLoading = withLoading(ArticleWriter);
@@ -63,11 +67,18 @@ const AppContent = () => {
   const KurdishDialectTranslatorWithLoading = withLoading(KurdishDialectTranslator);
   const StudyAnalyticsDashboardWithLoading = withLoading(StudyAnalyticsDashboard);
   const AIResearchAssistantWithLoading = withLoading(AIResearchAssistant);
+  const TextStructureFixerWithLoading = withLoading(TextStructureFixerPage);
  
   return (
-    <SidebarProvider>
-      {showSidebar && <CustomSidebar />}
-      <SidebarInset className={isMobile ? 'pb-16' : ''}>
+    <>
+      {showLoadingTransition && (
+        <LoadingTransition
+          onComplete={() => setShowLoadingTransition(false)}
+        />
+      )}
+      <SidebarProvider defaultOpen={false}>
+        {showSidebar && <CustomSidebar />}
+        <SidebarInset className={isMobile ? 'pb-16' : ''}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
@@ -90,6 +101,7 @@ const AppContent = () => {
           <Route path="/kurdish-dialect-translator" element={<KurdishDialectTranslatorWithLoading />} />
           <Route path="/study-analytics-dashboard" element={<StudyAnalyticsDashboardWithLoading />} />
           <Route path="/ai-research-assistant" element={<AIResearchAssistantWithLoading />} />
+          <Route path="/text-structure-fixer" element={<TextStructureFixerWithLoading />} />
           <Route path="/about" element={<About />} />
           <Route path="/chat-with-file" element={<ChatWithFileWithLoading />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
@@ -110,6 +122,7 @@ const AppContent = () => {
         />
       </SidebarInset>
     </SidebarProvider>
+    </>
   );
 };
 
@@ -123,7 +136,9 @@ const App = () => {
           v7_relativeSplatPath: true,
           v7_startTransition: true 
         }}>
-          <AppContent />
+          <TransitionProvider>
+            <AppContent />
+          </TransitionProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
