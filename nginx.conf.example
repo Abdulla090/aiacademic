@@ -1,0 +1,11 @@
+# nginx.conf example for SPA
+# Place this in your nginx server block
+
+location / {
+    try_files $uri $uri/ /index.html;
+}
+
+# Optional: Handle API routes if you have them
+# location /api {
+#     proxy_pass http://your-api-server;
+# }
