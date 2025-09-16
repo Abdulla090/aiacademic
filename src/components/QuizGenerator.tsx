@@ -8,6 +8,8 @@ import { useToast } from '@/components/ui/use-toast';
 import { motion } from 'framer-motion';
 import { readFileContent } from '@/lib/fileReader';
 import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
+import { ResponsiveLayout, ResponsiveButtonGroup } from '@/components/ui/responsive-layout';
+import { useResponsive } from '@/hooks/useResponsive';
 
 export const QuizGenerator = () => {
   const [text, setText] = useState('');
@@ -17,6 +19,7 @@ export const QuizGenerator = () => {
   const [submitted, setSubmitted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { isMobile, isTablet } = useResponsive();
 
   const triggerGeneration = async (contentText: string) => {
     if (!contentText.trim()) {
@@ -84,38 +87,49 @@ export const QuizGenerator = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <Card className="card-academic">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <span className="sorani-text">دروستکەری کویز</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="دەقەکەت لێرە بنووسە یان فایلێک باربکە..."
-              className="input-academic sorani-text h-32"
+    <ResponsiveLayout>
+      <Card className="card-academic">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <span className="sorani-text">دروستکەری کویز</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="دەقەکەت لێرە بنووسە یان فایلێک باربکە..."
+            className={`input-academic sorani-text ${isMobile ? 'min-h-[120px]' : 'h-32'} text-sm sm:text-base`}
+          />
+          <ResponsiveButtonGroup orientation={isMobile ? "vertical" : "horizontal"}>
+            <Button 
+              onClick={handleGenerate} 
+              disabled={loading} 
+              className={`btn-academic-primary ${isMobile ? 'text-xs px-3 py-2' : ''}`}
+            >
+              {loading ? (
+                <RefreshCw className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} ${isMobile ? 'mr-1' : 'mr-2'} animate-spin`} />
+              ) : null}
+              <span className="sorani-text">{loading ? 'چاوەڕوان بە...' : 'دروستکردنی کویز'}</span>
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => fileInputRef.current?.click()} 
+              className={`btn-academic-secondary ${isMobile ? 'text-xs px-3 py-2' : ''}`}
+            >
+              <Upload className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} mr-2`} />
+              <span className="sorani-text">{isMobile ? 'فایل' : 'بارکردنی فایل'}</span>
+            </Button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden"
+              accept=".txt,.md,.pdf,.docx"
             />
-            <div className="flex items-center gap-4">
-                <Button onClick={handleGenerate} disabled={loading} className="btn-academic-primary">
-                    {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'دروستکردنی کویز'}
-                </Button>
-                <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="btn-academic-secondary">
-                    <Upload className="h-4 w-4 mr-2" />
-                    بارکردنی فایل
-                </Button>
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className="hidden"
-                    accept=".txt,.md,.pdf,.docx"
-                />
-            </div>
-          </CardContent>
-        </Card>
+          </ResponsiveButtonGroup>
+        </CardContent>
+      </Card>
         
         {questions.length > 0 && (
             <div className="mt-8 space-y-6">
@@ -159,15 +173,20 @@ export const QuizGenerator = () => {
                 ))}
                 <div className="text-center">
                     {!submitted ? (
-                        <Button onClick={handleSubmit}>ناردنی وەڵامەکان</Button>
+                        <Button 
+                          onClick={handleSubmit}
+                          className={`${isMobile ? 'w-full text-sm py-2' : ''}`}
+                        >
+                          ناردنی وەڵامەکان
+                        </Button>
                     ) : (
-                        <div className="text-2xl font-bold">
+                        <div className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold`}>
                             نمرەکەت: {getScore()} / {questions.length}
                         </div>
                     )}
                 </div>
             </div>
         )}
-    </div>
+    </ResponsiveLayout>
   );
 };

@@ -8,6 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { geminiService, type CitationRequest } from '@/services/geminiService';
 import { readFileContent } from '@/lib/fileReader';
+import { ResponsiveLayout, ResponsiveButtonGroup } from '@/components/ui/responsive-layout';
+import { useResponsive } from '@/hooks/useResponsive';
 
 export const CitationGenerator = () => {
   const [inputType, setInputType] = useState<'file' | 'link'>('file');
@@ -19,6 +21,7 @@ export const CitationGenerator = () => {
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { isMobile, isTablet } = useResponsive();
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -27,7 +30,16 @@ export const CitationGenerator = () => {
       setLink(''); // Clear link if a file is selected
       try {
         const content = await readFileContent(selectedFile);
-        setTextContent(content);
+        if (typeof content === 'string') {
+          setTextContent(content);
+        } else {
+          toast({
+            title: 'هەڵە لە خوێندنەوەی فایل',
+            description: 'فایلەکە ناتوانرێت وەک دەق بخوێنرێتەوە',
+            variant: 'destructive',
+          });
+          setFile(null);
+        }
       } catch (error) {
         toast({
           title: 'هەڵە لە خوێندنەوەی فایل',

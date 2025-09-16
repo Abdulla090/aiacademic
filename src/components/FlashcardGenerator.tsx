@@ -8,6 +8,8 @@ import { useToast } from '@/components/ui/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { readFileContent } from '@/lib/fileReader';
 import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
+import { ResponsiveLayout, ResponsiveButtonGroup } from '@/components/ui/responsive-layout';
+import { useResponsive } from '@/hooks/useResponsive';
 
 export const FlashcardGenerator = () => {
   const [text, setText] = useState('');
@@ -17,6 +19,7 @@ export const FlashcardGenerator = () => {
   const [isFlipped, setIsFlipped] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { isMobile, isTablet } = useResponsive();
 
   const triggerGeneration = async (contentText: string) => {
     if (!contentText.trim()) {
@@ -53,8 +56,16 @@ export const FlashcardGenerator = () => {
     if (file) {
       try {
         const content = await readFileContent(file);
-        setText(content);
-        await triggerGeneration(content);
+        if (typeof content === 'string') {
+          setText(content);
+          await triggerGeneration(content);
+        } else {
+          toast({
+            title: 'هەڵە لە خوێندنەوەی فایل',
+            description: 'فایلەکە ناتوانرێت وەک دەق بخوێنرێتەوە',
+            variant: 'destructive',
+          });
+        }
       } catch (error) {
         toast({
           title: 'هەڵە لە خوێندنەوەی فایل',
@@ -80,41 +91,52 @@ export const FlashcardGenerator = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <Card className="card-academic">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <span className="sorani-text">دروستکەری فلاشکارت</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="دەقەکەت لێرە بنووسە یان فایلێک باربکە..."
-              className="input-academic sorani-text h-32"
+    <ResponsiveLayout>
+      <Card className="card-academic">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <span className="sorani-text">دروستکەری فلاشکارت</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="دەقەکەت لێرە بنووسە یان فایلێک باربکە..."
+            className={`input-academic sorani-text ${isMobile ? 'min-h-[120px]' : 'h-32'} text-sm sm:text-base`}
+          />
+          <ResponsiveButtonGroup orientation={isMobile ? "vertical" : "horizontal"}>
+            <Button 
+              onClick={handleGenerate} 
+              disabled={loading} 
+              className={`btn-academic-primary ${isMobile ? 'text-xs px-3 py-2' : ''}`}
+            >
+              {loading ? (
+                <RefreshCw className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} ${isMobile ? 'mr-1' : 'mr-2'} animate-spin`} />
+              ) : null}
+              <span className="sorani-text">{loading ? 'چاوەڕوان بە...' : 'دروستکردنی فلاشکارت'}</span>
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => fileInputRef.current?.click()} 
+              className={`btn-academic-secondary ${isMobile ? 'text-xs px-3 py-2' : ''}`}
+            >
+              <Upload className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} mr-2`} />
+              <span className="sorani-text">{isMobile ? 'فایل' : 'بارکردنی فایل'}</span>
+            </Button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden"
+              accept=".txt,.md,.pdf,.docx"
             />
-            <div className="flex items-center gap-4">
-                <Button onClick={handleGenerate} disabled={loading} className="btn-academic-primary">
-                    {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'دروستکردنی فلاشکارت'}
-                </Button>
-                <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="btn-academic-secondary">
-                    <Upload className="h-4 w-4 mr-2" />
-                    بارکردنی فایل
-                </Button>
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className="hidden"
-                    accept=".txt,.md,.pdf,.docx"
-                />
-            </div>
-          </CardContent>
-        </Card>
+          </ResponsiveButtonGroup>
+        </CardContent>
+      </Card>
         
         {flashcards.length > 0 && (
-            <div className="mt-8">
+            <div className={`${isMobile ? 'mt-4' : 'mt-8'}`}>
                 <AnimatePresence>
                     <motion.div
                         key={currentCard}
@@ -122,7 +144,7 @@ export const FlashcardGenerator = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -50 }}
                         transition={{ duration: 0.5 }}
-                        className="relative h-64"
+                        className={`relative ${isMobile ? 'h-48' : 'h-64'} cursor-pointer touch-manipulation`}
                         onClick={() => setIsFlipped(!isFlipped)}
                     >
                         <motion.div
@@ -130,11 +152,11 @@ export const FlashcardGenerator = () => {
                             style={{ backfaceVisibility: 'hidden' }}
                             animate={{ rotateY: isFlipped ? 180 : 0 }}
                         >
-                            <Card className="h-full flex items-center justify-center p-6 text-xl font-semibold text-center">
+                            <Card className={`h-full flex items-center justify-center ${isMobile ? 'p-3' : 'p-6'} ${isMobile ? 'text-base' : 'text-xl'} font-semibold text-center`}>
                                 <RichTextRenderer
                                   content={flashcards[currentCard].question}
                                   showCopyButton={false}
-                                  className="text-xl font-semibold text-center"
+                                  className={`${isMobile ? 'text-base' : 'text-xl'} font-semibold text-center leading-relaxed`}
                                 />
                             </Card>
                         </motion.div>
@@ -143,23 +165,41 @@ export const FlashcardGenerator = () => {
                             style={{ backfaceVisibility: 'hidden', rotateY: 180 }}
                             animate={{ rotateY: isFlipped ? 0 : -180 }}
                         >
-                            <Card className="h-full flex items-center justify-center p-6 text-lg text-center bg-secondary">
+                            <Card className={`h-full flex items-center justify-center ${isMobile ? 'p-3' : 'p-6'} ${isMobile ? 'text-sm' : 'text-lg'} text-center bg-secondary`}>
                                 <RichTextRenderer
                                   content={flashcards[currentCard].answer}
                                   showCopyButton={false}
-                                  className="text-lg text-center"
+                                  className={`${isMobile ? 'text-sm' : 'text-lg'} text-center leading-relaxed`}
                                 />
                             </Card>
                         </motion.div>
                     </motion.div>
                 </AnimatePresence>
-                <div className="flex items-center justify-center gap-4 mt-4">
-                    <Button onClick={handlePrevCard}><ChevronLeft className="h-4 w-4" /></Button>
-                    <span className="text-sm">{currentCard + 1} / {flashcards.length}</span>
-                    <Button onClick={handleNextCard}><ChevronRight className="h-4 w-4" /></Button>
-                </div>
+                <ResponsiveButtonGroup orientation="horizontal">
+                  <Button 
+                    onClick={handlePrevCard}
+                    disabled={currentCard === 0}
+                    size={isMobile ? "sm" : "default"}
+                    className={isMobile ? 'px-2' : ''}
+                  >
+                    <ChevronLeft className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
+                    {!isMobile && <span className="ml-1">قبلی</span>}
+                  </Button>
+                  <span className={`${isMobile ? 'text-xs' : 'text-sm'} flex items-center px-2`}>
+                    {currentCard + 1} / {flashcards.length}
+                  </span>
+                  <Button 
+                    onClick={handleNextCard}
+                    disabled={currentCard === flashcards.length - 1}
+                    size={isMobile ? "sm" : "default"}
+                    className={isMobile ? 'px-2' : ''}
+                  >
+                    {!isMobile && <span className="mr-1">دواتر</span>}
+                    <ChevronRight className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
+                  </Button>
+                </ResponsiveButtonGroup>
             </div>
         )}
-    </div>
+    </ResponsiveLayout>
   );
 };

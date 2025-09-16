@@ -10,6 +10,8 @@ import { geminiService } from '@/services/geminiService';
 import { useToast } from '@/components/ui/use-toast';
 import { jsPDF } from 'jspdf';
 import { loadKurdishFont, setKurdishFont, addRTLText } from '@/lib/kurdishFont';
+import { ResponsiveLayout, ResponsiveButtonGroup } from '@/components/ui/responsive-layout';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface OCRExtractorProps {
   language: string;

@@ -7,13 +7,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Download, Copy, RefreshCw, PenTool, Pause, Play, Square } from 'lucide-react';
+import { Download, Copy, RefreshCw, PenTool, Pause, Play, Square, Clock } from 'lucide-react';
 import { geminiService, type ArticleRequest } from '@/services/geminiService';
 import { useToast } from '@/components/ui/use-toast';
 import html2pdf from 'html2pdf.js';
 import { TypingIndicator } from '@/components/ui/typing-indicator';
 import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
 import { FormattingControls } from '@/components/ui/formatting-controls';
+import { ResponsiveLayout, ResponsiveCard, ResponsiveButtonGroup, ResponsiveText } from '@/components/ui/responsive-layout';
+import { useResponsive } from '@/hooks/useResponsive';
+import { useRateLimitStatus, formatRetryMessage } from '@/utils/rateLimitUtils';
 
 interface ArticleWriterProps {
   language: string;
@@ -34,6 +37,8 @@ export const ArticleWriter = ({ language }: ArticleWriterProps) => {
     language: 'en'
   });
   const { toast } = useToast();
+  const { isMobile, isTablet } = useResponsive();
+  const rateLimitStatus = useRateLimitStatus();
 
   // Function to convert Markdown to HTML
   const convertMarkdownToHtml = (markdown: string): string => {
@@ -130,12 +135,25 @@ export const ArticleWriter = ({ language }: ArticleWriterProps) => {
         description: 'بابەتەکە بە سەرکەوتوویی دروست کرا'
       });
       
-    } catch (error) {
+    } catch (error: any) {
       setLoading(false);
       setIsStreaming(false);
+      
+      // Provide specific error messages based on the error type
+      let errorTitle = 'هەڵە';
+      let errorDescription = 'نەتوانرا بابەتەکە دروست بکرێت';
+      
+      if (error.message?.includes('429') || error.message?.includes('Too Many Requests')) {
+        errorTitle = 'زۆر داواکاری';
+        errorDescription = 'زۆر داواکاری کردووە. تکایە چەند خولەکێک چاوەڕوان بە و دووبارە هەوڵ بدەوە';
+      } else if (error.message?.includes('Failed to communicate')) {
+        errorTitle = 'هەڵەی پەیوەندی';
+        errorDescription = 'نەتوانرا پەیوەندی بە خزمەتگوزاری AI وە بکرێت. تکایە هەوڵ بدەوە';
+      }
+      
       toast({
-        title: 'هەڵە',
-        description: 'نەتوانرا بابەتەکە دروست بکرێت',
+        title: errorTitle,
+        description: errorDescription,
         variant: 'destructive'
       });
     }
@@ -374,22 +392,26 @@ export const ArticleWriter = ({ language }: ArticleWriterProps) => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <ResponsiveLayout maxWidth="6xl">
       <div className="flex items-center gap-3 mb-8">
         <div className="p-3 bg-gradient-primary rounded-xl text-primary-foreground">
           <PenTool className="h-6 w-6" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold">
+          <ResponsiveText variant="h1">
             {language === 'ku' ? 'نووسەری بابەت' : language === 'ar' ? 'كاتب المقال' : 'Article Writer'}
-          </h1>
-          <p className="text-muted-foreground">
+          </ResponsiveText>
+          <ResponsiveText variant="caption">
             {language === 'ku' ? 'بابەتی ئەکادیمی دروست بکە' : language === 'ar' ? 'إنشاء مقالات أكاديمية' : 'Create academic articles'}
-          </p>
+          </ResponsiveText>
         </div>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <ResponsiveLayout 
+        variant="grid" 
+        gridCols={{ mobile: 1, tablet: 1, desktop: 2 }}
+        className={isMobile ? "gap-6" : "gap-8"}
+      >
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -458,6 +480,7 @@ export const ArticleWriter = ({ language }: ArticleWriterProps) => {
               onClick={handleGenerate} 
               disabled={loading || !request.topic.trim()}
               className="w-full"
+              size={isMobile ? "lg" : "default"}
             >
               {loading ? (
                 <>
@@ -471,6 +494,26 @@ export const ArticleWriter = ({ language }: ArticleWriterProps) => {
                 </>
               )}
             </Button>
+            
+            {/* Rate limit status indicator */}
+            {rateLimitStatus && (
+              <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                <div className="flex items-center gap-2 text-orange-700">
+                  <Clock className="h-4 w-4 animate-pulse" />
+                  <span className="text-sm font-medium">
+                    {formatRetryMessage(rateLimitStatus, language as 'ku' | 'en')}
+                  </span>
+                </div>
+                <div className="w-full bg-orange-200 rounded-full h-2 mt-2">
+                  <div 
+                    className="bg-orange-500 h-2 rounded-full transition-all duration-1000"
+                    style={{
+                      width: `${((rateLimitStatus.maxRetries - rateLimitStatus.retryAttempt + 1) / rateLimitStatus.maxRetries) * 100}%`
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -515,12 +558,17 @@ export const ArticleWriter = ({ language }: ArticleWriterProps) => {
                 </div>
               </div>
             </div>
-            {showFormatting && <FormattingControls />}
+            {showFormatting && (
+              <FormattingControls 
+                showFormatting={showFormatting} 
+                onToggleFormatting={setShowFormatting} 
+              />
+            )}
           </CardHeader>
           <CardContent className="flex-1 flex flex-col">
             <div className="flex-1 relative">
               {previewMode === 'preview' ? (
-                <div className="h-full overflow-auto border rounded-md p-4">
+                <div className={`overflow-auto border rounded-md p-4 ${isMobile ? 'h-64' : 'h-full'}`}>
                   <RichTextRenderer content={article || displayText} />
                 </div>
               ) : (
@@ -529,7 +577,7 @@ export const ArticleWriter = ({ language }: ArticleWriterProps) => {
                     placeholder={language === 'ku' ? 'بابەتەکەت لێرە دەردەکەوێت...' : language === 'ar' ? 'سيظهر مقالك هنا...' : 'Your article will appear here...'}
                     value={article || displayText}
                     onChange={(e) => setArticle(e.target.value)}
-                    className="h-full resize-none"
+                    className={`resize-none ${isMobile ? 'h-64 text-sm' : 'h-full'}`}
                     dir={language === 'ku' || language === 'ar' ? 'rtl' : 'ltr'}
                   />
                   {isStreaming && <TypingIndicator />}
@@ -538,39 +586,39 @@ export const ArticleWriter = ({ language }: ArticleWriterProps) => {
             </div>
             
             {(article || displayText) && (
-              <div className="flex gap-2 mt-4">
+              <ResponsiveButtonGroup className="mt-4">
                 <Button
                   variant="outline"
-                  size="sm"
+                  size={isMobile ? "sm" : "default"}
                   onClick={handleCopy}
-                  className="flex-1"
+                  className={isMobile ? "flex-1" : ""}
                 >
                   <Copy className="mr-2 h-4 w-4" />
                   {language === 'ku' ? 'کۆپی' : language === 'ar' ? 'نسخ' : 'Copy'}
                 </Button>
                 <Button
                   variant="outline"
-                  size="sm"
+                  size={isMobile ? "sm" : "default"}
                   onClick={() => handleDownload('text')}
-                  className="flex-1"
+                  className={isMobile ? "flex-1" : ""}
                 >
                   <Download className="mr-2 h-4 w-4" />
                   {language === 'ku' ? 'دابەزاندن TXT' : language === 'ar' ? 'تحميل TXT' : 'Download TXT'}
                 </Button>
                 <Button
                   variant="outline"
-                  size="sm"
+                  size={isMobile ? "sm" : "default"}
                   onClick={() => handleDownload('pdf')}
-                  className="flex-1"
+                  className={isMobile ? "flex-1" : ""}
                 >
                   <Download className="mr-2 h-4 w-4" />
                   {language === 'ku' ? 'دابەزاندن PDF' : language === 'ar' ? 'تحميل PDF' : 'Download PDF'}
                 </Button>
-              </div>
+              </ResponsiveButtonGroup>
             )}
           </CardContent>
         </Card>
-      </div>
-    </div>
+      </ResponsiveLayout>
+    </ResponsiveLayout>
   );
 };

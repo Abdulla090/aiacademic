@@ -8,6 +8,8 @@ import { geminiService } from '@/services/geminiService';
 import { useToast } from '@/components/ui/use-toast';
 import html2pdf from 'html2pdf.js';
 import useIsMobile from '@/hooks/use-is-mobile';
+import { ResponsiveLayout, ResponsiveButtonGroup, ResponsiveText } from '@/components/ui/responsive-layout';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface GrammarError {
   id: string;
@@ -35,6 +37,7 @@ export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
   const popupRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const { toast } = useToast();
+  const { isMobile: isResponsiveMobile, isTablet } = useResponsive();
 
   // Load saved text from localStorage
   useEffect(() => {
@@ -410,18 +413,26 @@ export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <ResponsiveLayout maxWidth="6xl">
       <div className="flex items-center gap-3 mb-8">
         <div className="p-3 bg-gradient-primary rounded-xl text-primary-foreground">
           <CheckSquare className="h-6 w-6" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-foreground sorani-text">ڕاستکەرەوەی ڕێزمان</h1>
-          <p className="text-muted-foreground latin-text">Advanced Grammar Checker</p>
+          <ResponsiveText variant="h1" className="text-foreground sorani-text">
+            ڕاستکەرەوەی ڕێزمان
+          </ResponsiveText>
+          <ResponsiveText variant="caption" className="latin-text">
+            Advanced Grammar Checker
+          </ResponsiveText>
         </div>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <ResponsiveLayout 
+        variant="grid" 
+        gridCols={{ mobile: 1, tablet: 1, desktop: 2 }}
+        className={isResponsiveMobile ? "gap-6" : "gap-8"}
+      >
         <Card className="card-academic">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -437,7 +448,7 @@ export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
                 onChange={(e) => setText(e.target.value)}
                 onClick={handleTextClick}
                 placeholder="نووسینەکەت لێرە بنووسە..."
-                className="input-academic sorani-text min-h-[400px] font-mono"
+                className={`input-academic sorani-text font-mono ${isResponsiveMobile ? 'min-h-[300px] text-sm' : 'min-h-[400px]'}`}
                 style={{ 
                   background: errors.length > 0 ? 'transparent' : undefined,
                   position: errors.length > 0 ? 'absolute' : 'relative',
@@ -460,11 +471,12 @@ export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
               )}
             </div>
             
-            <div className="flex flex-wrap gap-2">
+            <ResponsiveButtonGroup className="mt-4">
               <Button 
                 onClick={checkGrammar}
                 disabled={loading || !text.trim()}
                 className="btn-academic-primary"
+                size={isResponsiveMobile ? "lg" : "default"}
               >
                 {loading ? (
                   <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
@@ -482,6 +494,7 @@ export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
                   setShowPopup(false);
                 }}
                 className="btn-academic-secondary"
+                size={isResponsiveMobile ? "default" : "default"}
               >
                 <X className="h-4 w-4 mr-2" />
                 <span className="sorani-text">پاککردنەوە</span>
@@ -492,6 +505,7 @@ export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
                 onClick={copyToClipboard}
                 disabled={!text.trim()}
                 className="btn-academic-secondary"
+                size={isResponsiveMobile ? "default" : "default"}
               >
                 <Copy className="h-4 w-4 mr-2" />
                 <span className="sorani-text">کۆپی</span>
@@ -502,6 +516,7 @@ export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
                 onClick={saveText}
                 disabled={!text.trim()}
                 className="btn-academic-secondary"
+                size={isResponsiveMobile ? "default" : "default"}
               >
                 <Save className="h-4 w-4 mr-2" />
                 <span className="sorani-text">پاشەکەوت</span>
@@ -512,12 +527,13 @@ export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
                 onClick={exportToPDF}
                 disabled={!text.trim()}
                 className="btn-academic-secondary"
+                size={isResponsiveMobile ? "default" : "default"}
               >
                 <Download className="h-4 w-4 mr-2" />
                 <span className="sorani-text">PDF</span>
               </Button>
 
-              <div className="relative">
+              <div className={isResponsiveMobile ? "w-full" : "relative"}>
                 <input
                   type="file"
                   accept=".txt"
@@ -528,13 +544,14 @@ export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
                 <Button
                   variant="outline"
                   onClick={() => document.getElementById('file-upload')?.click()}
-                  className="btn-academic-secondary"
+                  className={`btn-academic-secondary ${isResponsiveMobile ? "w-full" : ""}`}
+                  size={isResponsiveMobile ? "default" : "default"}
                 >
                   <Upload className="h-4 w-4 mr-2" />
                   <span className="sorani-text">بارکردن</span>
                 </Button>
               </div>
-            </div>
+            </ResponsiveButtonGroup>
 
             {errors.length > 0 && (
               <div className="bg-gray-50 rounded-lg p-4">
@@ -586,7 +603,7 @@ export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
                   لەسەر هەڵەکان کلیک بکە بۆ دیتنی پێشنیارەکان
                 </p>
                 
-                <div className="space-y-3 max-h-96 overflow-y-auto">
+                <div className={`space-y-3 overflow-y-auto ${isResponsiveMobile ? 'max-h-64' : 'max-h-96'}`}>
                   {errors.map((error) => (
                     <div 
                       key={error.id}
@@ -627,9 +644,9 @@ export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
             )}
           </CardContent>
         </Card>
-      </div>
+      </ResponsiveLayout>
 
       <ErrorPopup />
-    </div>
+    </ResponsiveLayout>
   );
 };

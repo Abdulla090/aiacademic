@@ -227,6 +227,13 @@ const Index = () => {
       icon: Bot,
       category: "study",
       path: "/ai-research-assistant"
+    },
+    {
+      title: "aiContentHumanizer",
+      description: "aiContentHumanizerDescription",
+      icon: Wand2,
+      category: "editing",
+      path: "/ai-content-humanizer"
     }
   ];
 

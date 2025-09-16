@@ -144,6 +144,8 @@
   "studyAnalyticsDashboardDescription": "بەدواداچوون و شیکاری پێشکەوتنی ئەکادیمی تۆ لە هەموو ئامرازەکان.",
   "aiResearchAssistant": "یاریدەدەری تویژینەوەی AI",
   "aiResearchAssistantDescription": "یاریدەدەری پێشکەوتوو بۆ تویژینەوە لەگەڵ پشتڕاستکردنەوەی سەرچاوەکان و پشتگیری تەواو.",
+  "aiContentHumanizer": "مرۆڤیکەری ناوەڕۆکی AI",
+  "aiContentHumanizerDescription": "گۆڕینی ناوەڕۆکی دروستکراوی AI بۆ دەقی سروشتی و مرۆڤانە لەگەڵ کەسایەتی و ڕاستەقینەیی.",
   "textStructureFixer": "چاککەری پێکهاتەی دەق",
   "textStructureFixerDescription": "چاککردنی پێشکەوتوو و پێکهاتەی دەق بە هێزی AI بۆ بەڵگەنامە و PDFەکان.",
   "textStructureFixerTitle": "چاککەری پێکهاتەی دەقی AI",
@@ -217,5 +219,6 @@
   "improvement": "باشکردن",
   "processTime": "کاتی پڕۆسێسکردن",
   "changesApplied": "گۆڕانکارییە جێبەجێکراوەکان",
-  "beforeAfterComparison": "بەراوردکردنی پێش و دوای"
+  "beforeAfterComparison": "بەراوردکردنی پێش و دوای",
+  "selectLanguage": "زمان هەڵبژێرە"
 }

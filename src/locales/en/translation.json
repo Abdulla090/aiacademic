@@ -144,6 +144,8 @@
   "studyAnalyticsDashboardDescription": "Track and analyze your academic progress across all tools.",
   "aiResearchAssistant": "AI Research Assistant",
   "aiResearchAssistantDescription": "Advanced research helper with source validation and comprehensive research support.",
+  "aiContentHumanizer": "AI Content Humanizer",
+  "aiContentHumanizerDescription": "Transform AI-generated content into natural, human-like text with personality and authenticity.",
   "textStructureFixer": "Text Structure Fixer",
   "textStructureFixerDescription": "Advanced AI-powered text improvement and structure fixing for documents and PDFs.",
   "textStructureFixerTitle": "AI Text Structure Fixer",
@@ -217,5 +219,6 @@
   "improvement": "Improvement",
   "processTime": "Process Time",
   "changesApplied": "Changes Applied",
-  "beforeAfterComparison": "Before & After Comparison"
+  "beforeAfterComparison": "Before & After Comparison",
+  "selectLanguage": "Select Language"
 }

@@ -3,33 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { useState } from "react";
-import LandingPage from "./pages/LandingPage";
-import Dashboard from "./pages/Dashboard";
-import NotFound from "./pages/NotFound";
-import ArticleWriter from "./pages/ArticleWriter";
-import FileConverter from "./pages/FileConverter";
-import ImageConverter from "./pages/ImageConverter";
-import Compressor from "./pages/Compressor";
-import CitationGenerator from "./pages/CitationGenerator";
-import GrammarChecker from "./pages/GrammarChecker";
-import ReportGenerator from "./pages/ReportGenerator";
-import TaskPlanner from "./pages/TaskPlanner";
-import SummarizerParaphraser from "./pages/SummarizerParaphraser";
-import MindMapGenerator from "./pages/MindMapGenerator";
-import FlashcardGenerator from "./pages/FlashcardGenerator";
-import QuizGenerator from "./pages/QuizGenerator";
-import PresentationGenerator from "./pages/PresentationGenerator";
-import KnowledgeGraphPage from "./pages/KnowledgeGraphPage";
-import WritingSupervisor from "./pages/WritingSupervisor";
-import OCRExtractor from "./pages/OCRExtractor";
+import { useState, lazy, Suspense } from "react";
 import withLoading from "./hocs/withLoading";
-import ChatWithFile from "./pages/ChatWithFile";
-import About from "./pages/About";
-import KurdishDialectTranslator from "./pages/KurdishDialectTranslator";
-import StudyAnalyticsDashboard from "./pages/StudyAnalyticsDashboard";
-import AIResearchAssistant from "./pages/AIResearchAssistant";
-import TextStructureFixerPage from "./pages/TextStructureFixer";
 import { CustomSidebar } from "./components/CustomSidebar";
 import { SidebarProvider, SidebarInset } from "./components/ui/sidebar";
 import { MobileBottomNav } from "./components/MobileBottomNav";
@@ -37,8 +12,45 @@ import { MobileSettingsModal } from "./components/MobileSettingsModal";
 import { useIsMobile } from "./hooks/use-mobile";
 import { TransitionProvider, useTransition } from "./contexts/TransitionContext";
 import { LoadingTransition } from "./components/LoadingTransition";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { PageLoading } from "./components/LoadingSpinner";
+
+// Eager load essential pages
+import LandingPage from "./pages/LandingPage";
+import Dashboard from "./pages/Dashboard";
+import NotFound from "./pages/NotFound";
+import About from "./pages/About";
+
+// Lazy load feature pages for better performance
+const ArticleWriter = lazy(() => import("./pages/ArticleWriter"));
+const FileConverter = lazy(() => import("./pages/FileConverter"));
+const ImageConverter = lazy(() => import("./pages/ImageConverter"));
+const Compressor = lazy(() => import("./pages/Compressor"));
+const CitationGenerator = lazy(() => import("./pages/CitationGenerator"));
+const GrammarChecker = lazy(() => import("./pages/GrammarChecker"));
+const ReportGenerator = lazy(() => import("./pages/ReportGenerator"));
+const TaskPlanner = lazy(() => import("./pages/TaskPlanner"));
+const SummarizerParaphraser = lazy(() => import("./pages/SummarizerParaphraser"));
+const MindMapGenerator = lazy(() => import("./pages/MindMapGenerator"));
+const FlashcardGenerator = lazy(() => import("./pages/FlashcardGenerator"));
+const QuizGenerator = lazy(() => import("./pages/QuizGenerator"));
+const PresentationGenerator = lazy(() => import("./pages/PresentationGenerator"));
+const KnowledgeGraphPage = lazy(() => import("./pages/KnowledgeGraphPage"));
+const WritingSupervisor = lazy(() => import("./pages/WritingSupervisor"));
+const OCRExtractor = lazy(() => import("./pages/OCRExtractor"));
+const ChatWithFile = lazy(() => import("./pages/ChatWithFile"));
+const KurdishDialectTranslator = lazy(() => import("./pages/KurdishDialectTranslator"));
+const StudyAnalyticsDashboard = lazy(() => import("./pages/StudyAnalyticsDashboard"));
+const AIResearchAssistant = lazy(() => import("./pages/AIResearchAssistant"));
+const TextStructureFixerPage = lazy(() => import("./pages/TextStructureFixer"));
+const AIContentHumanizer = lazy(() => import("./pages/AIContentHumanizer"));
 
 const queryClient = new QueryClient();
+
+// Loading fallback component
+const PageLoadingFallback = () => (
+  <PageLoading text="Loading page..." className="py-20" />
+);
 
 const AppContent = () => {
   const location = useLocation();
@@ -68,6 +80,7 @@ const AppContent = () => {
   const StudyAnalyticsDashboardWithLoading = withLoading(StudyAnalyticsDashboard);
   const AIResearchAssistantWithLoading = withLoading(AIResearchAssistant);
   const TextStructureFixerWithLoading = withLoading(TextStructureFixerPage);
+  const AIContentHumanizerWithLoading = withLoading(AIContentHumanizer);
  
   return (
     <>
@@ -79,6 +92,7 @@ const AppContent = () => {
       <SidebarProvider defaultOpen={false}>
         {showSidebar && <CustomSidebar />}
         <SidebarInset className={isMobile ? 'pb-16' : ''}>
+        <Suspense fallback={<PageLoadingFallback />}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
@@ -102,11 +116,13 @@ const AppContent = () => {
           <Route path="/study-analytics-dashboard" element={<StudyAnalyticsDashboardWithLoading />} />
           <Route path="/ai-research-assistant" element={<AIResearchAssistantWithLoading />} />
           <Route path="/text-structure-fixer" element={<TextStructureFixerWithLoading />} />
+          <Route path="/ai-content-humanizer" element={<AIContentHumanizerWithLoading />} />
           <Route path="/about" element={<About />} />
           <Route path="/chat-with-file" element={<ChatWithFileWithLoading />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </Suspense>
         
         {/* Mobile Bottom Navigation */}
         {isMobile && location.pathname !== '/' && (
@@ -128,20 +144,22 @@ const AppContent = () => {
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter future={{ 
-          v7_relativeSplatPath: true,
-          v7_startTransition: true 
-        }}>
-          <TransitionProvider>
-            <AppContent />
-          </TransitionProvider>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter future={{ 
+            v7_relativeSplatPath: true,
+            v7_startTransition: true 
+          }}>
+            <TransitionProvider>
+              <AppContent />
+            </TransitionProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 

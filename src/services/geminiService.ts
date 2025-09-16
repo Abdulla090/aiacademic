@@ -1,3 +1,5 @@
+import { RateLimitNotifier } from '@/utils/rateLimitUtils';
+
 export interface GeminiResponse {
   text: string;
 }
@@ -120,112 +122,239 @@ export interface ResearchCitation {
 }
 
 class GeminiService {
-  private apiKey = 'AIzaSyBsMPe_MEasu7x3u9EK85ULYDHZ3oykklM';
+  private apiKeys = [
+    'AIzaSyBocGIDbzHW-O3L_Th2DkgGh9mIIjJ6bcw', // Primary API key
+    'AIzaSyBsMPe_MEasu7x3u9EK85ULYDHZ3oykklM'  // Secondary API key (fallback)
+  ];
+  private currentKeyIndex = 0;
   private baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
+  
+  // Rate limiting configuration
+  private requestQueue: Array<() => Promise<any>> = [];
+  private isProcessingQueue = false;
+  private lastRequestTime = 0;
+  private readonly minRequestInterval = 1000; // 1 second between requests
+  private readonly maxRetries = 3;
+  private readonly baseRetryDelay = 1000; // 1 second base delay
+
+  // Get current API key
+  private get apiKey(): string {
+    return this.apiKeys[this.currentKeyIndex];
+  }
+
+  // Rotate to next API key (for fallback)
+  private rotateApiKey(): void {
+    this.currentKeyIndex = (this.currentKeyIndex + 1) % this.apiKeys.length;
+    console.log(`Switched to API key ${this.currentKeyIndex + 1}/${this.apiKeys.length}`);
+  }
+
+  // Utility method to create a delay
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // Process the request queue to ensure rate limiting
+  private async processQueue(): Promise<void> {
+    if (this.isProcessingQueue || this.requestQueue.length === 0) {
+      return;
+    }
+
+    this.isProcessingQueue = true;
+
+    while (this.requestQueue.length > 0) {
+      const now = Date.now();
+      const timeSinceLastRequest = now - this.lastRequestTime;
+      
+      if (timeSinceLastRequest < this.minRequestInterval) {
+        await this.delay(this.minRequestInterval - timeSinceLastRequest);
+      }
+
+      const requestFn = this.requestQueue.shift();
+      if (requestFn) {
+        this.lastRequestTime = Date.now();
+        try {
+          await requestFn();
+        } catch (error) {
+          console.error('Request in queue failed:', error);
+        }
+      }
+    }
+
+    this.isProcessingQueue = false;
+  }
+
+  // Add request to queue and return a Promise
+  private queueRequest<T>(requestFn: () => Promise<T>): Promise<T> {
+    return new Promise((resolve, reject) => {
+      this.requestQueue.push(async () => {
+        try {
+          const result = await requestFn();
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        }
+      });
+      this.processQueue();
+    });
+  }
+
+  // Retry logic with exponential backoff and API key rotation
+  private async retryWithBackoff<T>(
+    requestFn: () => Promise<T>,
+    attempt: number = 1
+  ): Promise<T> {
+    try {
+      const result = await requestFn();
+      // Notify that retry completed successfully
+      if (attempt > 1) {
+        RateLimitNotifier.notifyRetryComplete();
+      }
+      return result;
+    } catch (error: any) {
+      // Check if it's a rate limit error (429) and we haven't exceeded max retries
+      if (error.message?.includes('429') && attempt <= this.maxRetries) {
+        // Try rotating API key if we have more than one
+        if (this.apiKeys.length > 1 && attempt === 1) {
+          console.log('Rate limit hit, trying alternate API key...');
+          this.rotateApiKey();
+          // Try immediately with the new key
+          return this.retryWithBackoff(requestFn, attempt);
+        }
+        
+        const delayMs = this.baseRetryDelay * Math.pow(2, attempt - 1); // Exponential backoff
+        console.warn(`Rate limit hit. Retrying in ${delayMs}ms (attempt ${attempt}/${this.maxRetries})`);
+        
+        // Notify about retry start
+        RateLimitNotifier.notifyRetryStart(attempt, this.maxRetries, delayMs);
+        
+        await this.delay(delayMs);
+        return this.retryWithBackoff(requestFn, attempt + 1);
+      }
+      
+      // If we've exhausted retries or it's a different error, notify completion
+      RateLimitNotifier.notifyRetryComplete();
+      throw error;
+    }
+  }
 
   private async makeRequest(prompt: string, model = 'gemini-2.0-flash-exp', streamCallback?: StreamCallback): Promise<GeminiResponse> {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-    try {
-      // If we have a streamCallback, use streaming mode
-      if (streamCallback) {
-        // For streaming, we need to use the streamGenerateContent endpoint
-        const streamUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${this.apiKey}`;
-        const response = await fetch(streamUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: prompt
-              }]
-            }],
-            generationConfig: {
-              temperature: 0.7,
-              topK: 40,
-              topP: 0.95,
-              maxOutputTokens: 8192,
-            }
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error(`API stream request failed: ${response.status}`);
-        }
-
-        if (!response.body) {
-          throw new Error('ReadableStream not supported');
-        }
-
-        const reader = response.body.getReader();
-        let fullText = '';
-
+    
+    // Queue the request to ensure rate limiting
+    return this.queueRequest(async () => {
+      return this.retryWithBackoff(async () => {
         try {
-          // Read the stream
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            
-            // Convert the chunk to text
-            const chunk = new TextDecoder().decode(value);
-            
-            // Parse the chunk - each line is a separate JSON object
-            const lines = chunk.split('\n').filter(line => line.trim() !== '');
-            
-            for (const line of lines) {
-              try {
-                const data = JSON.parse(line);
-                if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-                  const chunkText = data.candidates[0].content.parts[0].text;
-                  fullText += chunkText;
-                  streamCallback(chunkText);
+          // If we have a streamCallback, use streaming mode
+          if (streamCallback) {
+            // For streaming, we need to use the streamGenerateContent endpoint
+            const streamUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${this.apiKey}`;
+            const response = await fetch(streamUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                contents: [{
+                  parts: [{
+                    text: prompt
+                  }]
+                }],
+                generationConfig: {
+                  temperature: 0.7,
+                  topK: 40,
+                  topP: 0.95,
+                  maxOutputTokens: 8192,
                 }
-              } catch (e) {
-                console.error('Error parsing JSON from stream:', e);
+              })
+            });
+
+            if (!response.ok) {
+              if (response.status === 429) {
+                throw new Error(`429`);
               }
+              throw new Error(`API stream request failed: ${response.status}`);
             }
+
+            if (!response.body) {
+              throw new Error('ReadableStream not supported');
+            }
+
+            const reader = response.body.getReader();
+            let fullText = '';
+
+            try {
+              // Read the stream
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                
+                // Convert the chunk to text
+                const chunk = new TextDecoder().decode(value);
+                
+                // Parse the chunk - each line is a separate JSON object
+                const lines = chunk.split('\n').filter(line => line.trim() !== '');
+                
+                for (const line of lines) {
+                  try {
+                    const data = JSON.parse(line);
+                    if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+                      const chunkText = data.candidates[0].content.parts[0].text;
+                      fullText += chunkText;
+                      streamCallback(chunkText);
+                    }
+                  } catch (e) {
+                    console.error('Error parsing JSON from stream:', e);
+                  }
+                }
+              }
+            } finally {
+              reader.releaseLock();
+            }
+            
+            return { text: fullText };
+          } else {
+            // Non-streaming mode (original implementation)
+            const response = await fetch(`${url}?key=${this.apiKey}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                contents: [{
+                  parts: [{
+                    text: prompt
+                  }]
+                }],
+                generationConfig: {
+                  temperature: 0.7,
+                  topK: 40,
+                  topP: 0.95,
+                  maxOutputTokens: 8192,
+                }
+              })
+            });
+
+            if (!response.ok) {
+              if (response.status === 429) {
+                throw new Error(`429`);
+              }
+              throw new Error(`API request failed: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return {
+              text: data.candidates[0].content.parts[0].text
+            };
           }
-        } finally {
-          reader.releaseLock();
+        } catch (error: any) {
+          console.error('Gemini API Error:', error);
+          if (error.message?.includes('429')) {
+            throw error; // Re-throw 429 errors for retry logic
+          }
+          throw new Error('Failed to communicate with AI service');
         }
-        
-        return { text: fullText };
-      } else {
-        // Non-streaming mode (original implementation)
-        const response = await fetch(`${url}?key=${this.apiKey}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: prompt
-              }]
-            }],
-            generationConfig: {
-              temperature: 0.7,
-              topK: 40,
-              topP: 0.95,
-              maxOutputTokens: 8192,
-            }
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error(`API request failed: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return {
-          text: data.candidates[0].content.parts[0].text
-        };
-      }
-    } catch (error) {
-      console.error('Gemini API Error:', error);
-      throw new Error('Failed to communicate with AI service');
-    }
+      });
+    });
   }
 
   async generateArticleStreaming(request: ArticleRequest, options: StreamingOptions): Promise<void> {
@@ -334,41 +463,71 @@ class GeminiService {
 
   async generateReportOutline(topic: string, language: string): Promise<ReportOutline> {
     const prompt = `
-    Create a detailed, logical, and well-structured academic report outline for the topic: "${topic}".
+    Create a detailed, content-focused report outline for the topic: "${topic}".
 
-    The outline should be in ${language === 'ku' ? 'Sorani Kurdish' : language}. It must include a clear title and a series of relevant sections that flow logically from one to the next.
+    This should be a REPORT outline, NOT a research paper. Focus on the actual content and information that should be covered about the topic. Break down the topic into logical content areas that someone would want to learn about.
 
-    IMPORTANT: Respond ONLY with a valid JSON object. Do not include any other text, explanations, or markdown formatting like \`\`\`json. The entire response must be a single JSON object.
+    The outline should be in ${language === 'ku' ? 'Sorani Kurdish' : language}.
+
+    For example:
+    - If the topic is "Climate Change", sections might be: "What is Climate Change", "Causes of Climate Change", "Effects on Environment", "Effects on Society", "Current Solutions", "Future Outlook"
+    - If the topic is "Artificial Intelligence", sections might be: "Understanding AI", "Types of AI Systems", "AI in Daily Life", "Benefits of AI", "Challenges and Risks", "Future of AI"
+
+    IMPORTANT: Respond ONLY with a valid JSON object. Do not include any other text, explanations, or markdown formatting.
 
     JSON Format:
     {
-      "title": "A Relevant and Specific Title for the Report",
+      "title": "A Clear, Descriptive Title About the Topic",
       "sections": [
-        "Introduction",
-        "Background and Context",
-        "Key Area of Investigation 1",
-        "Key Area of Investigation 2",
-        "Analysis and Findings",
-        "Conclusion",
-        "References"
+        "Content Area 1 About the Topic",
+        "Content Area 2 About the Topic", 
+        "Content Area 3 About the Topic",
+        "Content Area 4 About the Topic",
+        "Content Area 5 About the Topic",
+        "Content Area 6 About the Topic"
       ]
     }
+
+    Create 5-8 content-focused sections that cover different aspects of the topic.
     `;
 
     const response = await this.makeRequest(prompt);
     try {
       const cleanedText = response.text.replace(/```json/g, '').replace(/```/g, '').trim();
+      
+      // Log the raw response for debugging
+      console.log("Raw AI response:", response.text);
+      console.log("Cleaned text:", cleanedText);
+      
       const jsonMatch = cleanedText.match(/(\{[\s\S]*\})/);
       if (jsonMatch && jsonMatch[0]) {
-        return JSON.parse(jsonMatch[0]);
+        const parsed = JSON.parse(jsonMatch[0]);
+        
+        // Log the parsed response for debugging
+        console.log("Parsed outline:", parsed);
+        
+        // Simple validation - just return what we parsed if it looks right
+        if (parsed && parsed.title && parsed.sections && Array.isArray(parsed.sections)) {
+          console.log("Returning parsed outline with", parsed.sections.length, "sections");
+          return parsed;
+        }
+        throw new Error("Invalid outline structure");
       }
       throw new Error("Failed to find JSON in AI response.");
     } catch (error) {
       console.error("Failed to parse report outline JSON:", error, "Raw response:", response.text);
-      // Fallback to a generic structure if parsing fails, but log the error.
+      // Fallback to a content-focused structure
       return {
-        title: `Report on: ${topic}`,
-        sections: ['Introduction', 'Main Body', 'Conclusion', 'References']
+        title: `Understanding ${topic}`,
+        sections: [
+          `What is ${topic}?`,
+          `Key Aspects of ${topic}`,
+          `Importance of ${topic}`,
+          `Current State of ${topic}`,
+          `Benefits and Advantages`,
+          `Challenges and Issues`,
+          `Future Outlook`
+        ]
       };
     }
   }
@@ -392,6 +551,9 @@ class GeminiService {
     - Use academic and formal language.
     - Be written in ${language === 'ku' ? 'Sorani Kurdish' : language}.
     - Be related to the other sections of the report.
+    - Focus on the specific topic of this section without adding a conclusion at the end
+    - Do NOT include concluding statements unless this is specifically a "Conclusion" or "Summary" section
+    - Present information and analysis without wrapping up or summarizing at the end
     - Use proper markdown formatting for enhanced readability:
       * Use **bold text** for key findings and important concepts
       * Use *italic text* for emphasis and terminology
@@ -433,6 +595,9 @@ class GeminiService {
     - Use academic and formal language.
     - Be written in ${language === 'ku' ? 'Sorani Kurdish' : language}.
     - Be related to the other sections of the report.
+    - Focus on the specific topic of this section without adding a conclusion at the end
+    - Do NOT include concluding statements unless this is specifically a "Conclusion" or "Summary" section
+    - Present information and analysis without wrapping up or summarizing at the end
     - Use proper markdown formatting for enhanced readability:
       * Use **bold text** for key findings and important concepts
       * Use *italic text* for emphasis and terminology
@@ -667,17 +832,22 @@ class GeminiService {
 
   async paraphraseText(text: string): Promise<string> {
     const prompt = `
-    Rewrite the following text in a different way, but with the same meaning:
+    Rewrite the following text in a different way, but with the same meaning and structure.
 
+    Text to rewrite:
     "${text}"
 
     Requirements:
-    - The main meaning should remain the same
-    - Change the words and sentences
-    - Use a different writing style
-    - Use Sorani Kurdish
+    - Keep the EXACT SAME language as the input text (do not translate)
+    - Keep the main meaning exactly the same
+    - Keep the same structure and formatting
+    - Make subtle word choice improvements for more natural flow
+    - If the input is in English, respond in English
+    - If the input is in Kurdish, respond in Kurdish
+    - If the input is in Arabic, respond in Arabic
+    - Do not add bullet points or change formatting
     
-    The rewritten text should be like a rewritten academic text, not a chat response. Make sure the meaning remains the same, but in a different way.
+    Return only the rewritten text with the same language, structure, and meaning.
     `;
 
     const response = await this.makeRequest(prompt);

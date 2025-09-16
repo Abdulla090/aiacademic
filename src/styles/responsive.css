@@ -1,0 +1,307 @@
+/* Responsive Design Utilities for AI Academic Features */
+
+/* Base responsive container utilities */
+.responsive-container {
+  @apply container mx-auto px-4 py-6;
+}
+
+@screen sm {
+  .responsive-container {
+    @apply px-6 py-8;
+  }
+}
+
+@screen lg {
+  .responsive-container {
+    @apply px-8 py-10;
+  }
+}
+
+/* Responsive grid layouts */
+.responsive-grid {
+  @apply grid gap-4;
+}
+
+@screen sm {
+  .responsive-grid {
+    @apply gap-6;
+  }
+}
+
+@screen lg {
+  .responsive-grid {
+    @apply gap-8 grid-cols-2;
+  }
+}
+
+.responsive-grid-single {
+  @apply grid gap-4;
+}
+
+@screen sm {
+  .responsive-grid-single {
+    @apply gap-6;
+  }
+}
+
+@screen lg {
+  .responsive-grid-single {
+    @apply gap-8;
+  }
+}
+
+/* Responsive card components */
+.responsive-card {
+  @apply bg-card text-card-foreground rounded-lg border shadow-sm p-4;
+}
+
+@screen sm {
+  .responsive-card {
+    @apply p-6;
+  }
+}
+
+/* Responsive button groups */
+.responsive-button-group {
+  @apply flex flex-col gap-2;
+}
+
+@screen sm {
+  .responsive-button-group {
+    @apply flex-row flex-wrap gap-3;
+  }
+}
+
+.responsive-button-group-vertical {
+  @apply flex flex-col gap-2;
+}
+
+/* Responsive text areas */
+.responsive-textarea {
+  @apply w-full p-3 text-sm border border-input bg-background rounded-md;
+  @apply resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent;
+  @apply transition-colors placeholder:text-muted-foreground;
+  @apply min-h-48 max-h-64;
+}
+
+@screen sm {
+  .responsive-textarea {
+    @apply text-base p-4 min-h-64 max-h-80;
+  }
+}
+
+@screen lg {
+  .responsive-textarea {
+    @apply min-h-80 max-h-96;
+  }
+}
+
+.responsive-textarea-compact {
+  @apply min-h-32 max-h-48;
+}
+
+@screen sm {
+  .responsive-textarea-compact {
+    @apply min-h-48 max-h-64;
+  }
+}
+
+/* Responsive typography */
+.responsive-heading {
+  @apply text-xl font-bold;
+}
+
+@screen sm {
+  .responsive-heading {
+    @apply text-2xl;
+  }
+}
+
+@screen lg {
+  .responsive-heading {
+    @apply text-3xl;
+  }
+}
+
+.responsive-subheading {
+  @apply text-lg font-semibold;
+}
+
+@screen sm {
+  .responsive-subheading {
+    @apply text-xl;
+  }
+}
+
+@screen lg {
+  .responsive-subheading {
+    @apply text-2xl;
+  }
+}
+
+.responsive-body {
+  @apply text-sm;
+}
+
+@screen sm {
+  .responsive-body {
+    @apply text-base;
+  }
+}
+
+.responsive-caption {
+  @apply text-xs text-muted-foreground;
+}
+
+@screen sm {
+  .responsive-caption {
+    @apply text-sm;
+  }
+}
+
+/* Responsive spacing */
+.responsive-spacing-section {
+  @apply mb-6;
+}
+
+@screen sm {
+  .responsive-spacing-section {
+    @apply mb-8;
+  }
+}
+
+.responsive-spacing-element {
+  @apply gap-2;
+}
+
+@screen sm {
+  .responsive-spacing-element {
+    @apply gap-3;
+  }
+}
+
+/* Responsive output areas */
+.responsive-output-area {
+  @apply w-full border rounded-md bg-background p-3 max-h-64 overflow-y-auto;
+}
+
+@screen sm {
+  .responsive-output-area {
+    @apply p-4 max-h-80;
+  }
+}
+
+@screen lg {
+  .responsive-output-area {
+    @apply max-h-96;
+  }
+}
+
+/* Responsive feature header */
+.responsive-feature-header {
+  @apply flex items-center gap-2 mb-6;
+}
+
+@screen sm {
+  .responsive-feature-header {
+    @apply gap-3 mb-8;
+  }
+}
+
+.responsive-feature-icon {
+  @apply p-2 bg-gradient-primary rounded-xl text-primary-foreground;
+}
+
+@screen sm {
+  .responsive-feature-icon {
+    @apply p-3;
+  }
+}
+
+/* Responsive forms */
+.responsive-form-group {
+  @apply space-y-4;
+}
+
+@screen sm {
+  .responsive-form-group {
+    @apply space-y-6;
+  }
+}
+
+.responsive-input {
+  @apply w-full px-3 py-2 text-sm border border-input bg-background rounded-md;
+  @apply focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent;
+}
+
+@screen sm {
+  .responsive-input {
+    @apply px-4 py-3 text-base;
+  }
+}
+
+/* Responsive buttons */
+.responsive-button {
+  @apply w-full text-sm px-3 py-2;
+}
+
+@screen sm {
+  .responsive-button {
+    @apply w-auto text-base px-4 py-2;
+  }
+}
+
+.responsive-button-primary {
+  @apply responsive-button;
+  @apply bg-primary text-primary-foreground hover:bg-primary/90;
+}
+
+.responsive-button-secondary {
+  @apply responsive-button;
+  @apply border border-input bg-background hover:bg-accent hover:text-accent-foreground;
+}
+
+/* Mobile-specific overrides */
+@media (max-width: 640px) {
+  .mobile-full-width {
+    @apply w-full;
+  }
+  
+  .mobile-vertical-stack {
+    @apply flex-col;
+  }
+  
+  .mobile-compact-spacing {
+    @apply gap-2;
+  }
+  
+  .mobile-smaller-text {
+    @apply text-sm;
+  }
+  
+  .mobile-hide {
+    @apply hidden;
+  }
+  
+  .mobile-show {
+    @apply block;
+  }
+}
+
+/* Tablet-specific styles */
+@media (min-width: 641px) and (max-width: 1023px) {
+  .tablet-two-cols {
+    @apply grid-cols-2;
+  }
+}
+
+/* Desktop-specific styles */
+@media (min-width: 1024px) {
+  .desktop-three-cols {
+    @apply grid-cols-3;
+  }
+  
+  .desktop-compact {
+    @apply max-w-4xl;
+  }
+}

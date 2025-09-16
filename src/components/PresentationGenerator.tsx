@@ -13,6 +13,8 @@ import Reveal from 'reveal.js';
 import 'reveal.js/dist/reveal.css';
 import 'reveal.js/dist/theme/white.css';
 import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
+import { ResponsiveLayout, ResponsiveButtonGroup } from '@/components/ui/responsive-layout';
+import { useResponsive } from '@/hooks/useResponsive';
 
 export const PresentationGenerator = () => {
   const [text, setText] = useState('');
@@ -25,6 +27,7 @@ export const PresentationGenerator = () => {
   const deckDivRef = useRef<HTMLDivElement>(null);
   const deckRef = useRef<Reveal.Api | null>(null);
   const { toast } = useToast();
+  const { isMobile, isTablet } = useResponsive();
 
   useEffect(() => {
     if (slides.length > 0 && deckDivRef.current) {
@@ -103,19 +106,19 @@ export const PresentationGenerator = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <Card className="card-academic">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <span className="sorani-text">دروستکەری پێشکەشکردن</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <Textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="دەقی پێشکەشکردنەکەت لێرە بنووسە یان فایلێک باربکە..."
-              className="input-academic sorani-text h-32"
+    <ResponsiveLayout>
+      <Card className="card-academic">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <span className="sorani-text">دروستکەری پێشکەشکردن</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <Textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="دەقی پێشکەشکردنەکەت لێرە بنووسە یان فایلێک باربکە..."
+            className={`input-academic sorani-text ${isMobile ? 'min-h-[120px]' : 'h-32'} text-sm sm:text-base`}
             />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
@@ -246,6 +249,6 @@ export const PresentationGenerator = () => {
             </div>
           </div>
         )}
-    </div>
+    </ResponsiveLayout>
   );
 };
