@@ -44,6 +44,7 @@ const StudyAnalyticsDashboard = lazy(() => import("./pages/StudyAnalyticsDashboa
 const AIResearchAssistant = lazy(() => import("./pages/AIResearchAssistant"));
 const TextStructureFixerPage = lazy(() => import("./pages/TextStructureFixer"));
 const AIContentHumanizer = lazy(() => import("./pages/AIContentHumanizer"));
+const KurdishFontTest = lazy(() => import("./pages/KurdishFontTest"));
 
 const queryClient = new QueryClient();
 
@@ -81,6 +82,7 @@ const AppContent = () => {
   const AIResearchAssistantWithLoading = withLoading(AIResearchAssistant);
   const TextStructureFixerWithLoading = withLoading(TextStructureFixerPage);
   const AIContentHumanizerWithLoading = withLoading(AIContentHumanizer);
+  const KurdishFontTestWithLoading = withLoading(KurdishFontTest);
  
   return (
     <>
@@ -117,6 +119,7 @@ const AppContent = () => {
           <Route path="/ai-research-assistant" element={<AIResearchAssistantWithLoading />} />
           <Route path="/text-structure-fixer" element={<TextStructureFixerWithLoading />} />
           <Route path="/ai-content-humanizer" element={<AIContentHumanizerWithLoading />} />
+          <Route path="/kurdish-font-test" element={<KurdishFontTestWithLoading />} />
           <Route path="/about" element={<About />} />
           <Route path="/chat-with-file" element={<ChatWithFileWithLoading />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

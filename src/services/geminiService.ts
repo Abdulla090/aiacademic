@@ -1311,23 +1311,35 @@ class GeminiService {
     return response.text.trim();
   }
 
-  async chatWithFile(fileContent: string, message: string): Promise<string> {
+  async chatWithFile(fileContent: string, conversation: { text: string; sender: 'user' | 'ai' }[]): Promise<string> {
+    const history = conversation
+      .map(msg => `${msg.sender === 'user' ? 'User' : 'Assistant'}: ${msg.text}`)
+      .join('\n');
+
     const prompt = `
-    You are an intelligent assistant that can answer questions based on the provided file content.
-    The user has uploaded a file and is asking a question about it.
+    You are an ultimate AI assistant, adept at analyzing file content and engaging in conversation. Your capabilities include:
+    - Understanding and processing texts in multiple languages, including Kurdish (Sorani), English, and Arabic.
+    - Accurately finding answers within the provided document.
+    - Maintaining a coherent conversation history.
 
     File Content:
     """
     ${fileContent}
     """
 
-    User's Question: "${message}"
+    Conversation History:
+    """
+    ${history}
+    """
+
+    User's Latest Question: "${conversation[conversation.length - 1].text}"
 
     Instructions:
-    - Answer the user's question based *only* on the information in the file content.
-    - If the answer is in the file, provide the answer and a reference to the page or section where the information can be found (if possible).
-    - If the answer is not in the file, say that you cannot find the answer in the provided document.
-    - Be concise and clear in your response.
+    1.  **Analyze the user's language**: Detect the language of the user's latest question (e.g., English, Kurdish, Arabic).
+    2.  **Answer in the user's language**: Formulate the answer in the same language you detected.
+    3.  **Base the answer on content**: Answer the user's question based *only* on the provided "File Content" and "Conversation History".
+    4.  **Handle missing information**: If the answer is not in the document, state this clearly in the user's language.
+    5.  **Be concise and helpful**: Provide a direct and clear answer.
     `;
 
     const response = await this.makeRequest(prompt);

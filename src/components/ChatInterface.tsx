@@ -6,9 +6,10 @@ interface ChatInterfaceProps {
   onSendMessage: (message: string) => void;
   messages: { text: string; sender: 'user' | 'ai' }[];
   isLoading: boolean;
+  isDisabled?: boolean;
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ onSendMessage, messages, isLoading }) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ onSendMessage, messages, isLoading, isDisabled }) => {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -80,12 +81,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onSendMessage, messages, 
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            disabled={isLoading}
+            disabled={isLoading || isDisabled}
           />
           <button
             className="ml-3 px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 disabled:bg-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             onClick={handleSend}
-            disabled={isLoading || !input.trim()}
+            disabled={isLoading || isDisabled || !input.trim()}
           >
             Send
           </button>

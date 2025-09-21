@@ -7,7 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { FileText, ChevronRight, Check, Download, RefreshCw, Pause, Play, Square } from 'lucide-react';
 import { geminiService, type ReportOutline, type ReportSection } from '@/services/geminiService';
 import { useToast } from '@/components/ui/use-toast';
-import html2pdf from 'html2pdf.js';
+import { KurdishPDFService } from '@/services/kurdishPdfService';
 import { TypingIndicator } from '@/components/ui/typing-indicator';
 import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
 import { FormattingControls } from '@/components/ui/formatting-controls';
@@ -39,7 +39,7 @@ const convertMarkdownToHtml = (markdown: string): string => {
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
   
   // Convert blockquotes
-  html = html.replace(/^>\s*(.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/^>\s+(.+)$/gm, '<blockquote>$1</blockquote>');
   
   // Convert horizontal rules
   html = html.replace(/^[-*_]{3,}$/gm, '<hr>');
@@ -207,297 +207,48 @@ export const ReportGenerator = ({ language }: ReportGeneratorProps) => {
   };
 
   const handleDownloadReport = async (format: 'text' | 'pdf' = 'text', singleSection: ReportSection | null = null) => {
-    try {
-      const sectionsToExport = singleSection ? [singleSection] : sections;
-      const titleToUse = singleSection ? singleSection.title : outline?.title || 'Report';
-      
-      if (sectionsToExport.length === 0) {
+    const sectionsToExport = singleSection ? [singleSection] : sections;
+    const titleToUse = singleSection ? singleSection.title : outline?.title || 'Report';
+
+    if (sectionsToExport.length === 0) {
+      toast({
+        title: 'هەڵە',
+        description: 'ڕاپۆرتەکە بەتاڵە',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (format === 'pdf') {
+      toast({
+        title: 'دروستکردنی PDF',
+        description: 'تکایە چاوەڕوان بە...',
+      });
+
+      try {
+        const pdfService = new KurdishPDFService();
+        await pdfService.createKurdishReport(
+          titleToUse,
+          sectionsToExport.map(s => ({ title: s.title, content: s.content || '' }))
+        );
+        pdfService.save(`${titleToUse.substring(0, 50).replace(/[^a-zA-Z0-9\u0600-\u06FF\s]/g, '')}.pdf`);
+        
+        toast({
+          title: 'سەرکەوتوو',
+          description: singleSection ? `بەشی "${singleSection.title}" وەک PDF دابەزێنرا` : 'ڕاپۆرتی تەواو وەک PDF دابەزێنرا',
+        });
+      } catch (error) {
+        console.error('PDF Generation Error:', error);
         toast({
           title: 'هەڵە',
-          description: 'ڕاپۆرتەکە بەتاڵە',
-          variant: 'destructive'
+          description: 'نەتوانرا PDF دروست بکرێت: ' + (error as Error).message,
+          variant: 'destructive',
         });
-        return;
       }
-      
-      if (format === 'pdf') {
-        // Show loading toast
-        toast({
-          title: 'دروستکردنی PDF',
-          description: 'تکایە چاوەڕوان بە...',
-        });
-
-        const isRTL = language === 'ku' || language === 'ar';
-        
-        try {
-          // Import jsPDF only - no text shaping libraries
-          const { jsPDF } = await import('jspdf');
-          
-          // Create new PDF document
-          const doc = new jsPDF({
-            orientation: 'portrait',
-            unit: 'mm',
-            format: 'a4'
-          });
-
-          let kurdishFontLoaded = false;
-          let loadedFontName = '';
-
-          // Try to add Kurdish font support if RTL
-          if (isRTL) {
-            const fontOptions = [
-              { url: '/kurdish-font/DejaVuSans.ttf', name: 'DejaVuSans' },
-              { url: '/kurdish-font/Amiri-Regular.ttf', name: 'AmiriRegular' },
-              { url: '/kurdish-font/amiri-regular.ttf', name: 'AmiriLocal' },
-              { url: '/kurdish-font/UniSalar_F_095.otf', name: 'UniSalar095' },
-              { url: '/kurdish-font/UniSalar_F_112.otf', name: 'UniSalar112' },
-              { url: '/kurdish-font/UniSalar_F_113.otf', name: 'UniSalar113' },
-              { url: '/kurdish-font/ku-font.ttf', name: 'KurdishFont' }
-            ];
-            
-            for (const fontOption of fontOptions) {
-              try {
-                console.log(`Trying to load font: ${fontOption.name} from ${fontOption.url}`);
-                const fontResponse = await fetch(fontOption.url);
-                
-                if (fontResponse.ok) {
-                  const fontArrayBuffer = await fontResponse.arrayBuffer();
-                  const fontUint8Array = new Uint8Array(fontArrayBuffer);
-                  let fontBase64 = '';
-                  
-                  // Convert to base64 in chunks
-                  const chunkSize = 0x8000;
-                  for (let i = 0; i < fontUint8Array.length; i += chunkSize) {
-                    const chunk = fontUint8Array.subarray(i, i + chunkSize);
-                    fontBase64 += String.fromCharCode.apply(null, Array.from(chunk));
-                  }
-                  fontBase64 = btoa(fontBase64);
-                  
-                  // Add the font to jsPDF
-                  doc.addFileToVFS(`${fontOption.name}.ttf`, fontBase64);
-                  doc.addFont(`${fontOption.name}.ttf`, fontOption.name, 'normal');
-                  kurdishFontLoaded = true;
-                  loadedFontName = fontOption.name;
-                  console.log(`Successfully loaded font: ${fontOption.name}`);
-                  break; // Exit loop on successful load
-                }
-              } catch (fontError) {
-                console.warn(`Failed to load font ${fontOption.name}:`, fontError);
-                continue; // Try next font
-              }
-            }
-            
-            if (!kurdishFontLoaded) {
-              console.warn('No Kurdish fonts could be loaded, will use system font');
-            }
-          }
-
-          // Simple text processing - no Arabic logic, preserve original structure
-          const processText = (text: string): string => {
-            // Just clean the text without any reshaping or Arabic processing
-            return text.trim();
-          };
-
-          // Helper function to handle mixed LTR/RTL content properly
-          const processMixedContent = (text: string): string => {
-            // Replace bullet points with Kurdish/Arabic equivalents if RTL
-            if (isRTL) {
-              // Convert numbered lists to Kurdish numerals or simple bullets
-              text = text.replace(/^\s*\d+\.\s+/gm, '• '); // Convert numbered lists to bullets
-              text = text.replace(/^\s*[-*+]\s+/gm, '• '); // Normalize bullet points
-            }
-            return text.trim();
-          };
-
-          // Test if current font supports Kurdish characters
-          const testKurdishSupport = (): boolean => {
-            try {
-              const testChars = 'ێزژچپگڤیۆۇەڵڕڵینئ';
-              const width = doc.getTextWidth(testChars);
-              // If width is 0 or too small, font doesn't support these characters
-              return width > 10;
-            } catch {
-              return false;
-            }
-          };
-
-          let yPosition = 20;
-          const pageWidth = doc.internal.pageSize.getWidth();
-          const pageHeight = doc.internal.pageSize.getHeight();
-          const margin = 20;
-          const maxWidth = pageWidth - (margin * 2);
-          
-          // Set font - prioritize fonts that support Kurdish characters
-          if (isRTL && kurdishFontLoaded) {
-            doc.setFont(loadedFontName);
-            console.log(`Using loaded Kurdish font: ${loadedFontName}`);
-            
-            // Test if the font actually supports Kurdish characters
-            if (!testKurdishSupport()) {
-              console.warn(`Font ${loadedFontName} doesn't support Kurdish characters properly, switching to courier`);
-              doc.setFont('courier');
-            }
-          } else if (isRTL) {
-            // Use courier as fallback - it has better Unicode support than times/helvetica
-            doc.setFont('courier');
-            console.log('Using Courier font for Kurdish (better Unicode support)');
-          } else {
-            doc.setFont('helvetica');
-          }
-          
-          // Add header
-          doc.setFontSize(10);
-          doc.setTextColor(100, 100, 100);
-          const headerText = isRTL ? 
-            `ڕێکەوت: ${new Date().toLocaleDateString('ku-Arab-IQ')} - ناوەندی ئەکادیمی زیرەکی دەستکرد` :
-            `AI Academic Hub - Generated on: ${new Date().toLocaleDateString()}`;
-          const headerX = isRTL ? pageWidth - margin : pageWidth / 2;
-          doc.text(headerText, headerX, yPosition, { align: isRTL ? 'right' : 'center' });
-          yPosition += 15;
-          
-          // Add a line under header
-          doc.setDrawColor(200, 200, 200);
-          doc.line(margin, yPosition, pageWidth - margin, yPosition);
-          yPosition += 15;
-          
-          // Add main title (if not single section)
-          if (!singleSection) {
-            doc.setFontSize(20);
-            doc.setTextColor(44, 62, 80);
-            
-            const cleanTitle = processText(titleToUse);
-            const titleLines = doc.splitTextToSize(cleanTitle, maxWidth);
-            titleLines.forEach((line: string) => {
-              if (yPosition > pageHeight - 30) {
-                doc.addPage();
-                yPosition = 20;
-              }
-              const titleX = isRTL ? pageWidth - margin : pageWidth / 2;
-              doc.text(line, titleX, yPosition, { align: isRTL ? 'right' : 'center' });
-              yPosition += 10;
-            });
-            yPosition += 20;
-          }
-          
-          // Process each section
-          sectionsToExport.forEach((section, index) => {
-            const cleanContent = (section.content || '').trim();
-            if (!cleanContent) return;
-            
-            // Check if we need a new page for section title
-            if (yPosition > pageHeight - 40) {
-              doc.addPage();
-              yPosition = 20;
-            }
-            
-            // Add section title
-            doc.setFontSize(16);
-            doc.setTextColor(52, 73, 94);
-            
-            const cleanSectionTitle = processText(section.title);
-            const sectionTitleLines = doc.splitTextToSize(cleanSectionTitle, maxWidth);
-            sectionTitleLines.forEach((line: string) => {
-              if (yPosition > pageHeight - 30) {
-                doc.addPage();
-                yPosition = 20;
-              }
-              const titleX = isRTL ? pageWidth - margin : margin;
-              doc.text(line, titleX, yPosition, { align: isRTL ? 'right' : 'left' });
-              yPosition += 8;
-            });
-            yPosition += 10;
-            
-            // Process section content
-            doc.setFontSize(12);
-            doc.setTextColor(51, 51, 51);
-            
-            // Clean content - remove markdown and handle mixed LTR/RTL properly
-            let processedContent = cleanContent
-              .replace(/\*\*(.+?)\*\*/g, '$1') // Remove bold markdown
-              .replace(/\*(.+?)\*/g, '$1') // Remove italic markdown
-              .replace(/###\s+(.+)/g, '$1') // Remove h3 markdown
-              .replace(/##\s+(.+)/g, '$1') // Remove h2 markdown
-              .replace(/^#\s+(.+)/gm, '$1') // Remove h1 markdown
-              .replace(/\n{3,}/g, '\n\n'); // Normalize line breaks
-            
-            // Process mixed content to handle LTR/RTL issues
-            processedContent = processMixedContent(processedContent);
-            
-            // Split content into paragraphs
-            const paragraphs = processedContent.split('\n\n').filter(p => p.trim());
-            
-            paragraphs.forEach((paragraph, pIndex) => {
-              if (paragraph.trim()) {
-                // Process text without Arabic logic - just clean
-                const cleanParagraph = processText(paragraph.trim());
-                
-                // Split text manually to avoid jsPDF's text direction issues
-                const words = cleanParagraph.split(' ');
-                let currentLine = '';
-                const maxLineWidth = maxWidth;
-                
-                words.forEach((word, wordIndex) => {
-                  const testLine = currentLine ? `${currentLine} ${word}` : word;
-                  const lineWidth = doc.getTextWidth(testLine);
-                  
-                  if (lineWidth > maxLineWidth && currentLine) {
-                    // Print current line
-                    if (yPosition > pageHeight - 20) {
-                      doc.addPage();
-                      yPosition = 20;
-                    }
-                    const textX = isRTL ? pageWidth - margin : margin;
-                    doc.text(currentLine, textX, yPosition, { align: isRTL ? 'right' : 'left' });
-                    yPosition += 6;
-                    currentLine = word;
-                  } else {
-                    currentLine = testLine;
-                  }
-                });
-                
-                // Print remaining text
-                if (currentLine) {
-                  if (yPosition > pageHeight - 20) {
-                    doc.addPage();
-                    yPosition = 20;
-                  }
-                  const textX = isRTL ? pageWidth - margin : margin;
-                  doc.text(currentLine, textX, yPosition, { align: isRTL ? 'right' : 'left' });
-                  yPosition += 6;
-                }
-                
-                yPosition += 5; // Extra space between paragraphs
-              }
-            });
-            
-            yPosition += 15; // Space between sections
-          });
-
-          // Save the PDF
-          const filename = `${titleToUse.substring(0, 50).replace(/[^a-zA-Z0-9\u0600-\u06FF\s]/g, '')}.pdf`;
-          doc.save(filename);
-          
-          toast({ 
-            title: 'سەرکەوتوو', 
-            description: singleSection ? `بەشی "${singleSection.title}" وەک PDF دابەزێنرا` : 'ڕاپۆرتی تەواو وەک PDF دابەزێنرا'
-          });
-          
-        } catch (error) {
-          console.error('PDF Generation Error:', error);
-          toast({
-            title: 'هەڵە',
-            description: 'نەتوانرا PDF دروست بکرێت: ' + error.message,
-            variant: 'destructive'
-          });
-        }
-        return;
-      }
-      
-      // Text format download
-      const reportText = singleSection 
+    } else {
+      const reportText = singleSection
         ? `${singleSection.title}\n\n${singleSection.content}`
-        : `${outline?.title}\n\n${sectionsToExport.map(section => `${section.title}\n\n${section.content}\n\n`).join('')}`;
-      
+        : `${outline?.title}\n\n${sections.map(section => `${section.title}\n\n${section.content}\n\n`).join('')}`;
       const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -507,17 +258,9 @@ export const ReportGenerator = ({ language }: ReportGeneratorProps) => {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      
       toast({
         title: 'دابەزاندن',
-        description: singleSection ? `بەشی "${singleSection.title}" دابەزێنرا` : 'ڕاپۆرتی تەواو دابەزێنرا'
-      });
-    } catch (error) {
-      console.error('Download error:', error);
-      toast({
-        title: 'هەڵە',
-        description: 'نەتوانرا فایلەکە دابەزێنرێت',
-        variant: 'destructive'
+        description: singleSection ? `بەشی "${singleSection.title}" دابەزێنرا` : 'ڕاپۆرتی تەواو دابەزێنرا',
       });
     }
   };

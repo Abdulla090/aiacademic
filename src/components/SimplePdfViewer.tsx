@@ -37,11 +37,27 @@ const SimplePdfViewer: FC<SimplePdfViewerProps> = ({ file, onTextExtracted }) =>
     setNumPages(pdf.numPages);
     let fullText = '';
     for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const textContent = await page.getTextContent();
-      const pageText = textContent.items.map((item: any) => item.str).join(' ');
-      fullText += pageText + '\n\n';
+      try {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map((item: any) => item.str).join(' ');
+        fullText += pageText + '\n\n';
+      } catch (error) {
+        console.error(`Error extracting text from page ${i}:`, error);
+      }
     }
+
+    try {
+      const { KurdishPDFService } = await import('../services/kurdishPdfService');
+      const kurdishService = new KurdishPDFService();
+      if (await kurdishService.isKurdish(fullText)) {
+        console.log("Kurdish text detected. Using OCR for better accuracy.");
+        fullText = await kurdishService.extractTextWithOCR(file);
+      }
+    } catch (error) {
+      console.error("Error during Kurdish language detection or OCR:", error);
+    }
+
     onTextExtracted(fullText);
   }
 

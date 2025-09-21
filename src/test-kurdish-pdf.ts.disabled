@@ -1,0 +1,53 @@
+// Test file for Kurdish PDF generation
+import { KurdishPDFService } from './services/kurdishPdfService';
+
+export async function runKurdishPDFTest() {
+  console.log('Starting Kurdish PDF test...');
+  
+  try {
+    // Test 1: Basic Kurdish PDF service
+    const pdfService = new KurdishPDFService();
+    
+    // Test 2: Font loading
+    console.log('Testing font loading...');
+    const fontLoaded = await pdfService.loadKurdishFontsWithFallback();
+    console.log('Loaded font:', fontLoaded);
+    
+    // Test 3: Kurdish text processing
+    console.log('Testing text processing...');
+    const testText = 'ئەم دەستەواژەی کوردی بە شێوەیەکی دروست پیشان بدرێت';
+    const processedText = pdfService.processKurdishText(testText);
+    console.log('Original text:', testText);
+    console.log('Processed text:', processedText);
+    
+    // Test 4: Font support test
+    const supportsKurdish = pdfService.testKurdishSupport();
+    console.log('Font supports Kurdish:', supportsKurdish);
+    
+    // Test 5: Create a simple test document
+    console.log('Creating test document...');
+    await pdfService.createKurdishReport(
+      'تاقیکردنەوەی کوردی', // Kurdish Test
+      [
+        {
+          title: 'تاقیکردنەوەی یەکەم',
+          content: 'ئەم دەق تاقیکردنەوەیەکە بۆ دڵنیابوون لەوەی کە پیتەکانی کوردی بە شێوەیەکی دروست دەردەکەون.'
+        },
+        {
+          title: 'تاقیکردنەوەی دووەم', 
+          content: 'پیتە تایبەتەکانی کوردی: ڕ، ۆ، ڤ، ڵ، ێ، ە، چ، پ، گ، ژ\nئەمانە دەبێت بە شێوەیەکی دروست نیشان بدرێن.'
+        }
+      ]
+    );
+    
+    console.log('Kurdish PDF test completed successfully!');
+    return { success: true, message: 'All tests passed' };
+    
+  } catch (error) {
+    console.error('Kurdish PDF test failed:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// Export for use in console
+(window as any).runKurdishPDFTest = runKurdishPDFTest;

@@ -17,8 +17,15 @@ const ChatWithFile: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileContent, setFileContent] = useState<string | Blob | null>(null);
   const [extractedText, setExtractedText] = useState<string | null>(null);
+  const handleTextExtracted = (text: string) => {
+    setExtractedText(text);
+    setIsFileReady(true);
+    setIsLoading(false);
+  };
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isFileReady, setIsFileReady] = useState<boolean>(false);
+  const [isAiResponding, setIsAiResponding] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedPdfText, setSelectedPdfText] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -44,6 +51,7 @@ const ChatWithFile: React.FC = () => {
       setFileContent(null);
       setExtractedText(null);
       setMessages([]);
+      setIsFileReady(false);
       setSelectedPdfText(''); // Clear selected text on new file
       setSearchTerm(''); // Clear search term on new file
       setPdfDocument(null); // Clear pdfDocument on new file
@@ -51,6 +59,10 @@ const ChatWithFile: React.FC = () => {
       try {
         const content = await readFileContent(file);
         setFileContent(content);
+        if (file.type !== 'application/pdf') {
+          setIsFileReady(true);
+          setIsLoading(false);
+        }
       } catch (err) {
         setError((err as Error).message);
         setFileContent(null);
@@ -73,19 +85,21 @@ const ChatWithFile: React.FC = () => {
       return;
     }
 
-    setMessages((prevMessages) => [...prevMessages, { text: message, sender: 'user' }]);
-    setIsLoading(true);
+    const newUserMessage: Message = { text: message, sender: 'user' };
+    const updatedMessages = [...messages, newUserMessage];
+    setMessages(updatedMessages);
+    setIsAiResponding(true);
 
     try {
-      const aiResponse = await geminiService.chatWithFile(contentForChat, message);
+      const aiResponse = await geminiService.chatWithFile(contentForChat, updatedMessages);
       setMessages((prevMessages) => [...prevMessages, { text: aiResponse, sender: 'ai' }]);
     } catch (error) {
       console.error('Error getting AI response:', error);
       setMessages((prevMessages) => [...prevMessages, { text: 'Error getting response from AI.', sender: 'ai' }]);
     } finally {
-      setIsLoading(false);
+      setIsAiResponding(false);
     }
-  }, [fileContent, extractedText, selectedFile]);
+  }, [fileContent, extractedText, selectedFile, messages]);
 
   const handleAskAboutSelection = useCallback(() => {
     if (selectedPdfText) {
@@ -129,25 +143,28 @@ const ChatWithFile: React.FC = () => {
   }, [fileContent, searchTerm]);
 
   const handleSummarize = useCallback(async () => {
-    if (typeof fileContent !== 'string') {
+    const contentForChat = selectedFile?.type === 'application/pdf' ? extractedText : fileContent;
+    if (typeof contentForChat !== 'string' || !contentForChat) {
       setMessages((prevMessages) => [...prevMessages, { text: "Summarization is currently only supported for text-based files.", sender: 'ai' }]);
       return;
     }
 
-    setIsLoading(true);
-    setMessages((prevMessages) => [...prevMessages, { text: "Summarizing the document...", sender: 'ai' }]);
+    const summaryPrompt = "Please provide a concise summary of the document.";
+    const newUserMessage: Message = { text: summaryPrompt, sender: 'user' };
+    const updatedMessages = [...messages, newUserMessage];
+    setMessages(updatedMessages);
+    setIsAiResponding(true);
 
     try {
-      const summaryPrompt = "Please provide a concise summary of the following document:";
-      const aiResponse = await geminiService.chatWithFile(fileContent, summaryPrompt);
+      const aiResponse = await geminiService.chatWithFile(contentForChat, updatedMessages);
       setMessages((prevMessages) => [...prevMessages, { text: `Summary:\n${aiResponse}`, sender: 'ai' }]);
     } catch (error) {
       console.error('Error getting summary:', error);
       setMessages((prevMessages) => [...prevMessages, { text: 'Error getting summary from AI.', sender: 'ai' }]);
     } finally {
-      setIsLoading(false);
+      setIsAiResponding(false);
     }
-  }, [fileContent]);
+  }, [fileContent, extractedText, selectedFile, messages]);
 
   const handleExtractImages = useCallback(async () => {
     if (!pdfDocument) {
@@ -221,7 +238,7 @@ const ChatWithFile: React.FC = () => {
             {showPreview ? (
               <div className="h-full overflow-y-auto p-2 bg-white rounded-lg border">
                 {selectedFile && selectedFile.type === 'application/pdf' ? (
-                  <SimplePdfViewer file={selectedFile} onTextExtracted={setExtractedText} />
+                  <SimplePdfViewer file={selectedFile} onTextExtracted={handleTextExtracted} />
                 ) : (
                   <div className="flex items-center justify-center h-full text-gray-500 p-4">
                     <p className="text-center">Preview for non-PDF files will be shown here.</p>
@@ -230,7 +247,7 @@ const ChatWithFile: React.FC = () => {
               </div>
             ) : (
               <div className="h-full flex flex-col bg-white rounded-lg border">
-                <ChatInterface onSendMessage={handleSendMessage} messages={messages} isLoading={isLoading} />
+                <ChatInterface onSendMessage={handleSendMessage} messages={messages} isLoading={isAiResponding} isDisabled={!isFileReady} />
               </div>
             )}
           </div>
@@ -239,7 +256,7 @@ const ChatWithFile: React.FC = () => {
             <ResizablePanel defaultSize={50}>
               <div className="h-full overflow-y-auto p-2">
                 {selectedFile && selectedFile.type === 'application/pdf' ? (
-                  <SimplePdfViewer file={selectedFile} onTextExtracted={setExtractedText} />
+                  <SimplePdfViewer file={selectedFile} onTextExtracted={handleTextExtracted} />
                 ) : (
                   <div className="flex items-center justify-center h-full text-gray-500 p-4">
                     <p className="text-center">Preview for non-PDF files will be shown here.</p>
@@ -250,7 +267,7 @@ const ChatWithFile: React.FC = () => {
             <ResizableHandle withHandle />
             <ResizablePanel defaultSize={50}>
               <div className="h-full flex flex-col">
-                <ChatInterface onSendMessage={handleSendMessage} messages={messages} isLoading={isLoading} />
+                <ChatInterface onSendMessage={handleSendMessage} messages={messages} isLoading={isAiResponding} isDisabled={!isFileReady} />
               </div>
             </ResizablePanel>
           </ResizablePanelGroup>
@@ -258,7 +275,12 @@ const ChatWithFile: React.FC = () => {
       </div>
 
       {error && <p className="text-red-500 text-center mt-2 text-sm">{error}</p>}
-      {isLoading && !messages.length && <p className="text-center text-gray-500 mt-2 text-sm">Processing...</p>}
+      {isLoading && !isFileReady && (
+        <div className="absolute inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      )}
+      {isAiResponding && <p className="text-center text-gray-500 mt-2 text-sm">AI is responding...</p>}
     </div>
   );
 };

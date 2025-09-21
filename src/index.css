@@ -5,6 +5,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Kurdish Font Face */
+@font-face {
+  font-family: 'new-ku-font';
+  src: url('/kurdish-font/new-ku-font.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Kurdish Sorani Academic Design System */
 
 suggestion {

@@ -1504,16 +1504,20 @@ const KurdishDialectTranslator: React.FC = () => {
         // Single word not found in dictionary, use AI
         toast.info('Word not found in dictionary. Using AI translation...');
         try {
-          const aiPrompt = `Translate this single word from ${sourceDialect === 'sorani' ? 'Kurdish Sorani' : 'Kurdish Kurmanji'} to ${targetDialect === 'sorani' ? 'Kurdish Sorani' : 'Kurdish Kurmanji'}. 
+          const aiPrompt = `As an expert in Kurdish dialects, translate the following single word from **${sourceDialect === 'sorani' ? 'Sorani' : 'Kurmanji'}** to **${targetDialect === 'kurmanji' ? 'Kurmanji' : 'Sorani'}**.
 
-Word to translate: "${text}"
+**Word to Translate:**
+"${text}"
 
-Guidelines:
-- Provide only the translation without explanations
-- If it's a proper noun, keep it as is
-- Use the most common translation for this word
+**Translation Guidelines:**
+1.  **Accuracy:** Provide the most common and accurate translation for this word.
+2.  **Dialect-Specific Vocabulary:** Ensure the translation uses the correct vocabulary for the target dialect.
+3.  **Proper Nouns:** If the word is a proper noun, it should remain unchanged.
 
-Translation:`;
+**Your Task:**
+Provide only the translated word, without any additional explanations.
+
+**Translated Word:**`;
 
           const aiTranslation = await geminiService.translateText(aiPrompt);
           if (aiTranslation && aiTranslation.trim() !== text) {
@@ -1533,19 +1537,25 @@ Translation:`;
       // For sentences (multiple words): Always use AI for better context
       toast.info('Translating sentence using AI for better context...');
       try {
-        const aiPrompt = `Translate this text from ${sourceDialect === 'sorani' ? 'Kurdish Sorani' : 'Kurdish Kurmanji'} to ${targetDialect === 'sorani' ? 'Kurdish Sorani' : 'Kurdish Kurmanji'}. 
+        const aiPrompt = `As an expert in Kurdish dialects, translate the following text from **${sourceDialect === 'sorani' ? 'Sorani' : 'Kurmanji'}** to **${targetDialect === 'kurmanji' ? 'Kurmanji' : 'Sorani'}**.
 
-Text to translate: "${text}"
+**Text to Translate:**
+"${text}"
 
-Guidelines:
-- Provide only the translation without explanations
-- Maintain the original meaning and context
-- Use proper Kurdish ${targetDialect} dialect conventions
-- Keep proper nouns as they are
-- Preserve punctuation and formatting
-- Ensure natural flow and grammar
+**Translation Guidelines:**
+1.  **Accuracy:** Prioritize direct and accurate translation.
+2.  **Dialect-Specific Vocabulary:** Use the correct vocabulary for the target dialect (e.g., "çay" in Sorani vs. "çay" in Kurmanji).
+3.  **Grammar and Syntax:** Adapt the sentence structure to fit the grammatical rules of the target dialect.
+4.  **Clarity:** Ensure the translation is clear and natural-sounding.
 
-Translation:`;
+**Example:**
+-   **Sorani to Kurmanji:** "من دەچم بۆ بازاڕ" → "ez diçim bazarê"
+-   **Kurmanji to Sorani:** "ew pirtûkekê dixwîne" → "ئەو کتێبێک دەخوێنێتەوە"
+
+**Your Task:**
+Provide only the translated text, without any additional explanations.
+
+**Translated Text:**`;
 
         const aiTranslation = await geminiService.translateText(aiPrompt);
         if (aiTranslation && aiTranslation.trim() !== text) {

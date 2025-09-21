@@ -1,0 +1,645 @@
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
+import { KurdishPDFService } from '@/services/kurdishPdfService';
+
+const KurdishPDFTest: React.FC = () => {
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [testResults, setTestResults] = useState<string[]>([]);
+
+  // Prepared test texts - Kurdish and Arabic for comparison
+  const testTexts = {
+    basic: `سڵاو لە هەموانتان! ئەمە تاقیکردنەوەیەکە بۆ نووسینی کوردی.`,
+    
+    arabic: `السلام عليكم! هذا اختبار للنص العربي في ملف PDF.`,
+    
+    comprehensive: `## پێناسەی زیرەکی دەستکرد (AI): چەمک و بنەماکان
+
+ئەم بەشە تیشک دەخاتە سەر چەمک و بنەما سەرەکییەکانی زیرەکی دەستکرد (AI). 
+
+### تایبەتمەندییەکانی کوردی:
+- ڕەشەکە: ڕ
+- ۆ (واو): ۆ  
+- ڤەکان: ڤ
+- ڵاماکان: ڵ
+- ێکارەکان: ێ
+- ەهەی کورت: ە
+- چیمەن: چ
+- پێکان: پ
+- گەڵاکان: گ
+- ژیان: ژ
+
+*زیرەکی دەستکرد بەگشتی وەک توانای ئامێرێک بۆ لاساییکردنەوەی توانا مرۆییەکان پێناسە دەکرێت.*
+
+> **زیرەکی دەستکرد بریتییە لە هەوڵدان بۆ دروستکردنی ئامێرگەلێک کە بتوانن بیر بکەنەوە، فێر ببن، و کێشەکان چارەسەر بکەن وەک مرۆڤ.**`,
+
+    arabicComprehensive: `## تعريف الذكاء الاصطناعي: المفاهيم والأسس
+
+هذا القسم يسلط الضوء على المفاهيم والأسس الأساسية للذكاء الاصطناعي.
+
+### خصائص النص العربي:
+- الأحرف العربية: ا ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ي
+- التشكيل: َ ِ ُ ً ٍ ٌ ّ ْ
+- الاتجاه: من اليمين إلى اليسار
+
+*الذكاء الاصطناعي يُعرَّف عمومًا كقدرة الآلة على محاكاة القدرات البشرية.*
+
+> **الذكاء الاصطناعي هو محاولة لإنشاء آلات يمكنها التفكير والتعلم وحل المشكلات مثل البشر.**`,
+
+    special: `### تەکنەلۆژیای نوێ:
+1. **فێربوونی ئامێری (Machine Learning)**
+2. **پرۆسێسکردنی زمانی سروشتی (NLP)**  
+3. **بینینی کۆمپیوتەری (Computer Vision)**
+4. **ڕۆبۆتیک (Robotics)**
+
+کوردستان، بەغداد، هەولێر، سلێمانی، دهۆک
+ئەڤین، خۆشەویستی، ڕێزگرتن، دۆستایەتی`,
+
+    arabicSpecial: `### التقنيات الحديثة:
+1. **التعلم الآلي (Machine Learning)**
+2. **معالجة اللغة الطبيعية (NLP)**
+3. **الرؤية الحاسوبية (Computer Vision)**
+4. **الروبوتات (Robotics)**
+
+العراق، بغداد، أربيل، السليمانية، دهوك
+الحب، المودة، الاحترام، الصداقة`
+  };
+
+  const addTestResult = (message: string) => {
+    const timestamp = new Date().toLocaleTimeString();
+    setTestResults(prev => [...prev, `[${timestamp}] ${message}`]);
+  };
+
+  const testBasicPDF = async () => {
+    try {
+      setIsGenerating(true);
+      addTestResult('🧪 Starting Basic Kurdish PDF Test...');
+      
+      const pdfService = new KurdishPDFService();
+      
+      // Load Kurdish fonts
+      addTestResult('📜 Loading Kurdish fonts...');
+      const loadedFont = await pdfService.loadKurdishFontsWithFallback();
+      addTestResult(`✅ Font loaded: ${loadedFont}`);
+      
+      const doc = pdfService.getDoc();
+      doc.setFontSize(16);
+      
+      // Test basic text
+      addTestResult('📝 Adding basic Kurdish text...');
+      addTestResult(`Text to add: ${testTexts.basic}`);
+      
+      pdfService.addKurdishText(testTexts.basic, 20, 30);
+      
+      // Save PDF
+      const filename = `kurdish-test-basic-${Date.now()}.pdf`;
+      pdfService.save(filename);
+      
+      addTestResult(`✅ Basic PDF generated: ${filename}`);
+      toast.success('Basic Kurdish PDF test completed!');
+      
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      addTestResult(`❌ Basic test failed: ${errorMsg}`);
+      toast.error('Basic test failed: ' + errorMsg);
+      console.error('Basic test error:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const testComprehensivePDF = async () => {
+    try {
+      setIsGenerating(true);
+      addTestResult('🧪 Starting Comprehensive Kurdish PDF Test...');
+      
+      const pdfService = new KurdishPDFService();
+      
+      // Load Kurdish fonts
+      addTestResult('📜 Loading Kurdish fonts...');
+      const loadedFont = await pdfService.loadKurdishFontsWithFallback();
+      addTestResult(`✅ Font loaded: ${loadedFont}`);
+      
+      const doc = pdfService.getDoc();
+      
+      // Test comprehensive text with formatting
+      addTestResult('📝 Adding comprehensive Kurdish text with formatting...');
+      
+      // Title
+      doc.setFontSize(18);
+      addTestResult('Adding title: تەکنەلۆژیای زیرەکی دەستکرد');
+      pdfService.addKurdishText('تەکنەلۆژیای زیرەکی دەستکرد', 20, 30);
+      
+      // Content
+      doc.setFontSize(12);
+      const lines = testTexts.comprehensive.split('\n').filter(line => line.trim());
+      let yPosition = 50;
+      
+      for (const line of lines) {
+        if (line.trim()) {
+          addTestResult(`Adding line: ${line.substring(0, 50)}...`);
+          pdfService.addKurdishText(line.trim(), 20, yPosition);
+          yPosition += 15;
+          
+          // Add new page if needed
+          if (yPosition > 270) {
+            doc.addPage();
+            yPosition = 30;
+          }
+        }
+      }
+      
+      // Save PDF
+      const filename = `kurdish-test-comprehensive-${Date.now()}.pdf`;
+      pdfService.save(filename);
+      
+      addTestResult(`✅ Comprehensive PDF generated: ${filename}`);
+      toast.success('Comprehensive Kurdish PDF test completed!');
+      
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      addTestResult(`❌ Comprehensive test failed: ${errorMsg}`);
+      toast.error('Comprehensive test failed: ' + errorMsg);
+      console.error('Comprehensive test error:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const testArabicPDF = async () => {
+    try {
+      setIsGenerating(true);
+      addTestResult('🇸🇦 Starting Arabic PDF Test...');
+      
+      const pdfService = new KurdishPDFService();
+      
+      // Load fonts (should work for Arabic too)
+      addTestResult('📜 Loading fonts for Arabic...');
+      const loadedFont = await pdfService.loadKurdishFontsWithFallback();
+      addTestResult(`✅ Font loaded: ${loadedFont}`);
+      
+      const doc = pdfService.getDoc();
+      doc.setFontSize(16);
+      
+      // Test basic Arabic text
+      addTestResult('📝 Adding basic Arabic text...');
+      addTestResult(`Arabic text to add: ${testTexts.arabic}`);
+      
+      pdfService.addKurdishText(testTexts.arabic, 20, 30);
+      
+      // Save PDF
+      const filename = `arabic-test-basic-${Date.now()}.pdf`;
+      pdfService.save(filename);
+      
+      addTestResult(`✅ Arabic PDF generated: ${filename}`);
+      toast.success('Arabic PDF test completed!');
+      
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      addTestResult(`❌ Arabic test failed: ${errorMsg}`);
+      toast.error('Arabic test failed: ' + errorMsg);
+      console.error('Arabic test error:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const testComprehensiveArabicPDF = async () => {
+    try {
+      setIsGenerating(true);
+      addTestResult('🇸🇦 Starting Comprehensive Arabic PDF Test...');
+      
+      const pdfService = new KurdishPDFService();
+      
+      // Load fonts
+      addTestResult('📜 Loading fonts for Arabic...');
+      const loadedFont = await pdfService.loadKurdishFontsWithFallback();
+      addTestResult(`✅ Font loaded: ${loadedFont}`);
+      
+      const doc = pdfService.getDoc();
+      
+      // Test comprehensive Arabic text with formatting
+      addTestResult('📝 Adding comprehensive Arabic text with formatting...');
+      
+      // Title
+      doc.setFontSize(18);
+      addTestResult('Adding Arabic title: تقنية الذكاء الاصطناعي');
+      pdfService.addKurdishText('تقنية الذكاء الاصطناعي', 20, 30);
+      
+      // Content
+      doc.setFontSize(12);
+      const lines = testTexts.arabicComprehensive.split('\n').filter(line => line.trim());
+      let yPosition = 50;
+      
+      for (const line of lines) {
+        if (line.trim()) {
+          addTestResult(`Adding Arabic line: ${line.substring(0, 50)}...`);
+          pdfService.addKurdishText(line.trim(), 20, yPosition);
+          yPosition += 15;
+          
+          // Add new page if needed
+          if (yPosition > 270) {
+            doc.addPage();
+            yPosition = 30;
+          }
+        }
+      }
+      
+      // Save PDF
+      const filename = `arabic-test-comprehensive-${Date.now()}.pdf`;
+      pdfService.save(filename);
+      
+      addTestResult(`✅ Comprehensive Arabic PDF generated: ${filename}`);
+      toast.success('Comprehensive Arabic PDF test completed!');
+      
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      addTestResult(`❌ Comprehensive Arabic test failed: ${errorMsg}`);
+      toast.error('Comprehensive Arabic test failed: ' + errorMsg);
+      console.error('Comprehensive Arabic test error:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const testCharacterSpecific = async () => {
+    try {
+      setIsGenerating(true);
+      addTestResult('🧪 Starting Character-Specific Kurdish PDF Test...');
+      
+      const pdfService = new KurdishPDFService();
+      
+      // Load Kurdish fonts
+      addTestResult('📜 Loading Kurdish fonts...');
+      const loadedFont = await pdfService.loadKurdishFontsWithFallback();
+      addTestResult(`✅ Font loaded: ${loadedFont}`);
+      
+      const doc = pdfService.getDoc();
+      doc.setFontSize(14);
+      
+      // Test each Kurdish-specific character individually
+      const kurdishChars = ['ڕ', 'ۆ', 'ڤ', 'ڵ', 'ێ', 'ە', 'چ', 'پ', 'گ', 'ژ'];
+      let yPosition = 30;
+      
+      addTestResult('🔤 Testing individual Kurdish characters...');
+      
+      for (const char of kurdishChars) {
+        const testLine = `${char} - تاقیکردنەوەی پیتی ${char} لە وشەی نموونەدا: ${char}ەکان`;
+        addTestResult(`Testing character: ${char}`);
+        pdfService.addKurdishText(testLine, 20, yPosition);
+        yPosition += 20;
+      }
+      
+      // Test special character combinations
+      yPosition += 10;
+      pdfService.addKurdishText('--- تێکەڵی پیتە تایبەتەکان ---', 20, yPosition);
+      yPosition += 20;
+      
+      const combinations = [
+        'ڕۆژگاری نوێ',
+        'ڤیدیۆی جوان', 
+        'ڵەگەڵ هاوڕێکان',
+        'ێوارەی خۆش',
+        'ەوە بۆ ئەوە',
+        'چیرۆکی کورد',
+        'پێکەنینی زۆر',
+        'گەشتی دوور',
+        'ژیانی باش'
+      ];
+      
+      for (const combo of combinations) {
+        addTestResult(`Testing combination: ${combo}`);
+        pdfService.addKurdishText(combo, 20, yPosition);
+        yPosition += 15;
+      }
+      
+      // Save PDF
+      const filename = `kurdish-test-characters-${Date.now()}.pdf`;
+      pdfService.save(filename);
+      
+      addTestResult(`✅ Character-specific PDF generated: ${filename}`);
+      toast.success('Character-specific Kurdish PDF test completed!');
+      
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      addTestResult(`❌ Character test failed: ${errorMsg}`);
+      toast.error('Character test failed: ' + errorMsg);
+      console.error('Character test error:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // WORKING Kurdish PDF with YOUR font
+  const testWorkingKurdishPDF = async () => {
+    setIsGenerating(true);
+    
+    try {
+      console.log('🎯 TESTING WORKING Kurdish PDF with YOUR font');
+      addTestResult('🎯 WORKING Kurdish PDF - using YOUR UniSalar_F_095.otf');
+      
+      const title = 'تاقیکردنەوەی کوردی';
+      const content = `سڵاو لە هەموانتان! ئەمە تاقیکردنەوەیەکە بۆ نووسینی کوردی.
+کوردی سۆرانی زمانی نەتەوەیی کوردە.
+ڕۆژگار پڕ لە هەولێکی زانستیە.
+ڕ ۆ ڤ ڵ ێ ە چ پ گ ژ`;
+      
+      addTestResult('📁 Loading YOUR UniSalar_F_095.otf font...');
+      
+      await createKurdishPDFWithYourFont(title, content, 'WORKING-kurdish.pdf');
+      
+      toast.success('🎉 WORKING Kurdish PDF created with YOUR font!');
+      addTestResult('✅ SUCCESS: PDF created with YOUR UniSalar font');
+      addTestResult('📁 File saved as: WORKING-kurdish.pdf');
+      
+    } catch (error) {
+      console.error('❌ WORKING test failed:', error);
+      toast.error(`WORKING test failed: ${error.message}`);
+      addTestResult(`❌ WORKING test failed: ${error.message}`);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // ULTIMATE DIRECT TEST - Zero processing
+  const testUltimateDirectKurdish = async () => {
+    setIsGenerating(true);
+    
+    try {
+      console.log('🚨 ULTIMATE DIRECT TEST');
+      addTestResult('🚨 ULTIMATE DIRECT TEST - Zero processing, pure jsPDF + your font');
+      
+      const result = await testDirectKurdish();
+      
+      if (result) {
+        toast.success('🎉 ULTIMATE test completed! Check ULTIMATE-direct-test.pdf');
+        addTestResult('✅ ULTIMATE test: PDF generated with ZERO text processing');
+        addTestResult('📁 File: ULTIMATE-direct-test.pdf');
+      } else {
+        toast.error('❌ ULTIMATE test failed');
+        addTestResult('❌ ULTIMATE test failed - check console');
+      }
+      
+    } catch (error) {
+      console.error('❌ ULTIMATE test error:', error);
+      toast.error(`ULTIMATE test error: ${error.message}`);
+      addTestResult(`❌ ULTIMATE test error: ${error.message}`);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Test DIRECT Kurdish PDF (bypasses all jsPDF processing)
+  const testDirectKurdishPDF = async () => {
+    setIsGenerating(true);
+    
+    try {
+      console.log('🚨 TESTING DIRECT Kurdish PDF approach');
+      addTestResult('🚨 Starting DIRECT Kurdish PDF test (bypassing ALL jsPDF processing)...');
+      
+      const directPdf = new DirectKurdishPDF();
+      
+      const testText = `سڵاو لە هەموانتان! ئەمە تاقیکردنەوەیەکە بۆ نووسینی کوردی.
+کوردی سۆرانی زمانی نەتەوەیی کوردە.
+ڕۆژگار پڕ لە هەولێکی زانستیە.
+ڕ ۆ ڤ ڵ ێ ە چ پ گ ژ`;
+      
+      addTestResult('🎯 Loading YOUR UniSalar font directly...');
+      await directPdf.createTestPDF(testText);
+      directPdf.save('DIRECT-kurdish-test.pdf');
+      
+      toast.success('🚨 DIRECT Kurdish PDF created! Check the download.');
+      addTestResult('✅ DIRECT approach: PDF generated without ANY jsPDF text processing');
+      addTestResult('📁 File saved as: DIRECT-kurdish-test.pdf');
+      
+    } catch (error) {
+      console.error('❌ DIRECT test failed:', error);
+      toast.error(`DIRECT test failed: ${error.message}`);
+      addTestResult(`❌ DIRECT approach failed: ${error.message}`);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const testHTMLToPDF = async () => {
+    try {
+      setIsGenerating(true);
+      addTestResult('🆕 Starting HTML-to-PDF Kurdish Test...');
+      
+      addTestResult('📝 Using HTML rendering approach...');
+      await AlternativeKurdishPDF.generateFromHTML(testTexts.basic);
+      
+      addTestResult('✅ HTML-based PDF generated successfully!');
+      toast.success('HTML-based Kurdish PDF test completed!');
+      
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      addTestResult(`❌ HTML test failed: ${errorMsg}`);
+      toast.error('HTML test failed: ' + errorMsg);
+      console.error('HTML test error:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const clearResults = () => {
+    setTestResults([]);
+  };
+
+  return (
+    <div className="container mx-auto p-6 max-w-4xl">
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            🧪 Kurdish PDF Test Laboratory
+          </CardTitle>
+          <CardDescription>
+            Comprehensive testing environment for Kurdish Sorani PDF generation debugging
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Kurdish Tests */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-3 text-center">🏴 Kurdish Tests</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Button 
+                onClick={testBasicPDF}
+                disabled={isGenerating}
+                className="w-full"
+              >
+                {isGenerating ? '⏳ Testing...' : '🔤 Basic Kurdish Test'}
+              </Button>
+              
+              <Button 
+                onClick={testComprehensivePDF}
+                disabled={isGenerating}
+                variant="outline"
+                className="w-full"
+              >
+                {isGenerating ? '⏳ Testing...' : '📄 Comprehensive Kurdish'}
+              </Button>
+              
+              <Button 
+                onClick={testCharacterSpecific}
+                disabled={isGenerating}
+                variant="secondary"
+                className="w-full"
+              >
+                {isGenerating ? '⏳ Testing...' : '🔍 Kurdish Characters'}
+              </Button>
+            </div>
+          </div>
+
+          {/* Arabic Tests */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-3 text-center">🇸🇦 Arabic Tests (for comparison)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Button 
+                onClick={testArabicPDF}
+                disabled={isGenerating}
+                variant="default"
+                className="w-full bg-green-600 hover:bg-green-700"
+              >
+                {isGenerating ? '⏳ Testing...' : '🔤 Basic Arabic Test'}
+              </Button>
+              
+              <Button 
+                onClick={testComprehensiveArabicPDF}
+                disabled={isGenerating}
+                variant="outline"
+                className="w-full border-green-600 text-green-600 hover:bg-green-50"
+              >
+                {isGenerating ? '⏳ Testing...' : '📄 Comprehensive Arabic'}
+              </Button>
+            </div>
+          </div>
+
+          {/* WORKING METHOD WITH YOUR FONT */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-3 text-center">🎯 YOUR FONT - WORKING METHOD</h3>
+            <div className="grid grid-cols-1 gap-4">
+              <Button 
+                onClick={testWorkingKurdishPDF}
+                disabled={isGenerating}
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3"
+              >
+                {isGenerating ? '⏳ Testing...' : '🎯 USE YOUR UNISALAR FONT NOW'}
+              </Button>
+            </div>
+          </div>
+
+          {/* ULTIMATE DIRECT METHOD */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-3 text-center">🔥 ULTIMATE DIRECT TEST</h3>
+            <div className="grid grid-cols-1 gap-4">
+              <Button 
+                onClick={testUltimateDirectKurdish}
+                disabled={isGenerating}
+                className="w-full bg-orange-600 hover:bg-orange-700"
+              >
+                {isGenerating ? '⏳ Testing...' : '🔥 ULTIMATE: Pure jsPDF + Your Font'}
+              </Button>
+            </div>
+          </div>
+
+          {/* Emergency Direct Method */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-3 text-center">🚨 EMERGENCY DIRECT METHOD</h3>
+            <div className="grid grid-cols-1 gap-4">
+              <Button 
+                onClick={testDirectKurdishPDF}
+                disabled={isGenerating}
+                variant="destructive"
+                className="w-full bg-red-600 hover:bg-red-700"
+              >
+                {isGenerating ? '⏳ Testing...' : '🚨 DIRECT Kurdish PDF (No Processing)'}
+              </Button>
+            </div>
+          </div>
+
+          {/* Alternative Method */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-3 text-center">🆕 Alternative Method</h3>
+            <div className="grid grid-cols-1 gap-4">
+              <Button 
+                onClick={testHTMLToPDF}
+                disabled={isGenerating}
+                variant="outline"
+                className="w-full"
+              >
+                {isGenerating ? '⏳ Testing...' : '🆕 HTML to PDF Test'}
+              </Button>
+            </div>
+          </div>
+          
+          <Button 
+            onClick={clearResults}
+            variant="destructive"
+            size="sm"
+            className="w-full md:w-auto"
+          >
+            🗑️ Clear Test Results
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Test Preview Texts */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Basic Test Text</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-sm font-mono bg-muted p-3 rounded text-right" dir="rtl">
+              {testTexts.basic}
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Character Test</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-sm font-mono bg-muted p-3 rounded text-right" dir="rtl">
+              ڕ ۆ ڤ ڵ ێ ە چ پ گ ژ
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Special Combinations</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-sm font-mono bg-muted p-3 rounded text-right" dir="rtl">
+              ڕۆژگار، ڤیدیۆ، ڵەگەڵ، ێوارە
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Test Results */}
+      {testResults.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Test Results Log</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-black text-green-400 p-4 rounded font-mono text-xs max-h-96 overflow-y-auto">
+              {testResults.map((result, index) => (
+                <div key={index} className="mb-1">
+                  {result}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+};
+
+export default KurdishPDFTest;
