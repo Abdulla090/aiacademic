@@ -7,6 +7,9 @@ import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { geminiService } from '../services/geminiService';
 import { readFileContent } from '../lib/fileReader';
+import { LanguageSelection } from '../components/LanguageSelection';
+import { BackButton } from '@/components/BackButton';
+import { useNavigate } from 'react-router-dom';
 
 interface Message {
   text: string;
@@ -32,7 +35,9 @@ const ChatWithFile: React.FC = () => {
   const [pdfDocument, setPdfDocument] = useState<any>(null); // State to store pdfDocument
   const [extractedImages, setExtractedImages] = useState<string[]>([]); // State to store extracted image Data URLs
   const [showPreview, setShowPreview] = useState(true);
+  const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const [responseLanguage, setResponseLanguage] = useState('en');
 
   useEffect(() => {
     if (isMobile) {
@@ -210,8 +215,9 @@ const ChatWithFile: React.FC = () => {
   }, [pdfDocument]);
 
   return (
-    <div className="flex flex-col h-screen p-2 sm:p-4 bg-gray-100">
+    <div className="flex flex-col h-screen p-2 sm:p-4 bg-gray-100 bg-purple-grid">
       <header className="pb-3 sm:pb-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <BackButton />
         <div className="w-full">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Chat with Your Files</h1>
           <div className="mt-3 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:space-x-4">
@@ -223,6 +229,10 @@ const ChatWithFile: React.FC = () => {
             {selectedFile && (
               <span className="text-gray-600 text-sm sm:text-base truncate max-w-xs">Selected: {selectedFile.name}</span>
             )}
+           <LanguageSelection
+             selectedLanguage={responseLanguage}
+             onLanguageChange={setResponseLanguage}
+           />
           </div>
         </div>
         {isMobile && selectedFile && (

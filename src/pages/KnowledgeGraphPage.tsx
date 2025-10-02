@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { KnowledgeGraphGenerator } from '@/components/KnowledgeGraphGenerator';
 import { MindMapGenerator } from '@/components/MindMapGenerator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { BackButton } from '@/components/BackButton';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 const KnowledgeGraphPage: React.FC = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [graphData, setGraphData] = useState<{ nodes: { id: string; label: string }[]; edges: { from: string; to: string }[] } | null>(null);
 
   const handleGenerateGraph = (nodes: { id: string; label: string }[], edges: { from: string; to: string }[]) => {
@@ -13,7 +16,10 @@ const KnowledgeGraphPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-subtle p-4 sm:p-8">
+    <div className="min-h-screen bg-gradient-subtle bg-purple-grid p-4 sm:p-8">
+      <div className="mb-6 flex justify-between items-center">
+        <BackButton />
+      </div>
       <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-6 sm:mb-8 text-center">
         {t('knowledgeGraphPageTitle')}
       </h1>

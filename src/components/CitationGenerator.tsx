@@ -10,6 +10,7 @@ import { geminiService, type CitationRequest } from '@/services/geminiService';
 import { readFileContent } from '@/lib/fileReader';
 import { ResponsiveLayout, ResponsiveButtonGroup } from '@/components/ui/responsive-layout';
 import { useResponsive } from '@/hooks/useResponsive';
+import { LanguageSelection } from './LanguageSelection';
 
 export const CitationGenerator = () => {
   const [inputType, setInputType] = useState<'file' | 'link'>('file');
@@ -22,6 +23,7 @@ export const CitationGenerator = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { isMobile, isTablet } = useResponsive();
+  const [responseLanguage, setResponseLanguage] = useState('en');
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -186,6 +188,10 @@ export const CitationGenerator = () => {
               </SelectContent>
             </Select>
           </div>
+           <LanguageSelection
+             selectedLanguage={responseLanguage}
+             onLanguageChange={setResponseLanguage}
+           />
           
           <Button onClick={handleGenerate} disabled={loading} className="btn-academic-primary w-full">
             {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'دروستکردنی بەڵگەنامە'}

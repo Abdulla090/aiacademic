@@ -27,11 +27,13 @@ import {
   ExternalLink,
   Bookmark,
   Filter,
-  RefreshCw
+  RefreshCw,
+ Settings2
 } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 import { useToast } from "@/hooks/use-toast";
 import { researchQuery } from "@/services/geminiService";
+import { LanguageSelection } from './LanguageSelection';
 
 interface ResearchQuery {
   id: string;
@@ -81,6 +83,7 @@ export const AIResearchAssistant: React.FC = () => {
     dateRange: 'all',
     credibilityThreshold: 70
   });
+  const [responseLanguage, setResponseLanguage] = useState('en');
 
   // Mock research data for demonstration
   const mockResearchResult: ResearchResult = {
@@ -249,7 +252,7 @@ export const AIResearchAssistant: React.FC = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="search" className="flex items-center gap-2">
             <Search className="h-4 w-4" />
             گەڕان
@@ -265,6 +268,10 @@ export const AIResearchAssistant: React.FC = () => {
           <TabsTrigger value="history" className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
             مێژوو
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="flex items-center gap-2">
+            <Settings2 className="h-4 w-4" />
+            ڕێکخستنەکان
           </TabsTrigger>
         </TabsList>
 
@@ -607,6 +614,23 @@ export const AIResearchAssistant: React.FC = () => {
                   )}
                 </div>
               </ScrollArea>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="settings" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>ڕێکخستنەکانی گەڕان</CardTitle>
+              <CardDescription>
+                هەڵبژاردنەکانی گەڕانەکەت بگۆڕە
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+               <LanguageSelection
+                 selectedLanguage={responseLanguage}
+                 onLanguageChange={setResponseLanguage}
+               />
             </CardContent>
           </Card>
         </TabsContent>

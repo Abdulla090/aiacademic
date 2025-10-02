@@ -10,6 +10,7 @@ import jsPDF from 'jspdf';
 import { saveAs } from 'file-saver';
 import { Document, Packer, Paragraph, TextRun } from 'docx';
 import * as pdfjs from 'pdfjs-dist';
+import { LanguageSelection } from './LanguageSelection';
 
 if (typeof window !== 'undefined') {
   pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdfjs-dist/${pdfjs.version}/pdf.worker.min.js`;
@@ -17,6 +18,7 @@ if (typeof window !== 'undefined') {
 
 export const FileConverter = () => {
   const [file, setFile] = useState<File | null>(null);
+  const [responseLanguage, setResponseLanguage] = useState('en');
   const [outputFormat, setOutputFormat] = useState('docx');
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -123,6 +125,10 @@ export const FileConverter = () => {
               className="hidden"
             />
           </div>
+           <LanguageSelection
+             selectedLanguage={responseLanguage}
+             onLanguageChange={setResponseLanguage}
+           />
           <div className="flex items-center gap-4">
             <Select onValueChange={setOutputFormat} defaultValue={outputFormat}>
               <SelectTrigger>

@@ -10,6 +10,7 @@ import html2pdf from 'html2pdf.js';
 import useIsMobile from '@/hooks/use-is-mobile';
 import { ResponsiveLayout, ResponsiveButtonGroup, ResponsiveText } from '@/components/ui/responsive-layout';
 import { useResponsive } from '@/hooks/useResponsive';
+import { LanguageSelection } from './LanguageSelection';
 
 interface GrammarError {
   id: string;
@@ -23,13 +24,13 @@ interface GrammarError {
 }
 
 interface GrammarCheckerProps {
-  language: string;
 }
 
-export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
+export const GrammarChecker = ({}: GrammarCheckerProps) => {
   const [text, setText] = useState('');
   const [errors, setErrors] = useState<GrammarError[]>([]);
   const [loading, setLoading] = useState(false);
+  const [language, setLanguage] = useState('en');
   const [selectedError, setSelectedError] = useState<GrammarError | null>(null);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [showPopup, setShowPopup] = useState(false);
@@ -552,6 +553,11 @@ export const GrammarChecker = ({ language }: GrammarCheckerProps) => {
                 </Button>
               </div>
             </ResponsiveButtonGroup>
+
+             <LanguageSelection
+               selectedLanguage={language}
+               onLanguageChange={setLanguage}
+             />
 
             {errors.length > 0 && (
               <div className="bg-gray-50 rounded-lg p-4">

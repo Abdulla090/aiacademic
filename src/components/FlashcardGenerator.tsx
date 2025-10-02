@@ -10,10 +10,12 @@ import { readFileContent } from '@/lib/fileReader';
 import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
 import { ResponsiveLayout, ResponsiveButtonGroup } from '@/components/ui/responsive-layout';
 import { useResponsive } from '@/hooks/useResponsive';
+import { LanguageSelection } from './LanguageSelection';
 
 export const FlashcardGenerator = () => {
   const [text, setText] = useState('');
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
+  const [responseLanguage, setResponseLanguage] = useState('en');
   const [loading, setLoading] = useState(false);
   const [currentCard, setCurrentCard] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -56,16 +58,7 @@ export const FlashcardGenerator = () => {
     if (file) {
       try {
         const content = await readFileContent(file);
-        if (typeof content === 'string') {
-          setText(content);
-          await triggerGeneration(content);
-        } else {
-          toast({
-            title: 'هەڵە لە خوێندنەوەی فایل',
-            description: 'فایلەکە ناتوانرێت وەک دەق بخوێنرێتەوە',
-            variant: 'destructive',
-          });
-        }
+        setText(content);
       } catch (error) {
         toast({
           title: 'هەڵە لە خوێندنەوەی فایل',
@@ -106,9 +99,13 @@ export const FlashcardGenerator = () => {
             className={`input-academic sorani-text ${isMobile ? 'min-h-[120px]' : 'h-32'} text-sm sm:text-base`}
           />
           <ResponsiveButtonGroup orientation={isMobile ? "vertical" : "horizontal"}>
-            <Button 
-              onClick={handleGenerate} 
-              disabled={loading} 
+            <LanguageSelection
+               selectedLanguage={responseLanguage}
+               onLanguageChange={setResponseLanguage}
+            />
+            <Button
+              onClick={handleGenerate}
+              disabled={loading}
               className={`btn-academic-primary ${isMobile ? 'text-xs px-3 py-2' : ''}`}
             >
               {loading ? (
@@ -165,7 +162,7 @@ export const FlashcardGenerator = () => {
                             style={{ backfaceVisibility: 'hidden', rotateY: 180 }}
                             animate={{ rotateY: isFlipped ? 0 : -180 }}
                         >
-                            <Card className={`h-full flex items-center justify-center ${isMobile ? 'p-3' : 'p-6'} ${isMobile ? 'text-sm' : 'text-lg'} text-center bg-secondary`}>
+                            <Card className={`h-full flex items-center justify-center ${isMobile ? 'p-3' : 'p-6'} ${isMobile ? 'text-sm' : 'text-lg'} text-center`}>
                                 <RichTextRenderer
                                   content={flashcards[currentCard].answer}
                                   showCopyButton={false}

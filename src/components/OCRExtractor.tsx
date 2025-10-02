@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,10 +15,9 @@ import { ResponsiveLayout, ResponsiveButtonGroup } from '@/components/ui/respons
 import { useResponsive } from '@/hooks/useResponsive';
 
 interface OCRExtractorProps {
-  language: string;
 }
 
-export function OCRExtractor({ language }: OCRExtractorProps) {
+export function OCRExtractor({}: OCRExtractorProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [extractedText, setExtractedText] = useState('');
@@ -254,7 +254,6 @@ export function OCRExtractor({ language }: OCRExtractorProps) {
           if (targetLanguage === 'ku') {
             addRTLText(pdf, line, 190, yPosition, { align: 'right', charSpace: 0.3 });
           } else {
-            pdf.text(line, 20, yPosition, { align: 'left' });
           }
           yPosition += lineHeight;
         }
@@ -311,11 +310,11 @@ export function OCRExtractor({ language }: OCRExtractorProps) {
         </div>
         <div>
           <h1 className="text-3xl font-bold text-foreground">
-            {language === 'ku' ? 'دەرهێنانی دەق لە وێنە' : 'OCR Text Extractor'}
+            {targetLanguage === 'ku' ? 'دەرهێنانی دەق لە وێنە' : 'OCR Text Extractor'}
           </h1>
           <p className="text-muted-foreground">
-            {language === 'ku' 
-              ? 'دەقی کوردی و ئینگلیزی لە وێنەکان دەربهێنە' 
+            {targetLanguage === 'ku'
+              ? 'دەقی کوردی و ئینگلیزی لە وێنەکان دەربهێنە'
               : 'Extract Kurdish and English text from images'}
           </p>
         </div>
@@ -327,14 +326,14 @@ export function OCRExtractor({ language }: OCRExtractorProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Upload className="h-5 w-5" />
-              {language === 'ku' ? 'وێنە بارکردن' : 'Upload Image'}
+              {targetLanguage === 'ku' ? 'وێنە بارکردن' : 'Upload Image'}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Language Selection */}
             <div className="space-y-2">
               <label className="text-sm font-medium">
-                {language === 'ku' ? 'زمانی دەق:' : 'Text Language:'}
+                {'Text Language:'}
               </label>
               <Select value={targetLanguage} onValueChange={(value: 'ku' | 'en') => setTargetLanguage(value)}>
                 <SelectTrigger>
@@ -347,9 +346,7 @@ export function OCRExtractor({ language }: OCRExtractorProps) {
               </Select>
               {targetLanguage === 'ku' && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  {language === 'ku' 
-                    ? 'پشتگیری پیتە تایبەتەکانی کوردی: ێ وە ۆ ژ ڵ ڕ چ گ' 
-                    : 'Supports Kurdish special letters: ێ وە ۆ ژ ڵ ڕ چ گ'}
+                  {'Supports Kurdish special letters: ێ وە ۆ ژ ڵ ڕ چ گ'}
                 </p>
               )}
             </div>
@@ -371,12 +368,12 @@ export function OCRExtractor({ language }: OCRExtractorProps) {
               
               <FileImage className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
               <p className="text-lg font-medium mb-2">
-                {language === 'ku' ? 'وێنەیەک بارکە یان فڕێبدە' : 'Upload or drag an image'}
+                {targetLanguage === 'ku' ? 'وێنەیەک بارکە یان فڕێبدە' : 'Upload or drag an image'}
               </p>
               <p className="text-sm text-muted-foreground">
-                {language === 'ku' 
+                {targetLanguage === 'ku'
                   ? 'JPG، PNG، WEBP پاڵپشتی دەکرێت (زیاتر لە ١٠MB)'
-                  : 'Supports JPG, PNG, WEBP (max 10MB)'}
+                  : 'Supports JPG، PNG، WEBP (max 10MB)'}
               </p>
             </div>
 
@@ -391,7 +388,7 @@ export function OCRExtractor({ language }: OCRExtractorProps) {
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Button 
+                  <Button
                     onClick={extractText}
                     disabled={isProcessing}
                     className="flex-1"
@@ -399,24 +396,24 @@ export function OCRExtractor({ language }: OCRExtractorProps) {
                     {isProcessing ? (
                       <>
                         <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                        {language === 'ku' ? 'دەرهێنان...' : 'Extracting...'}
+                        {targetLanguage === 'ku' ? 'دەرهێنان...' : 'Extracting...'}
                       </>
                     ) : (
                       <>
                         <Eye className="h-4 w-4 mr-2" />
-                        {language === 'ku' ? 'دەق دەربهێنە' : 'Extract Text'}
+                        {targetLanguage === 'ku' ? 'دەق دەربهێنە' : 'Extract Text'}
                       </>
                     )}
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={clearAll}
                     disabled={isProcessing}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                  <Button 
-                    variant="secondary" 
+                  <Button
+                    variant="secondary"
                     size="sm"
                     onClick={testConnection}
                     disabled={isProcessing}
@@ -431,7 +428,7 @@ export function OCRExtractor({ language }: OCRExtractorProps) {
             {progress > 0 && (
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span>{language === 'ku' ? 'پێشکەوتن:' : 'Progress:'}</span>
+                  <span>{targetLanguage === 'ku' ? 'پێشکەوتن:' : 'Progress:'}</span>
                   <span>{progress}%</span>
                 </div>
                 <Progress value={progress} className="w-full" />
@@ -445,10 +442,10 @@ export function OCRExtractor({ language }: OCRExtractorProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileImage className="h-5 w-5" />
-              {language === 'ku' ? 'دەقی دەرهێنراو' : 'Extracted Text'}
+              {targetLanguage === 'ku' ? 'دەقی دەرهێنراو' : 'Extracted Text'}
               {extractedText && (
                 <Badge variant="secondary">
-                  {extractedText.split(/\s+/).length} {language === 'ku' ? 'وشە' : 'words'}
+                  {extractedText.split(/\s+/).length} {targetLanguage === 'ku' ? 'وشە' : 'words'}
                 </Badge>
               )}
             </CardTitle>
@@ -457,7 +454,7 @@ export function OCRExtractor({ language }: OCRExtractorProps) {
             <Textarea
               value={extractedText}
               onChange={(e) => setExtractedText(e.target.value)}
-              placeholder={language === 'ku' 
+              placeholder={targetLanguage === 'ku'
                 ? 'دەقی دەرهێنراو لێرە دەردەکەوێت...'
                 : 'Extracted text will appear here...'}
               className="min-h-[300px] resize-none"
@@ -468,15 +465,15 @@ export function OCRExtractor({ language }: OCRExtractorProps) {
               <div className="flex gap-2">
                 <Button onClick={copyToClipboard} variant="outline" size="sm">
                   <Copy className="h-4 w-4 mr-2" />
-                  {language === 'ku' ? 'کۆپی' : 'Copy'}
+                  {targetLanguage === 'ku' ? 'کۆپی' : 'Copy'}
                 </Button>
                 <Button onClick={saveAsText} variant="outline" size="sm">
                   <Save className="h-4 w-4 mr-2" />
-                  {language === 'ku' ? 'وەک تێکست' : 'As Text'}
+                  {targetLanguage === 'ku' ? 'وەک تێکست' : 'As Text'}
                 </Button>
                 <Button onClick={saveAsPDF} variant="outline" size="sm">
                   <Download className="h-4 w-4 mr-2" />
-                  {language === 'ku' ? 'وەک PDF' : 'As PDF'}
+                  {targetLanguage === 'ku' ? 'وەک PDF' : 'As PDF'}
                 </Button>
               </div>
             )}

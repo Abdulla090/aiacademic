@@ -5,6 +5,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { KurdishPDFService } from '@/services/kurdishPdfService';
+import { BackButton } from '@/components/BackButton';
+import { useNavigate } from 'react-router-dom';
 
 const KurdishFontTestPage: React.FC = () => {
   const [title, setTitle] = useState('تاقیکردنەوەی فۆنتی کوردی نوێ');
@@ -30,6 +32,7 @@ const KurdishFontTestPage: React.FC = () => {
 ئەم تاقیکردنەوەیە پیشان دەدات کە فۆنتی نوێ چۆن کار دەکات.`);
   const [testing, setTesting] = useState(false);
   const [fontTest, setFontTest] = useState('');
+  const navigate = useNavigate();
   const testAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -115,7 +118,11 @@ const KurdishFontTestPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
+    <div className="min-h-screen bg-gradient-subtle bg-purple-grid">
+      <div className="container mx-auto p-6 max-w-4xl">
+      <div className="mb-6 flex justify-between items-center">
+        <BackButton />
+      </div>
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="text-2xl text-center">
@@ -215,6 +222,7 @@ const KurdishFontTestPage: React.FC = () => {
 
         </CardContent>
       </Card>
+    </div>
     </div>
   );
 };

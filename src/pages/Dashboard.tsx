@@ -1,22 +1,15 @@
-import { AcademicStats } from "@/components/AcademicStats";
 import { AcademicToolCard } from "@/components/AcademicToolCard";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { 
-  PenTool, 
-  FileText, 
-  CheckSquare, 
-  Brain, 
-  BookOpen, 
-  Shield, 
-  CreditCard, 
-  Presentation, 
+import {
+  PenTool,
+  FileText,
+  CheckSquare,
+  Brain,
+  BookOpen,
+  Shield,
+  CreditCard,
+  Presentation,
   Calendar,
-  Filter,
-  Grid3X3,
-  List,
-  Search,
   FileUp,
   Image,
   Minimize,
@@ -28,30 +21,12 @@ import {
   Bot,
   Wand2
 } from "lucide-react";
-import { PageHeader } from "@/components/PageHeader"; 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ArticleWriter } from "@/components/ArticleWriter";
-import { GrammarChecker } from "@/components/GrammarChecker";
-import { ReportGenerator } from "@/components/ReportGenerator";
-import { TaskPlanner } from "@/components/TaskPlanner";
-import { SummarizerParaphraser } from "@/components/SummarizerParaphraser";
-import { MindMapGenerator } from "@/components/MindMapGenerator";
 
 const Index = () => {
   const { t } = useTranslation();
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [currentTool, setCurrentTool] = useState<string | null>(null);
-
-  // Handle URL parameters for category filtering
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const categoryParam = urlParams.get('category');
-    if (categoryParam && categoryParam !== 'all') {
-      setSelectedCategory(categoryParam);
-    }
-  }, []);
 
   interface AcademicTool {
     title: string;
@@ -237,97 +212,42 @@ const Index = () => {
     }
   ];
 
-  const categories = [
-    { key: 'all', label: 'categoryAll' },
-    { key: 'writing', label: 'categoryWriting' },
-    { key: 'editing', label: 'categoryEditing' },
-    { key: 'planning', label: 'categoryPlanning' },
-    { key: 'study', label: 'categoryStudy' },
-    { key: 'presentation', label: 'categoryPresentation' },
-    { key: 'verification', label: 'categoryVerification' },
-    { key: 'tools', label: 'tools' }
-  ];
+  const toolsByCategory: { [key: string]: AcademicTool[] } = {
+    Writing: academicTools.filter(tool => ["writing", "editing"].includes(tool.category)),
+    Study: academicTools.filter(tool => ["study", "planning"].includes(tool.category) && tool.title !== 'taskPlanner' && tool.category !== 'presentation'),
+    Tools: academicTools.filter(tool => ["tools", "verification"].includes(tool.category)),
+    General: academicTools.filter(tool => tool.title === 'taskPlanner'),
+    Presentation: academicTools.filter(tool => tool.category === 'presentation'),
+  };
 
-  const filteredTools = selectedCategory === 'all' 
-    ? academicTools 
-    : academicTools.filter(tool => tool.category === selectedCategory);
+  const categoryOrder = ["Writing", "Study", "Tools", "Presentation", "General"];
 
-  return (
-    <div className="min-h-screen bg-gradient-subtle">
-      
-      <main className="container mx-auto px-4 py-8">
-        <PageHeader />
-        {/* Welcome Section */}
-        <div className="text-center mb-8 sm:mb-12">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4">
-            {t('welcomeTitle')}
-          </h1>
-          <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-2">
-            {t('welcomeSubtitle')}
-          </p>
-          <p className="text-sm sm:text-base text-foreground-secondary max-w-3xl mx-auto leading-relaxed">
-            {t('welcomeDescription')}
-          </p>
-        </div>
-
-        {/* Stats */}
-        <AcademicStats />
-
-        {/* Tools Section */}
-        <div className="space-y-6">
-          {/* Filters and View Controls */}
-          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <Button
-                  key={category.key}
-                  variant={selectedCategory === category.key ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedCategory(category.key)}
-                  className={`text-xs sm:text-sm ${selectedCategory === category.key ? 'btn-academic-primary' : 'btn-academic-outline'}`}
-                >
-                  {t(category.label)}
-                </Button>
-              ))}
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto">
-              <div className="flex items-center gap-1 border border-border rounded-lg p-1">
-                <Button
-                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('grid')}
-                  className={`h-8 w-8 p-0 ${viewMode === 'grid' ? 'btn-academic-primary' : 'btn-academic-outline'}`}
-                >
-                  <Grid3X3 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                  className={`h-8 w-8 p-0 ${viewMode === 'list' ? 'btn-academic-primary' : 'btn-academic-outline'}`}
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
-              
-              <div className="relative flex-grow w-full sm:w-auto">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder={t('searchPlaceholder')}
-                  className="input-academic pl-10 w-full"
-                />
-              </div>
+  // If a specific category is selected, show the tools within that category
+ if (currentTool && toolsByCategory[currentTool]) {
+    const selectedCategoryTools = toolsByCategory[currentTool];
+    return (
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 bg-purple-grid">
+        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10">
+            <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4 sm:mb-0">My porta</h1>
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <Button variant="outline" className="bg-white dark:bg-gray-800 dark:border-gray-600">
+                <FileUp className="mr-2 h-4 w-4" /> Upload
+              </Button>
+              <Button className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white">
+                + Create new
+              </Button>
             </div>
           </div>
 
-          {/* Tools Grid/List */}
-          <div className={`grid gap-6 ${
-            viewMode === 'grid' 
-              ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' 
-              : 'grid-cols-1'
-          }`}>
-            {filteredTools.map((tool, index) => (
+          <div className="mb-6">
+            <Button variant="outline" onClick={() => setCurrentTool(null)} className="dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100">
+              &larr; Back to Categories
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {selectedCategoryTools.map((tool, index) => (
               <AcademicToolCard
                 key={index}
                 title={t(tool.title)}
@@ -338,37 +258,69 @@ const Index = () => {
                 isComingSoon={tool.isComingSoon}
                 path={tool.path}
                 onClick={() => {
-                  if (!tool.isComingSoon) {
+                  if (!tool.isComingSoon && tool.path) {
                     setCurrentTool(tool.title);
                   }
                 }}
               />
             ))}
           </div>
-        </div>
+        </main>
+      </div>
+    );
+  }
 
-        {/* Quick Actions */}
-        <div className="mt-8 sm:mt-12 card-academic p-6 sm:p-8 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3 sm:mb-4">
-            {t('quickActionsTitle')}
-          </h2>
-          <p className="text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">
-            {t('quickActionsSubtitle')}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-            <Button className="btn-academic-primary relative overflow-hidden text-sm sm:text-base">
-              <span className="relative z-10">{t('newArticle')}</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl"></span>
+  const categoryCards = categoryOrder.map(categoryName => {
+    const tools = toolsByCategory[categoryName];
+    if (!tools || tools.length === 0) return null;
+
+    // Create a single card for the category with all its tools
+    // We need to define a default icon for the category card
+    const getCategoryIcon = (category: string) => {
+      switch(category) {
+        case 'Writing': return PenTool;
+        case 'Study': return BookOpen;
+        case 'Tools': return FileUp;
+        case 'Presentation': return Presentation;
+        case 'General': return Calendar;
+        default: return FileText;
+      }
+    };
+
+    return (
+      <AcademicToolCard
+        key={categoryName}
+        title={categoryName}
+        description={`${t(categoryName.toLowerCase())} tools: ${tools.map(tool => t(tool.title)).join(', ')}`}
+        icon={getCategoryIcon(categoryName)}
+        image={tools[0]?.image} // Use the image from the first tool in the category
+        category={categoryName}
+        path={undefined} // Categories don't have a direct path
+        onClick={() => {
+          // Set current tool to the category name to trigger filtering
+          setCurrentTool(categoryName);
+        }}
+      />
+    );
+ });
+
+  return (
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 bg-purple-grid">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10">
+          <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4 sm:mb-0">My porta</h1>
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <Button variant="outline" className="bg-white dark:bg-gray-800 dark:border-gray-600">
+              <FileUp className="mr-2 h-4 w-4" /> Upload
             </Button>
-            <Button className="btn-academic-secondary relative overflow-hidden text-sm sm:text-base">
-              <span className="relative z-10">{t('createReport')}</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl"></span>
-            </Button>
-            <Button className="btn-academic-outline relative overflow-hidden text-sm sm:text-base">
-              <span className="relative z-10">{t('checkGrammar')}</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl"></span>
+            <Button className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white">
+              + Create new
             </Button>
           </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {categoryCards}
         </div>
       </main>
     </div>

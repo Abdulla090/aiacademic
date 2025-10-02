@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Download, Copy, RefreshCw, PenTool, Pause, Play, Square, Clock } from 'lucide-react';
 import { geminiService, type ArticleRequest } from '@/services/geminiService';
 import { useToast } from '@/components/ui/use-toast';
+import { EnglishPDFService } from '@/services/englishPdfService';
 import html2pdf from 'html2pdf.js';
 import { TypingIndicator } from '@/components/ui/typing-indicator';
 import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
@@ -17,14 +18,15 @@ import { FormattingControls } from '@/components/ui/formatting-controls';
 import { ResponsiveLayout, ResponsiveCard, ResponsiveButtonGroup, ResponsiveText } from '@/components/ui/responsive-layout';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useRateLimitStatus, formatRetryMessage } from '@/utils/rateLimitUtils';
+import { LanguageSelection } from './LanguageSelection';
 
 interface ArticleWriterProps {
-  language: string;
 }
 
-export const ArticleWriter = ({ language }: ArticleWriterProps) => {
+export const ArticleWriter = ({}: ArticleWriterProps) => {
   const [article, setArticle] = useState('');
   const [displayText, setDisplayText] = useState('');
+  const [language, setLanguage] = useState('en');
   const [loading, setLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [previewMode, setPreviewMode] = useState<'edit' | 'preview'>('edit');
@@ -184,7 +186,6 @@ export const ArticleWriter = ({ language }: ArticleWriterProps) => {
   const handleDownload = async (format: 'text' | 'pdf' = 'text') => {
     try {
       if (format === 'pdf') {
-        // Create HTML content with proper styling for Kurdish/Arabic text
         const htmlContent = `
           <!DOCTYPE html>
           <html lang="${language === 'ku' ? 'ku' : language === 'ar' ? 'ar' : 'en'}" dir="${language === 'ku' || language === 'ar' ? 'rtl' : 'ltr'}">
@@ -194,10 +195,10 @@ export const ArticleWriter = ({ language }: ArticleWriterProps) => {
               @import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;700&display=swap');
               
               body {
-                font-family: 'Noto Naskh Arabic', 'Arial Unicode MS', Arial, sans-serif;
+                font-family: ${language === 'en' ? "'Times New Roman', Times, serif" : "'Noto Naskh Arabic', 'Arial Unicode MS', Arial, sans-serif"};
                 font-size: 14px;
                 line-height: 1.6;
-                color: #333;
+                color: #000;
                 max-width: 800px;
                 margin: 0 auto;
                 padding: 20px;
@@ -213,45 +214,33 @@ export const ArticleWriter = ({ language }: ArticleWriterProps) => {
                 color: #2c3e50;
                 border-bottom: 2px solid #3498db;
                 padding-bottom: 10px;
+                page-break-before: always;
               }
               
-              h2 {
-                font-size: 20px;
-                font-weight: bold;
-                margin-top: 25px;
-                margin-bottom: 15px;
+              h2, h3, h4, h5, h6 {
                 color: #34495e;
-              }
-              
-              h3 {
-                font-size: 18px;
+                margin-top: 1em;
+                margin-bottom: 0.5em;
                 font-weight: bold;
-                margin-top: 20px;
-                margin-bottom: 12px;
-                color: #34495e;
+                page-break-inside: avoid;
               }
-              
-              h4, h5, h6 {
-                font-size: 16px;
-                font-weight: bold;
-                margin-top: 15px;
-                margin-bottom: 10px;
-                color: #34495e;
-              }
-              
+              h2 { font-size: 20px; }
+              h3 { font-size: 18px; }
+              h4 { font-size: 16px; }
+
               p {
                 margin-bottom: 12px;
                 text-align: justify;
+                page-break-inside: avoid;
               }
               
               ul, ol {
                 margin-bottom: 15px;
                 padding-${language === 'ku' || language === 'ar' ? 'right' : 'left'}: 25px;
+                page-break-inside: avoid;
               }
               
-              li {
-                margin-bottom: 8px;
-              }
+              li { margin-bottom: 8px; }
               
               blockquote {
                 border-${language === 'ku' || language === 'ar' ? 'right' : 'left'}: 4px solid #3498db;
@@ -259,6 +248,7 @@ export const ArticleWriter = ({ language }: ArticleWriterProps) => {
                 margin: 15px 0;
                 background-color: #f8f9fa;
                 font-style: italic;
+                page-break-inside: avoid;
               }
               
               code {
@@ -276,53 +266,15 @@ export const ArticleWriter = ({ language }: ArticleWriterProps) => {
                 overflow-x: auto;
                 margin: 15px 0;
               }
-              
-              pre code {
-                background: none;
-                padding: 0;
-              }
-              
-              strong {
-                font-weight: bold;
-              }
-              
-              em {
-                font-style: italic;
-              }
-              
-              hr {
-                border: none;
-                height: 1px;
-                background-color: #ddd;
-                margin: 20px 0;
-              }
-              
-              .header-info {
-                text-align: center;
-                font-size: 12px;
-                color: #666;
-                margin-bottom: 20px;
-                border-bottom: 1px solid #eee;
-                padding-bottom: 15px;
-              }
-              
-              .article-meta {
-                background-color: #f8f9fa;
-                padding: 15px;
-                border-radius: 5px;
-                margin-bottom: 25px;
-                font-size: 12px;
-                color: #666;
-              }
             </style>
           </head>
           <body>
-            <div class="header-info">
+            <div class="header-info" style="text-align: center; font-size: 12px; color: #666; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
               <strong>AI Academic Hub</strong><br>
               Generated on: ${new Date().toLocaleDateString(language === 'ku' ? 'ku-Arab-IQ' : language === 'ar' ? 'ar-IQ' : 'en-US')}
             </div>
             
-            <div class="article-meta">
+            <div class="article-meta" style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 25px; font-size: 12px; color: #666;">
               <strong>${language === 'ku' ? 'زانیاری بابەت:' : language === 'ar' ? 'معلومات المقال:' : 'Article Information:'}</strong><br>
               ${language === 'ku' ? 'بابەت:' : language === 'ar' ? 'الموضوع:' : 'Topic:'} ${request.topic}<br>
               ${language === 'ku' ? 'درێژی:' : language === 'ar' ? 'الطول:' : 'Length:'} ${request.length}<br>
@@ -339,30 +291,30 @@ export const ArticleWriter = ({ language }: ArticleWriterProps) => {
           </html>
         `;
 
-        // Configure html2pdf options for better Unicode support
-        const options = {
-          margin: [0.5, 0.5, 0.5, 0.5],
-          filename: `${(request.topic || 'article').substring(0, 50)}.pdf`,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { 
-            scale: 2,
-            useCORS: true,
-            letterRendering: true,
-            allowTaint: true
-          },
-          jsPDF: { 
-            unit: 'in', 
-            format: 'a4', 
-            orientation: 'portrait'
-          }
-        };
-
-        // Generate PDF using html2pdf
-        await html2pdf().set(options).from(htmlContent).save();
+        if (language === 'en') {
+          const pdfService = new EnglishPDFService();
+          pdfService.addTitle(request.topic || 'Article');
+          article.split('\n').forEach(paragraph => {
+            if (paragraph.trim()) {
+              pdfService.addParagraph(paragraph);
+            }
+          });
+          pdfService.save(`${(request.topic || 'article').substring(0, 50)}.pdf`);
+        } else {
+          // Fallback to html2pdf for Kurdish and other languages
+          const options = {
+            margin: [0.5, 0.5, 0.5, 0.5],
+            filename: `${(request.topic || 'article').substring(0, 50)}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+          };
+          await html2pdf().set(options).from(htmlContent).save();
+        }
         
         toast({
-          title: 'دابەزاندن',
-          description: 'PDF دابەزێنرا'
+          title: 'Download Complete',
+          description: 'PDF has been downloaded.'
         });
         return;
       }
@@ -476,8 +428,15 @@ export const ArticleWriter = ({ language }: ArticleWriterProps) => {
               </Label>
             </div>
 
-            <Button 
-              onClick={handleGenerate} 
+            <div className="space-y-2">
+               <LanguageSelection
+                 selectedLanguage={language}
+                 onLanguageChange={setLanguage}
+               />
+            </div>
+
+            <Button
+              onClick={handleGenerate}
               disabled={loading || !request.topic.trim()}
               className="w-full"
               size={isMobile ? "lg" : "default"}

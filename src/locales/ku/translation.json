@@ -220,5 +220,10 @@
   "processTime": "کاتی پڕۆسێسکردن",
   "changesApplied": "گۆڕانکارییە جێبەجێکراوەکان",
   "beforeAfterComparison": "بەراوردکردنی پێش و دوای",
-  "selectLanguage": "زمان هەڵبژێرە"
+  "selectLanguage": "زمان هەڵبژێرە",
+  "verification": "پشتڕاستکردنەوە",
+  "knowledgeGraphGenerator": "دروستکەری نەخشەی زانیاری",
+  "knowledgeGraphGeneratorPlaceholder": "دەقەکەت لێرە بنووسە بۆ دروستکردنی نەخشەی زانیاری...",
+  "generateKnowledgeGraph": "دروستکردنی نەخشەی زانیاری",
+ "general": "گشتی"
 }

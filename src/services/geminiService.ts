@@ -1100,9 +1100,10 @@ class GeminiService {
     }
   }
 
-  async generateQuiz(text: string): Promise<QuizQuestion[]> {
+  async generateQuiz(text: string, questionCount: number = 5): Promise<QuizQuestion[]> {
     const prompt = `
-    Based on the following text, generate a multiple-choice quiz. Each question should have four options and one correct answer.
+    Based on the following text, generate a ${questionCount}-question multiple-choice quiz.
+    Each question must have four options and one correct answer.
 
     Text: "${text}"
 

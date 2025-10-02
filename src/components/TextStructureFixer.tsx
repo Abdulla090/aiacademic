@@ -71,12 +71,12 @@ interface TextChange {
 }
 
 interface TextStructureFixerProps {
-  language: string;
 }
 
-export function TextStructureFixer({ language }: TextStructureFixerProps) {
+export function TextStructureFixer({}: TextStructureFixerProps) {
   const [inputText, setInputText] = useState('');
   const [fixedText, setFixedText] = useState('');
+  const [language, setLanguage] = useState('en');
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState('');
@@ -693,6 +693,24 @@ ${text}
                   <SelectItem value="arabic">{t('arabic')}</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-3">
+               <label className="text-sm font-medium mb-2 block">{t('language')}</label>
+               <Select
+                   value={fixingOptions.language}
+                   onValueChange={(value: FixingLanguage) => setFixingOptions(prev => ({ ...prev, language: value }))}
+               >
+                   <SelectTrigger>
+                       <SelectValue />
+                   </SelectTrigger>
+                   <SelectContent>
+                       <SelectItem value="auto">{t('autoDetect')}</SelectItem>
+                       <SelectItem value="english">{t('english')}</SelectItem>
+                       <SelectItem value="kurdish">{t('kurdish')}</SelectItem>
+                       <SelectItem value="arabic">{t('arabic')}</SelectItem>
+                   </SelectContent>
+               </Select>
             </div>
 
             <div className="space-y-3">

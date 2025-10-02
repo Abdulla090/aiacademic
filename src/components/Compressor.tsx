@@ -4,10 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Upload, RefreshCw, Download } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import imageCompression from 'browser-image-compression';
+import { LanguageSelection } from './LanguageSelection';
 
 export const Compressor = () => {
   const [file, setFile] = useState<File | null>(null);
   const [compressedFile, setCompressedFile] = useState<File | null>(null);
+  const [responseLanguage, setResponseLanguage] = useState('en');
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -92,6 +94,10 @@ export const Compressor = () => {
               className="hidden"
             />
           </div>
+           <LanguageSelection
+             selectedLanguage={responseLanguage}
+             onLanguageChange={setResponseLanguage}
+           />
           {file && (
             <div className="flex justify-between items-center">
               <div>

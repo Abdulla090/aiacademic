@@ -1,5 +1,4 @@
 import { jsPDF } from 'jspdf';
-import * as ArabicReshaper from 'arabic-reshaper';
 
 // Kurdish character mapping for proper rendering
 const KURDISH_CHAR_MAP = {
@@ -54,7 +53,7 @@ export class KurdishPDFService {
   }
 
   // Process Kurdish text for proper rendering
-  processKurdishText(text: string): string {
+  async processKurdishText(text: string): Promise<string> {
     if (!text) return '';
     
     console.log('Original text:', text);
@@ -71,15 +70,8 @@ export class KurdishPDFService {
     
     // Use Arabic reshaper to handle contextual forms and connections
     try {
-      const reshaped = ArabicReshaper(processedText, {
-        ligatures: true,
-        harakat: true,
-        // Support Kurdish specific characters
-        support: {
-          persian: true,
-          urdu: true
-        }
-      });
+      const { default: ArabicReshaper } = await import('arabic-reshaper');
+      const reshaped = ArabicReshaper.convert(processedText);
       console.log('Reshaped text:', reshaped);
       
       // Reverse the text for proper RTL display in jsPDF
@@ -141,49 +133,57 @@ export class KurdishPDFService {
   async createKurdishReport(
     title: string,
     sections: Array<{ title: string; content: string }>,
+    language: 'ku' | 'en' = 'ku',
     options?: {
       showHeader?: boolean;
       headerText?: { kurdish?: string; english?: string };
     }
   ): Promise<void> {
-    await this.loadKurdishFont();
-    
+    if (language === 'ku') {
+      await this.loadKurdishFont();
+    } else {
+      this.doc.setFont('helvetica');
+    }
+
     const pageWidth = this.doc.internal.pageSize.getWidth();
     let y = 20;
 
     // Add header if requested
-    if (options?.showHeader && options?.headerText?.kurdish) {
+    if (options?.showHeader) {
       this.doc.setFontSize(10);
-      const processedHeader = this.processKurdishText(options.headerText.kurdish);
-      this.doc.text(processedHeader, pageWidth - 20, y, { align: 'right' });
-      y += 15;
+      const headerText = language === 'ku' ? options.headerText?.kurdish : options.headerText?.english;
+      if (headerText) {
+        const processedHeader = language === 'ku' ? await this.processKurdishText(headerText) : headerText;
+        this.doc.text(processedHeader, language === 'ku' ? pageWidth - 20 : 20, y, { align: language === 'ku' ? 'right' : 'left' });
+        y += 15;
+      }
     }
 
     if (title) {
       this.doc.setFontSize(18);
-      const processedTitle = this.processKurdishText(title);
-      this.doc.text(processedTitle, pageWidth - 20, y, { align: 'right' });
+      const processedTitle = language === 'ku' ? await this.processKurdishText(title) : title;
+      this.doc.text(processedTitle, language === 'ku' ? pageWidth - 20 : 20, y, { align: language === 'ku' ? 'right' : 'left' });
       y += 20;
     }
 
     for (const section of sections) {
       if (section.title) {
         this.doc.setFontSize(16);
-        const processedSectionTitle = this.processKurdishText(section.title);
-        this.doc.text(processedSectionTitle, pageWidth - 20, y, { align: 'right' });
+        const processedSectionTitle = language === 'ku' ? await this.processKurdishText(section.title) : section.title;
+        this.doc.text(processedSectionTitle, language === 'ku' ? pageWidth - 20 : 20, y, { align: language === 'ku' ? 'right' : 'left' });
         y += 15;
       }
 
       if (section.content) {
         this.doc.setFontSize(14);
-        const lines = section.content.split('\n');
+        const lines = this.doc.splitTextToSize(section.content, pageWidth - 40);
         
         for (const line of lines) {
           if (line.trim()) {
-            const processedLine = this.processKurdishText(line.trim());
-            this.doc.text(processedLine, pageWidth - 20, y, { align: 'right' });
+            const processedLine = language === 'ku' ? await this.processKurdishText(line.trim()) : line.trim();
+            this.doc.text(processedLine, language === 'ku' ? pageWidth - 20 : 20, y, { align: language === 'ku' ? 'right' : 'left' });
+            y += 8;
           }
-          y += 8;
         }
         y += 10;
       }
@@ -202,10 +202,11 @@ export class KurdishPDFService {
 export async function createKurdishPDF(
   title: string,
   sections: Array<{ title: string; content: string }>,
+  language: 'ku' | 'en' = 'ku',
   filename?: string
 ): Promise<Blob> {
   const pdf = new KurdishPDFService();
-  await pdf.createKurdishReport(title, sections);
+  await pdf.createKurdishReport(title, sections, language);
   
   if (filename) {
     pdf.save(filename);

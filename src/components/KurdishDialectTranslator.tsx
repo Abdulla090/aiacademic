@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowRightLeft, BookOpen, Globe, Volume2 } from 'lucide-react';
+import { ArrowRightLeft, BookOpen, Globe, Volume2, Settings2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { geminiService } from '@/services/geminiService';
+import { LanguageSelection } from './LanguageSelection';
 
 interface DialectComparison {
   sorani: string;
@@ -1432,6 +1433,7 @@ const KurdishDialectTranslator: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
+  const [responseLanguage, setResponseLanguage] = useState('en');
 
   // Force purple background by overriding parent styles
   useEffect(() => {
@@ -1607,7 +1609,7 @@ Provide only the translated text, without any additional explanations.
         </div>
 
         <Tabs defaultValue="translator" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="translator">
               <ArrowRightLeft className="w-4 h-4 ml-2" />
               وەرگێڕ (Translator)
@@ -1615,6 +1617,10 @@ Provide only the translated text, without any additional explanations.
             <TabsTrigger value="dictionary">
               <BookOpen className="w-4 h-4 ml-2" />
               فەرهەنگ (Dictionary)
+            </TabsTrigger>
+            <TabsTrigger value="settings">
+               <Settings2 className="w-4 h-4 ml-2" />
+               ڕێکخستنەکان
             </TabsTrigger>
           </TabsList>
 
@@ -1818,6 +1824,20 @@ Provide only the translated text, without any additional explanations.
             </Card>
           </TabsContent>
         </Tabs>
+
+        <TabsContent value="settings">
+           <Card className="bg-purple-200/70 backdrop-blur border-purple-300">
+               <CardHeader>
+                   <CardTitle className="text-gray-800">ڕێکخستنەکانی وەرگێڕ</CardTitle>
+               </CardHeader>
+               <CardContent>
+                   <LanguageSelection
+                       selectedLanguage={responseLanguage}
+                       onLanguageChange={setResponseLanguage}
+                   />
+               </CardContent>
+           </Card>
+        </TabsContent>
       </div>
     </div>
   );

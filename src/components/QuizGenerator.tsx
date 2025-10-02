@@ -10,13 +10,18 @@ import { readFileContent } from '@/lib/fileReader';
 import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
 import { ResponsiveLayout, ResponsiveButtonGroup } from '@/components/ui/responsive-layout';
 import { useResponsive } from '@/hooks/useResponsive';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { LanguageSelection } from './LanguageSelection';
 
 export const QuizGenerator = () => {
   const [text, setText] = useState('');
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+  const [responseLanguage, setResponseLanguage] = useState('en');
   const [loading, setLoading] = useState(false);
   const [answers, setAnswers] = useState<{[key: number]: string}>({});
   const [submitted, setSubmitted] = useState(false);
+  const [questionCount, setQuestionCount] = useState(5);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { isMobile, isTablet } = useResponsive();
@@ -34,7 +39,7 @@ export const QuizGenerator = () => {
     setSubmitted(false);
     setAnswers({});
     try {
-      const result = await geminiService.generateQuiz(contentText);
+      const result = await geminiService.generateQuiz(contentText, questionCount);
       setQuestions(result);
       toast({
         title: 'سەرکەوتوو بوو',
@@ -56,8 +61,7 @@ export const QuizGenerator = () => {
     if (file) {
       try {
         const content = await readFileContent(file);
-        setText(content as string);
-        await triggerGeneration(content as string);
+        setText(content);
       } catch (error) {
         toast({
           title: 'هەڵە لە خوێندنەوەی فایل',
@@ -101,12 +105,31 @@ export const QuizGenerator = () => {
             placeholder="دەقەکەت لێرە بنووسە یان فایلێک باربکە..."
             className={`input-academic sorani-text ${isMobile ? 'min-h-[120px]' : 'h-32'} text-sm sm:text-base`}
           />
-          <ResponsiveButtonGroup orientation={isMobile ? "vertical" : "horizontal"}>
-            <Button 
-              onClick={handleGenerate} 
-              disabled={loading} 
-              className={`btn-academic-primary ${isMobile ? 'text-xs px-3 py-2' : ''}`}
-            >
+          <div className="flex items-center gap-4">
+            <div className="flex-1">
+              <Label htmlFor="question-count" className="sorani-text">
+                ژمارەی پرسیارەکان
+              </Label>
+              <Input
+                id="question-count"
+                type="number"
+                value={questionCount}
+                onChange={(e) => setQuestionCount(Math.max(1, parseInt(e.target.value, 10)))}
+                className="input-academic mt-1"
+                min="1"
+                max="20"
+              />
+            </div>
+             <LanguageSelection
+               selectedLanguage={responseLanguage}
+               onLanguageChange={setResponseLanguage}
+             />
+            <ResponsiveButtonGroup orientation={isMobile ? "vertical" : "horizontal"} className="flex-shrink-0">
+              <Button
+                onClick={handleGenerate}
+                disabled={loading}
+                className={`btn-academic-primary ${isMobile ? 'text-xs px-3 py-2' : ''}`}
+              >
               {loading ? (
                 <RefreshCw className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} ${isMobile ? 'mr-1' : 'mr-2'} animate-spin`} />
               ) : null}
@@ -128,6 +151,7 @@ export const QuizGenerator = () => {
               accept=".txt,.md,.pdf,.docx"
             />
           </ResponsiveButtonGroup>
+          </div>
         </CardContent>
       </Card>
         

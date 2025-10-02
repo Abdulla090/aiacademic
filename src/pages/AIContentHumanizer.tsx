@@ -16,6 +16,9 @@ import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { Copy, Download, RefreshCw, Zap, Eye, Settings2, BarChart3 } from 'lucide-react';
 import { geminiService } from '@/services/geminiService';
 import { analyticsService } from '@/services/analytics';
+import { LanguageSelection } from '@/components/LanguageSelection';
+import { BackButton } from '@/components/BackButton';
+import { useNavigate } from 'react-router-dom';
 
 // AI Detection and Humanization utilities
 import { detectAIPatterns, humanizeContent, AIDetectionResult, HumanizationOptions } from '../utils/aiHumanizer';
@@ -32,6 +35,7 @@ interface HumanizationSettings {
 }
 
 const AIContentHumanizer: React.FC = () => {
+  const navigate = useNavigate();
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -39,6 +43,7 @@ const AIContentHumanizer: React.FC = () => {
   const [detectionResult, setDetectionResult] = useState<AIDetectionResult | null>(null);
   const [progress, setProgress] = useState(0);
   const { toast } = useToast();
+  const [responseLanguage, setResponseLanguage] = useState('en');
 
   const [settings, setSettings] = useState<HumanizationSettings>({
     tone: 'conversational',
@@ -168,6 +173,7 @@ Settings to apply:
 - Formality: ${settings.formality}% (lower = more casual)
 - Personality: ${settings.personality}% (higher = more personal)
 - Creativity: ${settings.creativity}% (higher = more varied language)
+- Response Language: ${responseLanguage}
 
 PRESERVE:
 - Original language (CRITICAL - do not change)
@@ -260,8 +266,12 @@ OUTPUT: Return the humanized version with the same structure and language, just 
   };
 
   return (
-    <ResponsiveLayout>
+    <div className="min-h-screen bg-gradient-subtle bg-purple-grid">
+      <ResponsiveLayout>
       <div className="container mx-auto px-4 py-8 space-y-6">
+        <div className="flex justify-between items-center">
+          <BackButton />
+        </div>
         {/* Header */}
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-2">
@@ -313,8 +323,7 @@ OUTPUT: Return the humanized version with the same structure and language, just 
                   <Button
                     onClick={handleAnalyzeContent}
                     disabled={isAnalyzing || !inputText.trim()}
-                    variant="outline"
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 btn-gradient-primary"
                   >
                     {isAnalyzing ? <LoadingSpinner size="sm" /> : <BarChart3 className="h-4 w-4" />}
                     Analyze AI Patterns
@@ -322,7 +331,7 @@ OUTPUT: Return the humanized version with the same structure and language, just 
                   <Button
                     onClick={handleHumanizeContent}
                     disabled={isProcessing || !inputText.trim()}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 btn-gradient-primary"
                   >
                     {isProcessing ? <LoadingSpinner size="sm" /> : <Zap className="h-4 w-4" />}
                     Humanize Content
@@ -388,16 +397,14 @@ OUTPUT: Return the humanized version with the same structure and language, just 
                   <ResponsiveButtonGroup>
                     <Button
                       onClick={handleCopyResult}
-                      variant="outline"
-                      className="flex items-center gap-2"
+                      className="flex items-center gap-2 btn-gradient-primary"
                     >
                       <Copy className="h-4 w-4" />
                       Copy Result
                     </Button>
                     <Button
                       onClick={handleDownload}
-                      variant="outline"
-                      className="flex items-center gap-2"
+                      className="flex items-center gap-2 btn-gradient-primary"
                     >
                       <Download className="h-4 w-4" />
                       Download
@@ -516,6 +523,12 @@ OUTPUT: Return the humanized version with the same structure and language, just 
                         />
                       </div>
                     </div>
+                     <div className="space-y-2">
+                       <LanguageSelection
+                         selectedLanguage={responseLanguage}
+                         onLanguageChange={setResponseLanguage}
+                       />
+                     </div>
                   </TabsContent>
                 </Tabs>
               </CardContent>
@@ -539,6 +552,7 @@ OUTPUT: Return the humanized version with the same structure and language, just 
         </div>
       </div>
     </ResponsiveLayout>
+    </div>
   );
 };
 

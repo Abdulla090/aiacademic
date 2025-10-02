@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslation } from 'react-i18next';
+import { LanguageSelection } from './LanguageSelection';
 
 interface KnowledgeGraphGeneratorProps {
   onGenerateGraph: (nodes: { id: string; label: string }[], edges: { from: string; to: string }[]) => void;
@@ -11,6 +12,7 @@ interface KnowledgeGraphGeneratorProps {
 export const KnowledgeGraphGenerator: React.FC<KnowledgeGraphGeneratorProps> = ({ onGenerateGraph }) => {
   const { t } = useTranslation();
   const [inputText, setInputText] = useState<string>('');
+  const [responseLanguage, setResponseLanguage] = useState('en');
 
   // Define a list of common English stop words
   const stopWords = new Set([
@@ -92,6 +94,12 @@ export const KnowledgeGraphGenerator: React.FC<KnowledgeGraphGeneratorProps> = (
         <Button onClick={generateGraph} className="btn-academic-primary">
           {t('generateKnowledgeGraph')}
         </Button>
+        <div className="mt-4">
+           <LanguageSelection
+             selectedLanguage={responseLanguage}
+             onLanguageChange={setResponseLanguage}
+           />
+        </div>
       </CardContent>
     </Card>
   );

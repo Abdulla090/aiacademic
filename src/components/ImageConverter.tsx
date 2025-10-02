@@ -7,10 +7,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
+import { LanguageSelection } from './LanguageSelection';
 
 export const ImageConverter = () => {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [responseLanguage, setResponseLanguage] = useState('en');
   const [outputFormat, setOutputFormat] = useState('png');
   const [quality, setQuality] = useState(0.92);
   const [width, setWidth] = useState(0);
@@ -131,6 +133,10 @@ export const ImageConverter = () => {
                   </SelectContent>
                 </Select>
               </div>
+               <LanguageSelection
+                 selectedLanguage={responseLanguage}
+                 onLanguageChange={setResponseLanguage}
+               />
               <div>
                 <Label htmlFor="quality">کوالێتی: {Math.round(quality * 100)}%</Label>
                 <Slider

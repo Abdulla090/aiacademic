@@ -18,10 +18,10 @@ export const LanguageSelection = ({ selectedLanguage, onLanguageChange }: Langua
   return (
     <div className="flex items-center gap-2">
       <label htmlFor="language-select" className="text-sm font-medium text-muted-foreground">
-        {t('language')}
+        {t('responseLanguage')}
       </label>
       <Select value={selectedLanguage} onValueChange={onLanguageChange}>
-        <SelectTrigger id="language-select" className="w-[180px]">
+        <SelectTrigger id="language-select" className="w-full">
           <SelectValue placeholder={t('selectLanguage')} />
         </SelectTrigger>
         <SelectContent>

@@ -1,8 +1,9 @@
-import { getDocument, version, GlobalWorkerOptions } from 'pdfjs-dist';
+import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
+import * as pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.js';
 
 // Set the worker path for PDF.js
 if (typeof window !== 'undefined') {
-  GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+  GlobalWorkerOptions.workerSrc = pdfjsWorker;
 }
 
 export interface PDFExtractionResult {

@@ -8,14 +8,15 @@ import { FileText, ChevronRight, Check, Download, RefreshCw, Pause, Play, Square
 import { geminiService, type ReportOutline, type ReportSection } from '@/services/geminiService';
 import { useToast } from '@/components/ui/use-toast';
 import { KurdishPDFService } from '@/services/kurdishPdfService';
+import { EnglishPDFService } from '@/services/englishPdfService';
 import { TypingIndicator } from '@/components/ui/typing-indicator';
 import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
 import { FormattingControls } from '@/components/ui/formatting-controls';
 import { ResponsiveLayout, ResponsiveButtonGroup } from '@/components/ui/responsive-layout';
 import { useResponsive } from '@/hooks/useResponsive';
+import { LanguageSelection } from './LanguageSelection';
 
 interface ReportGeneratorProps {
-  language: string;
 }
 
 const convertMarkdownToHtml = (markdown: string): string => {
@@ -68,9 +69,10 @@ const convertMarkdownToHtml = (markdown: string): string => {
   return html;
 };
 
-export const ReportGenerator = ({ language }: ReportGeneratorProps) => {
+export const ReportGenerator = ({}: ReportGeneratorProps) => {
   const reportRef = useRef<HTMLDivElement | null>(null);
   const [topic, setTopic] = useState('');
+  const [language, setLanguage] = useState('en');
   const [outline, setOutline] = useState<ReportOutline | null>(null);
   const [sections, setSections] = useState<ReportSection[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
@@ -221,27 +223,44 @@ export const ReportGenerator = ({ language }: ReportGeneratorProps) => {
 
     if (format === 'pdf') {
       toast({
-        title: 'دروستکردنی PDF',
-        description: 'تکایە چاوەڕوان بە...',
+        title: 'Creating PDF',
+        description: 'Please wait...',
       });
 
       try {
-        const pdfService = new KurdishPDFService();
-        await pdfService.createKurdishReport(
-          titleToUse,
-          sectionsToExport.map(s => ({ title: s.title, content: s.content || '' }))
-        );
-        pdfService.save(`${titleToUse.substring(0, 50).replace(/[^a-zA-Z0-9\u0600-\u06FF\s]/g, '')}.pdf`);
+        if (language === 'en') {
+          const pdfService = new EnglishPDFService();
+          pdfService.addTitle(titleToUse);
+          sectionsToExport.forEach(section => {
+            pdfService.addSectionTitle(section.title);
+            if (section.content) {
+              section.content.split('\n').forEach(paragraph => {
+                if (paragraph.trim()) {
+                  pdfService.addParagraph(paragraph);
+                }
+              });
+            }
+          });
+          pdfService.save(`${titleToUse.substring(0, 50).replace(/[^a-zA-Z0-9\s]/g, '')}.pdf`);
+        } else {
+          const pdfService = new KurdishPDFService();
+          await pdfService.createKurdishReport(
+            titleToUse,
+            sectionsToExport.map(s => ({ title: s.title, content: s.content || '' })),
+            language as 'ku'
+          );
+          pdfService.save(`${titleToUse.substring(0, 50).replace(/[^a-zA-Z0-9\u0600-\u06FF\s]/g, '')}.pdf`);
+        }
         
         toast({
-          title: 'سەرکەوتوو',
-          description: singleSection ? `بەشی "${singleSection.title}" وەک PDF دابەزێنرا` : 'ڕاپۆرتی تەواو وەک PDF دابەزێنرا',
+          title: 'Success',
+          description: singleSection ? `Section "${singleSection.title}" has been downloaded as a PDF.` : 'The full report has been downloaded as a PDF.',
         });
       } catch (error) {
         console.error('PDF Generation Error:', error);
         toast({
-          title: 'هەڵە',
-          description: 'نەتوانرا PDF دروست بکرێت: ' + (error as Error).message,
+          title: 'Error',
+          description: 'Failed to generate PDF: ' + (error as Error).message,
           variant: 'destructive',
         });
       }
@@ -297,7 +316,13 @@ export const ReportGenerator = ({ language }: ReportGeneratorProps) => {
               placeholder="بابەتی ڕاپۆرتەکەت بنووسە..."
               className={`input-academic ${language === 'ku' ? 'sorani-text' : 'latin-text'} ${isMobile ? 'text-sm' : ''}`}
             />
-            <Button 
+            <div className="space-y-2">
+               <LanguageSelection
+                 selectedLanguage={language}
+                 onLanguageChange={setLanguage}
+               />
+            </div>
+            <Button
               onClick={handleGenerateOutline}
               disabled={loading || !topic.trim()}
               className={`btn-academic-primary ${isMobile ? 'w-full text-sm py-2' : ''}`}

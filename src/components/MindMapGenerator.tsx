@@ -19,6 +19,7 @@ import { Brain, RefreshCw, Download } from 'lucide-react';
 import { geminiService, type MindMapNode } from '@/services/geminiService';
 import { useToast } from '@/components/ui/use-toast';
 import dagre from 'dagre';
+import { LanguageSelection } from './LanguageSelection';
 
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -68,7 +69,7 @@ const CustomNode = ({ data }: any) => {
         '#10b981', // emerald-500
         '#eab308', // yellow-500
         '#06b6d4', // cyan-500
-        '#ec4899', // pink-500
+        '#8b5cf6', // purple-500
     ];
 
     const getColor = (nodeId: string) => {
@@ -119,6 +120,7 @@ const MindMapInternal: React.FC<MindMapInternalProps> = ({ initialNodes, initial
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [layoutDirection, setLayoutDirection] = useState('TB');
+  const [responseLanguage, setResponseLanguage] = useState('en');
 
   useEffect(() => {
     if (initialNodes.length > 0) {
@@ -186,6 +188,10 @@ const MindMapInternal: React.FC<MindMapInternalProps> = ({ initialNodes, initial
             </div>
           </div>
         </div>
+         <LanguageSelection
+           selectedLanguage={responseLanguage}
+           onLanguageChange={setResponseLanguage}
+         />
       </div>
       <div className="react-flow-wrapper h-[70vh] w-full">
         <ReactFlow

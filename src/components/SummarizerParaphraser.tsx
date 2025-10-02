@@ -11,10 +11,12 @@ import { useToast } from '@/components/ui/use-toast';
 import { jsPDF } from "jspdf";
 import { notoNaskhArabic } from '@/lib/fonts';
 import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
+import { LanguageSelection } from './LanguageSelection';
 
 export const SummarizerParaphraser = () => {
   const [text, setText] = useState('');
   const [summarizedText, setSummarizedText] = useState('');
+  const [responseLanguage, setResponseLanguage] = useState('en');
   const [paraphrasedText, setParaphrasedText] = useState('');
   const [summaryLength, setSummaryLength] = useState<'short' | 'medium' | 'detailed'>('medium');
   const [loading, setLoading] = useState(false);
@@ -346,6 +348,10 @@ export const SummarizerParaphraser = () => {
               placeholder="نووسینەکەت لێرە بنووسە بۆ کورتکردنەوە یان نووسینەوە..."
               className="min-h-[400px] sorani-text text-base leading-relaxed"
             />
+             <LanguageSelection
+               selectedLanguage={responseLanguage}
+               onLanguageChange={setResponseLanguage}
+             />
             
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2">

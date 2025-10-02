@@ -12,10 +12,12 @@ import { geminiService, type TaskPlan } from '@/services/geminiService';
 import { useToast } from '@/components/ui/use-toast';
 import { jsPDF } from "jspdf";
 import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
+import { LanguageSelection } from './LanguageSelection';
 
 export const TaskPlanner = () => {
   const [projectTitle, setProjectTitle] = useState('');
   const [deadline, setDeadline] = useState('');
+  const [responseLanguage, setResponseLanguage] = useState('en');
   const [details, setDetails] = useState('');
   const [taskType, setTaskType] = useState('study');
   const [currentLevel, setCurrentLevel] = useState('beginner');
@@ -84,7 +86,7 @@ export const TaskPlanner = () => {
     { value: 'assignment', label: '📝 ئەرک', icon: Circle, color: 'text-green-600' },
     { value: 'research', label: '🔬 توێژینەوە', icon: FlaskConical, color: 'text-purple-600' },
     { value: 'language', label: '🗣️ زمان', icon: Languages, color: 'text-orange-600' },
-    { value: 'workout', label: '💪 وەرزش', icon: Dumbbell, color: 'text-pink-600' },
+    { value: 'workout', label: '💪 وەرزش', icon: Dumbbell, color: 'text-purple-600' },
     { value: 'work', label: '💼 کار', icon: Briefcase, color: 'text-gray-600' },
     { value: 'skill', label: '⭐ شارەزایی', icon: Award, color: 'text-yellow-600' }
   ];
@@ -484,6 +486,11 @@ export const TaskPlanner = () => {
               />
             </div>
 
+             <LanguageSelection
+               selectedLanguage={responseLanguage}
+               onLanguageChange={setResponseLanguage}
+             />
+
             {/* File Upload Section */}
             <div className="space-y-3">
               <label className="text-sm font-medium sorani-text flex items-center gap-2">
@@ -494,7 +501,7 @@ export const TaskPlanner = () => {
               <div
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
-                className="border-2 border-dashed border-purple-300 rounded-lg p-6 text-center hover:border-purple-500 transition-colors cursor-pointer bg-gradient-to-br from-purple-50 to-pink-50"
+                className="border-2 border-dashed border-purple-300 rounded-lg p-6 text-center hover:border-purple-500 transition-colors cursor-pointer bg-gradient-to-br from-purple-50 to-purple-100"
               >
                 <input
                   type="file"
@@ -593,7 +600,7 @@ export const TaskPlanner = () => {
               <Button
                 onClick={handleGeneratePlan}
                 disabled={loading}
-                className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg transform transition-all duration-200 hover:scale-105"
+                className="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white shadow-lg transform transition-all duration-200 hover:scale-105"
               >
                 {loading ? (
                   <>
@@ -611,7 +618,7 @@ export const TaskPlanner = () => {
 
             {/* AI Insights */}
             {tasks.length === 0 && !loading && (
-              <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg">
+              <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <Brain className="h-5 w-5 text-purple-600" />
                   <h3 className="font-semibold text-purple-800 sorani-text">زیرەکی دەستکرد</h3>

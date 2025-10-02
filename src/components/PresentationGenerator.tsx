@@ -15,10 +15,12 @@ import 'reveal.js/dist/theme/white.css';
 import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
 import { ResponsiveLayout, ResponsiveButtonGroup } from '@/components/ui/responsive-layout';
 import { useResponsive } from '@/hooks/useResponsive';
+import { LanguageSelection } from './LanguageSelection';
 
 export const PresentationGenerator = () => {
   const [text, setText] = useState('');
   const [slides, setSlides] = useState<PresentationSlide[]>([]);
+  const [responseLanguage, setResponseLanguage] = useState('en');
   const [loading, setLoading] = useState(false);
   const [slideCount, setSlideCount] = useState(7);
   const [style, setStyle] = useState('academic');
@@ -153,6 +155,10 @@ export const PresentationGenerator = () => {
                 </SelectContent>
               </Select>
             </div>
+             <LanguageSelection
+               selectedLanguage={responseLanguage}
+               onLanguageChange={setResponseLanguage}
+             />
             <div className="flex items-center gap-4">
               <Button onClick={handleGenerate} disabled={loading} className="btn-academic-primary">
                 {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'دروستکردنی پێشکەشکردن'}
