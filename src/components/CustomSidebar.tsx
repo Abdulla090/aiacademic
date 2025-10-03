@@ -117,7 +117,7 @@ export function CustomSidebar() {
   return (
     <Sidebar collapsible="icon">
         <SidebarHeader className="border-b border-sidebar-border">
-          <div className="flex items-center justify-between p-4">
+          <div className="flex items-center justify-between p-4" dir={i18n.dir()}>
             {state === "expanded" && (
               <div>
                 <h2 className="text-lg font-semibold">{t('appName')}</h2>
@@ -210,27 +210,27 @@ export function CustomSidebar() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="bg-background">
                     <DropdownMenuItem onClick={toggleTheme}>
-                      {isDark ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
+                      {isDark ? <Sun className="ms-2 h-4 w-4" /> : <Moon className="ms-2 h-4 w-4" />}
                       <span>{t(isDark ? 'lightMode' : 'darkMode')}</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                      <Languages className="mr-2 h-4 w-4" />
+                      <Languages className="ms-2 h-4 w-4" />
                       <LanguageSwitcher />
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <a href="/help">
-                        <HelpCircle className="mr-2 h-4 w-4" />
+                        <HelpCircle className="ms-2 h-4 w-4" />
                         <span>{t('help')}</span>
                       </a>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <a href="/about">
-                        <Info className="mr-2 h-4 w-4" />
+                        <Info className="ms-2 h-4 w-4" />
                         <span>{t('about')}</span>
                       </a>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                      <LogOut className="mr-2 h-4 w-4" />
+                      <LogOut className="ms-2 h-4 w-4" />
                       <span>{t('logout')}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>

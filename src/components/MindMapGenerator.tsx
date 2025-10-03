@@ -9,6 +9,8 @@ import ReactFlow, {
   addEdge,
   Connection,
   Edge,
+  Node,
+  Position,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -27,7 +29,7 @@ dagreGraph.setDefaultEdgeLabel(() => ({}));
 const nodeWidth = 172;
 const nodeHeight = 36;
 
-const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
+const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => {
   const isHorizontal = direction === 'LR';
   dagreGraph.setGraph({ rankdir: direction });
 
@@ -43,8 +45,8 @@ const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
 
   nodes.forEach((node) => {
     const nodeWithPosition = dagreGraph.node(node.id);
-    node.targetPosition = isHorizontal ? 'left' : 'top';
-    node.sourcePosition = isHorizontal ? 'right' : 'bottom';
+    node.targetPosition = isHorizontal ? Position.Left : Position.Top;
+    node.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
 
     // We are shifting the dagre node position (anchor=center center) to the top left
     // so it matches the React Flow node anchor point (top left).
@@ -60,7 +62,7 @@ const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
 };
 
 
-const CustomNode = ({ data }: any) => {
+const CustomNode = ({ data }: { data: { label: string } }) => {
     const colors = [
         '#60a5fa', // blue-400
         '#8b5cf6', // violet-500
@@ -111,8 +113,8 @@ const nodeTypes = {
 };
 
 interface MindMapInternalProps {
-  initialNodes: any[];
-  initialEdges: any[];
+  initialNodes: Node[];
+  initialEdges: Edge[];
 }
 
 const MindMapInternal: React.FC<MindMapInternalProps> = ({ initialNodes, initialEdges }) => {
@@ -213,8 +215,8 @@ const MindMapInternal: React.FC<MindMapInternalProps> = ({ initialNodes, initial
 };
 
 interface MindMapGeneratorProps {
-  nodes: any[];
-  edges: any[];
+  nodes: Node[];
+  edges: Edge[];
 }
 
 export const MindMapGenerator: React.FC<MindMapGeneratorProps> = ({ nodes, edges }) => {

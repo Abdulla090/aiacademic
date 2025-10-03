@@ -23,10 +23,9 @@ interface GrammarError {
   severity: 'error' | 'warning' | 'suggestion';
 }
 
-interface GrammarCheckerProps {
-}
+type GrammarCheckerProps = object;
 
-export const GrammarChecker = ({}: GrammarCheckerProps) => {
+export const GrammarChecker = () => {
   const [text, setText] = useState('');
   const [errors, setErrors] = useState<GrammarError[]>([]);
   const [loading, setLoading] = useState(false);
@@ -121,7 +120,7 @@ export const GrammarChecker = ({}: GrammarCheckerProps) => {
       title: 'گۆڕانکاری جێبەجێ کرا',
       description: 'پێشنیارەکە جێبەجێ کرا',
     });
-  }, [text, errors]);
+  }, [text, errors, toast]);
 
   const handleTextClick = useCallback((event: React.MouseEvent<HTMLTextAreaElement>) => {
     if (!textareaRef.current || errors.length === 0) return;

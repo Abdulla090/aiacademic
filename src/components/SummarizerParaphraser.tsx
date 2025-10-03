@@ -362,7 +362,7 @@ export const SummarizerParaphraser = () => {
               <TabsContent value="summarize" className="space-y-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium sorani-text">درێژی کورتکردنەوە</label>
-                  <Select value={summaryLength} onValueChange={(value: any) => setSummaryLength(value)}>
+                  <Select value={summaryLength} onValueChange={(value: string) => setSummaryLength(value as 'short' | 'medium' | 'detailed')}>
                     <SelectTrigger className="input-academic">
                       <SelectValue />
                     </SelectTrigger>

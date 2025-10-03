@@ -414,7 +414,7 @@ export const ArticleWriter = ({ language }: ArticleWriterProps) => {
               <Label>
                 {language === 'ku' ? 'درێژی' : language === 'ar' ? 'الطول' : 'Length'}
               </Label>
-              <Select value={request.length} onValueChange={(value: any) => setRequest(prev => ({ ...prev, length: value }))}>
+              <Select value={request.length} onValueChange={(value: string) => setRequest(prev => ({ ...prev, length: value as 'short' | 'medium' | 'long' }))}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -430,7 +430,7 @@ export const ArticleWriter = ({ language }: ArticleWriterProps) => {
               <Label>
                 {language === 'ku' ? 'شێوازی سەرچاوە' : language === 'ar' ? 'نمط الاستشهاد' : 'Citation Style'}
               </Label>
-              <Select value={request.citationStyle} onValueChange={(value: any) => setRequest(prev => ({ ...prev, citationStyle: value }))}>
+              <Select value={request.citationStyle} onValueChange={(value: string) => setRequest(prev => ({ ...prev, citationStyle: value as 'APA' | 'MLA' | 'Chicago' | 'Harvard' }))}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -454,10 +454,10 @@ export const ArticleWriter = ({ language }: ArticleWriterProps) => {
               </Label>
             </div>
 
-            <Button 
-              onClick={handleGenerate} 
+            <Button
+              onClick={handleGenerate}
               disabled={loading || !request.topic.trim()}
-              className="w-full"
+              className="w-full btn-3d-primary"
             >
               {loading ? (
                 <>
@@ -515,7 +515,7 @@ export const ArticleWriter = ({ language }: ArticleWriterProps) => {
                 </div>
               </div>
             </div>
-            {showFormatting && <FormattingControls />}
+            {showFormatting && <FormattingControls showFormatting={showFormatting} onToggleFormatting={setShowFormatting} />}
           </CardHeader>
           <CardContent className="flex-1 flex flex-col">
             <div className="flex-1 relative">

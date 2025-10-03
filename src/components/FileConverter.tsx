@@ -52,7 +52,7 @@ export const FileConverter = () => {
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const text = await page.getTextContent();
-          textContent += text.items.map(s => (s as any).str).join(' ');
+          textContent += text.items.map(s => (s as { str: string }).str).join(' ');
         }
       } else if (file.name.endsWith('.docx')) {
         const { value } = await mammoth.extractRawText({ arrayBuffer });

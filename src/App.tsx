@@ -54,18 +54,18 @@ const PageLoadingFallback = () => (
   <PageLoading text="Loading page..." className="py-20" />
 );
 
-const AppContent = () => {
+const AppContent = ({ i18n }: { i18n: any }) => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const [showMobileSettings, setShowMobileSettings] = useState(false);
   const { showLoadingTransition, setShowLoadingTransition } = useTransition();
   const showSidebar = location.pathname !== '/' && !isMobile;
-  const { i18n } = useTranslation();
 
   useEffect(() => {
-    document.documentElement.dir = i18n.language === "ku" ? "rtl" : "ltr";
+    document.documentElement.dir = i18n.dir();
     document.documentElement.lang = i18n.language;
-  }, [i18n.language]);
+    document.body.classList.toggle('rtl', i18n.dir() === 'rtl');
+  }, [i18n, i18n.language]);
 
 
 
@@ -155,18 +155,19 @@ const AppContent = () => {
 };
 
 const App = () => {
+  const { i18n } = useTranslation();
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter future={{ 
+          <BrowserRouter future={{
             v7_relativeSplatPath: true,
-            v7_startTransition: true 
+            v7_startTransition: true
           }}>
             <TransitionProvider>
-              <AppContent />
+              <AppContent key={i18n.language} i18n={i18n} />
             </TransitionProvider>
           </BrowserRouter>
         </TooltipProvider>

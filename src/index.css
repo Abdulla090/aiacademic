@@ -50,40 +50,40 @@ suggestion,
 @layer base {
   :root {
     /* Background System */
-    --background: 240 15% 98%;
-    --background-secondary: 240 20% 95%;
-    --background-tertiary: 240 25% 92%;
+    --background: 0 0% 100%;
+    --background-secondary: 240 5% 96%;
+    --background-tertiary: 240 5% 90%;
     --foreground: 240 15% 8%;
     --foreground-secondary: 240 10% 25%;
 
     /* Academic Brand Colors */
-    --primary: 240 85% 58%;
-    --primary-light: 240 85% 68%;
-    --primary-dark: 240 85% 48%;
+    --primary: 265 60% 50%;
+    --primary-light: 265 60% 60%;
+    --primary-dark: 265 60% 40%;
     --primary-foreground: 0 0% 100%;
 
     /* Academic Secondary */
-    --secondary: 280 50% 65%;
-    --secondary-light: 280 60% 75%;
+    --secondary: 275 45% 55%;
+    --secondary-light: 275 45% 65%;
     --secondary-foreground: 0 0% 100%;
 
     /* Academic Accent */
-    --accent: 200 85% 55%;
-    --accent-light: 200 85% 65%;
+    --accent: 270 70% 58%;
+    --accent-light: 270 70% 68%;
     --accent-foreground: 0 0% 100%;
 
     /* Card System */
-    --card: 0 0% 100%;
-    --card-secondary: 240 20% 99%;
+    --card: 240 5% 98%;
+    --card-secondary: 240 5% 94%;
     --card-foreground: 240 15% 8%;
-    --card-border: 240 20% 88%;
+    --card-border: 240 5% 90%;
 
     /* Interactive Elements */
     --muted: 240 15% 96%;
     --muted-foreground: 240 10% 45%;
     --border: 240 20% 90%;
     --input: 240 20% 95%;
-    --ring: 240 85% 58%;
+    --ring: 265 60% 50%;
 
     /* Popover */
     --popover: 0 0% 100%;
@@ -108,7 +108,7 @@ suggestion,
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-    --shadow-academic: 0 8px 30px -8px hsl(var(--primary) / 0.15);
+    --shadow-academic: 0 10px 30px -10px hsl(var(--primary) / 0.2), 0 4px 6px -2px hsl(var(--primary) / 0.05);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -143,18 +143,18 @@ suggestion,
     --foreground: 240 15% 92%;
     --foreground-secondary: 240 10% 75%;
 
-    --primary: 240 85% 68%;
-    --primary-light: 240 85% 78%;
-    --primary-dark: 240 85% 58%;
-    --primary-foreground: 240 15% 8%;
+    --primary: 265 65% 60%;
+    --primary-light: 265 65% 70%;
+    --primary-dark: 265 65% 50%;
+    --primary-foreground: 260 15% 95%;
 
-    --secondary: 280 50% 75%;
-    --secondary-light: 280 60% 85%;
-    --secondary-foreground: 240 15% 8%;
+    --secondary: 275 50% 65%;
+    --secondary-light: 275 50% 75%;
+    --secondary-foreground: 270 15% 95%;
 
-    --accent: 200 85% 65%;
-    --accent-light: 200 85% 75%;
-    --accent-foreground: 240 15% 8%;
+    --accent: 270 75% 68%;
+    --accent-light: 270 75% 78%;
+    --accent-foreground: 265 15% 95%;
 
     --card: 240 15% 12%;
     --card-secondary: 240 15% 10%;
@@ -165,7 +165,7 @@ suggestion,
     --muted-foreground: 240 10% 55%;
     --border: 240 20% 20%;
     --input: 240 20% 16%;
-    --ring: 240 85% 68%;
+    --ring: 265 65% 60%;
 
     /* Popover */
     --popover: 240 15% 12%;
@@ -623,17 +623,17 @@ suggestion,
 /* Purple grid background */
 .bg-purple-grid {
   background-image:
-    linear-gradient(rgba(139, 92, 246, 0.4) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(139, 92, 246, 0.4) 1px, transparent 1px);
-  background-size: 20px 20px;
+    linear-gradient(rgba(91, 33, 182, 0.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(91, 33, 182, 0.4) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
 /* Dark mode purple grid background */
 .dark .bg-purple-grid {
   background-image:
-    linear-gradient(rgba(139, 92, 246, 0.2) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(139, 92, 246, 0.2) 1px, transparent 1px);
-  background-size: 20px 20px;
+    linear-gradient(rgba(91, 33, 182, 0.2) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(91, 33, 182, 0.2) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 @layer utilities {
   .animated-border-snake {
@@ -661,7 +661,7 @@ suggestion,
     left: 0;
     width: 100%;
     height: 2px;
-    background: linear-gradient(90deg, transparent, #f9a8d4, #a855f7);
+    background: linear-gradient(90deg, transparent, #c4b5fd, #8b5cf6);
     animation: snake-border-top 2s linear infinite;
   }
   .animated-border-snake::after {
@@ -669,7 +669,7 @@ suggestion,
     right: 0;
     width: 2px;
     height: 100%;
-    background: linear-gradient(180deg, transparent, #f9a8d4, #a855f7);
+    background: linear-gradient(180deg, transparent, #c4b5fd, #8b5cf6);
     animation: snake-border-right 2s linear infinite;
     animation-delay: 0.5s;
   }
@@ -678,7 +678,7 @@ suggestion,
     right: 0;
     width: 100%;
     height: 2px;
-    background: linear-gradient(270deg, transparent, #f9a8d4, #a855f7);
+    background: linear-gradient(270deg, transparent, #c4b5fd, #8b5cf6);
     animation: snake-border-bottom 2s linear infinite;
     animation-delay: 1s;
   }
@@ -687,7 +687,7 @@ suggestion,
     left: 0;
     width: 2px;
     height: 100%;
-    background: linear-gradient(0deg, transparent, #f9a8d4, #a855f7);
+    background: linear-gradient(0deg, transparent, #c4b5fd, #8b5cf6);
     animation: snake-border-left 2s linear infinite;
     animation-delay: 1.5s;
   }

@@ -218,7 +218,7 @@ OUTPUT: Return the humanized version with the same structure and language, just 
     } finally {
       setIsProcessing(false);
     }
-  }, [inputText, settings, toast]);
+  }, [inputText, settings, toast, responseLanguage]);
 
   const handleCopyResult = useCallback(() => {
     if (outputText) {
@@ -437,7 +437,7 @@ OUTPUT: Return the humanized version with the same structure and language, just 
                   <TabsContent value="tone" className="space-y-4">
                     <div className="space-y-2">
                       <Label>Writing Tone</Label>
-                      <Select value={settings.tone} onValueChange={(value: any) => setSettings({...settings, tone: value})}>
+                      <Select value={settings.tone} onValueChange={(value: string) => setSettings({...settings, tone: value as 'casual' | 'professional' | 'conversational' | 'friendly' | 'creative'})}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>

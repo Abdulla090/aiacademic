@@ -70,10 +70,9 @@ interface TextChange {
   position: { start: number; end: number };
 }
 
-interface TextStructureFixerProps {
-}
+type TextStructureFixerProps = object;
 
-export function TextStructureFixer({}: TextStructureFixerProps) {
+export function TextStructureFixer() {
   const [inputText, setInputText] = useState('');
   const [fixedText, setFixedText] = useState('');
   const [language, setLanguage] = useState('en');

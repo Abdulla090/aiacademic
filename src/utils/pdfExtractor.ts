@@ -52,7 +52,7 @@ export class PDFTextExtractor {
 
   static formatExtractedText(text: string): string {
     // Clean up common PDF extraction artifacts
-    let cleanedText = text
+    const cleanedText = text
       // Remove excessive whitespace
       .replace(/\s+/g, ' ')
       // Fix line breaks

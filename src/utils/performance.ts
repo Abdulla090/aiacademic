@@ -4,7 +4,7 @@ export interface PerformanceMetric {
   name: string;
   value: number;
   timestamp: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export class PerformanceMonitor {
@@ -80,7 +80,7 @@ export class PerformanceMonitor {
       if ('PerformanceObserver' in window) {
         const fidObserver = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
-            const fidEntry = entry as any; // FID entries have custom properties
+            const fidEntry = entry as PerformanceEntry & { processingStart: number; startTime: number };
             if (fidEntry.processingStart) {
               this.recordMetric('first_input_delay', fidEntry.processingStart - fidEntry.startTime);
             }
@@ -98,7 +98,7 @@ export class PerformanceMonitor {
     }
   }
 
-  public recordMetric(name: string, value: number, metadata?: Record<string, any>) {
+  public recordMetric(name: string, value: number, metadata?: Record<string, unknown>) {
     const metric: PerformanceMetric = {
       name,
       value,
@@ -126,8 +126,8 @@ export class PerformanceMonitor {
   private sendToAnalytics(metric: PerformanceMetric) {
     try {
       // Send to Google Analytics 4
-      if (typeof window !== 'undefined' && (window as any).gtag) {
-        (window as any).gtag('event', 'performance_metric', {
+      if (typeof window !== 'undefined' && (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) {
+        (window as unknown as { gtag: (...args: unknown[]) => void }).gtag('event', 'performance_metric', {
           custom_metric_name: metric.name,
           value: metric.value,
           custom_metadata: JSON.stringify(metric.metadata || {}),
@@ -167,7 +167,7 @@ export class PerformanceMonitor {
 export const measureAsync = async <T>(
   name: string,
   fn: () => Promise<T>,
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 ): Promise<T> => {
   const start = performance.now();
   try {
@@ -188,7 +188,7 @@ export const measureAsync = async <T>(
 export const measureSync = <T>(
   name: string,
   fn: () => T,
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 ): T => {
   const start = performance.now();
   try {
@@ -234,7 +234,7 @@ export const usePerformanceTracker = (componentName: string) => {
   });
 
   return {
-    recordMetric: (name: string, value: number, metadata?: Record<string, any>) => {
+    recordMetric: (name: string, value: number, metadata?: Record<string, unknown>) => {
       PerformanceMonitor.getInstance().recordMetric(name, value, {
         component: componentName,
         ...metadata,

@@ -50,6 +50,25 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+## Environment Variables
+
+This project uses several environment variables for configuration. Copy `.env.example` to `.env.local` and configure the values as needed.
+
+### Required Variables
+
+- `VITE_GEMINI_API_KEY`: Your Gemini AI API key
+- `VITE_GEMINI_API_URL`: Gemini API endpoint URL
+
+### Optional Variables
+
+- `I18N_DEBUG`: Enable i18n debugging logs (default: `false` in production, `true` in development)
+  - Set to `true` to enable detailed i18n debugging
+  - Automatically enabled when `NODE_ENV` is not `production`
+- `VITE_ENABLE_DEBUG`: General application debugging (default: `false`)
+- `VITE_ENABLE_ANALYTICS`: Enable analytics tracking (default: `true`)
+- `VITE_GA_TRACKING_ID`: Google Analytics tracking ID
+- `VITE_SENTRY_DSN`: Sentry error tracking DSN
+
 ## How can I deploy this project?
 
 ## Can I connect a custom domain to this project?

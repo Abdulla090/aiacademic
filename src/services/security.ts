@@ -293,7 +293,7 @@ export class SecurityService {
 
   private setupSecurityEventListeners(): void {
     // Detect devtools
-    let devtools = { open: false, orientation: null };
+    const devtools = { open: false, orientation: null };
     
     setInterval(() => {
       if (window.outerHeight - window.innerHeight > 200 || window.outerWidth - window.innerWidth > 200) {

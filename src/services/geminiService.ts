@@ -14,7 +14,7 @@ export type StreamingOptions = {
 };
 
 export interface CitationStyle {
-  type: 'APA' | 'MLA' | 'IEEE';
+  type: 'APA' | 'MLA' | 'Chicago' | 'Harvard';
 }
 
 export interface ArticleRequest {

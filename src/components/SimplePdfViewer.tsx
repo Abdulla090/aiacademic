@@ -2,6 +2,7 @@ import { useState, FC, useRef, useEffect } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
+import { PDFDocumentProxy } from 'pdfjs-dist';
 
 // Configure PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -33,14 +34,14 @@ const SimplePdfViewer: FC<SimplePdfViewerProps> = ({ file, onTextExtracted }) =>
     };
   }, []);
 
-  async function onDocumentLoadSuccess(pdf: any) {
+  async function onDocumentLoadSuccess(pdf: PDFDocumentProxy) {
     setNumPages(pdf.numPages);
     let fullText = '';
     for (let i = 1; i <= pdf.numPages; i++) {
       try {
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
-        const pageText = textContent.items.map((item: any) => item.str).join(' ');
+        const pageText = textContent.items.map((item: unknown) => (item as { str: string }).str).join(' ');
         fullText += pageText + '\n\n';
       } catch (error) {
         console.error(`Error extracting text from page ${i}:`, error);

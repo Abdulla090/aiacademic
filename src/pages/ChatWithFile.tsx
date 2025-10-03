@@ -8,6 +8,7 @@ import { Button } from '../components/ui/button';
 import { geminiService } from '../services/geminiService';
 import { readFileContent } from '../lib/fileReader';
 import { LanguageSelection } from '../components/LanguageSelection';
+import { PDFDocumentProxy } from 'pdfjs-dist';
 import { BackButton } from '@/components/BackButton';
 import { useNavigate } from 'react-router-dom';
 
@@ -32,7 +33,7 @@ const ChatWithFile: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedPdfText, setSelectedPdfText] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [pdfDocument, setPdfDocument] = useState<any>(null); // State to store pdfDocument
+  const [pdfDocument, setPdfDocument] = useState<PDFDocumentProxy | null>(null); // State to store pdfDocument
   const [extractedImages, setExtractedImages] = useState<string[]>([]); // State to store extracted image Data URLs
   const [showPreview, setShowPreview] = useState(true);
   const navigate = useNavigate();

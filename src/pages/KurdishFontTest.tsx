@@ -80,7 +80,7 @@ const KurdishFontTestPage: React.FC = () => {
         ).join('\n\n')
       });
 
-      await pdfService.createKurdishReport(title, sections, {
+      await pdfService.createKurdishReport(title, sections, 'ku', {
         showHeader: true,
         headerText: {
           kurdish: `تاقیکردنەوەی فۆنتی نوێ - ${new Date().toLocaleDateString('ku-Arab-IQ')}`

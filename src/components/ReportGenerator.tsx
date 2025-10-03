@@ -16,8 +16,7 @@ import { ResponsiveLayout, ResponsiveButtonGroup } from '@/components/ui/respons
 import { useResponsive } from '@/hooks/useResponsive';
 import { LanguageSelection } from './LanguageSelection';
 
-interface ReportGeneratorProps {
-}
+type ReportGeneratorProps = object;
 
 const convertMarkdownToHtml = (markdown: string): string => {
   let html = markdown;
@@ -69,7 +68,7 @@ const convertMarkdownToHtml = (markdown: string): string => {
   return html;
 };
 
-export const ReportGenerator = ({}: ReportGeneratorProps) => {
+export const ReportGenerator = () => {
   const reportRef = useRef<HTMLDivElement | null>(null);
   const [topic, setTopic] = useState('');
   const [language, setLanguage] = useState('en');

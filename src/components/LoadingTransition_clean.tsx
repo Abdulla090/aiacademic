@@ -45,7 +45,7 @@ export const LoadingTransition: React.FC<LoadingTransitionProps> = ({
 
   useEffect(() => {
     console.log('LoadingTransition: Starting timer');
-    let startTime = Date.now();
+    const startTime = Date.now();
 
     const timer = setInterval(() => {
       const elapsed = Date.now() - startTime;

@@ -51,7 +51,7 @@ export const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-sm mx-auto">
+      <DialogContent className="max-w-sm sm:max-w-lg mx-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 sorani-text">
             <Settings2 className="h-5 w-5" />
@@ -148,7 +148,7 @@ export const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({
         <div className="flex justify-end pt-4">
           <Button 
             onClick={onClose}
-            className="bg-purple-600 hover:bg-purple-700 text-white"
+            className="btn-3d-primary"
           >
             <span className="sorani-text">داخستن</span>
           </Button>

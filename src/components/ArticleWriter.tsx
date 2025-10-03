@@ -20,10 +20,9 @@ import { useResponsive } from '@/hooks/useResponsive';
 import { useRateLimitStatus, formatRetryMessage } from '@/utils/rateLimitUtils';
 import { LanguageSelection } from './LanguageSelection';
 
-interface ArticleWriterProps {
-}
+type ArticleWriterProps = object;
 
-export const ArticleWriter = ({}: ArticleWriterProps) => {
+export const ArticleWriter = () => {
   const [article, setArticle] = useState('');
   const [displayText, setDisplayText] = useState('');
   const [language, setLanguage] = useState('en');
@@ -388,7 +387,7 @@ export const ArticleWriter = ({}: ArticleWriterProps) => {
               <Label>
                 {language === 'ku' ? 'درێژی' : language === 'ar' ? 'الطول' : 'Length'}
               </Label>
-              <Select value={request.length} onValueChange={(value: any) => setRequest(prev => ({ ...prev, length: value }))}>
+              <Select value={request.length} onValueChange={(value) => setRequest(prev => ({ ...prev, length: value as typeof request.length }))}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -404,7 +403,7 @@ export const ArticleWriter = ({}: ArticleWriterProps) => {
               <Label>
                 {language === 'ku' ? 'شێوازی سەرچاوە' : language === 'ar' ? 'نمط الاستشهاد' : 'Citation Style'}
               </Label>
-              <Select value={request.citationStyle} onValueChange={(value: any) => setRequest(prev => ({ ...prev, citationStyle: value }))}>
+              <Select value={request.citationStyle} onValueChange={(value) => setRequest(prev => ({ ...prev, citationStyle: value as typeof request.citationStyle }))}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -438,7 +437,7 @@ export const ArticleWriter = ({}: ArticleWriterProps) => {
             <Button
               onClick={handleGenerate}
               disabled={loading || !request.topic.trim()}
-              className="w-full"
+              className="w-full btn-3d-primary"
               size={isMobile ? "lg" : "default"}
             >
               {loading ? (

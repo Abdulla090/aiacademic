@@ -14,10 +14,9 @@ import { loadKurdishFont, setKurdishFont, addRTLText } from '@/lib/kurdishFont';
 import { ResponsiveLayout, ResponsiveButtonGroup } from '@/components/ui/responsive-layout';
 import { useResponsive } from '@/hooks/useResponsive';
 
-interface OCRExtractorProps {
-}
+type OCRExtractorProps = object;
 
-export function OCRExtractor({}: OCRExtractorProps) {
+export function OCRExtractor() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [extractedText, setExtractedText] = useState('');
@@ -215,7 +214,8 @@ export function OCRExtractor({}: OCRExtractorProps) {
 
       // Add title
       if (targetLanguage === 'ku') {
-        setKurdishFont(pdf, 18);
+        setKurdishFont(pdf, 'normal');
+        pdf.setFontSize(18);
         addRTLText(pdf, 'دەقی دەرهێنراو لە وێنە', 105, 30, { align: 'center' });
       } else {
         pdf.setFont('helvetica');
@@ -234,7 +234,8 @@ export function OCRExtractor({}: OCRExtractorProps) {
       const paragraphs = extractedText.split('\n\n');
 
       if (targetLanguage === 'ku') {
-        setKurdishFont(pdf, 12);
+        setKurdishFont(pdf, 'normal');
+        pdf.setFontSize(12);
       } else {
         pdf.setFont('helvetica');
         pdf.setFontSize(12);
@@ -254,6 +255,8 @@ export function OCRExtractor({}: OCRExtractorProps) {
           if (targetLanguage === 'ku') {
             addRTLText(pdf, line, 190, yPosition, { align: 'right', charSpace: 0.3 });
           } else {
+            // For English, add normal left-aligned text
+            pdf.text(line, 20, yPosition);
           }
           yPosition += lineHeight;
         }

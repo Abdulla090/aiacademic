@@ -218,22 +218,27 @@ export const RichTextRenderer: React.FC<RichTextRendererProps> = ({
   const formatInlineText = (text: string): React.ReactNode => {
     if (!text) return null;
 
-    let result: React.ReactNode[] = [];
+    const result: React.ReactNode[] = [];
     let currentIndex = 0;
 
     // Regex patterns for different formatting
     const patterns = [
-      { regex: /\*\*([^*]+)\*\*/g, component: (match: string, content: string, key: number) => <strong key={key}>{content}</strong> },
-      { regex: /\*([^*]+)\*/g, component: (match: string, content: string, key: number) => <em key={key}>{content}</em> },
-      { regex: /`([^`]+)`/g, component: (match: string, content: string, key: number) => <code key={key} className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">{content}</code> },
-      { regex: /~~([^~]+)~~/g, component: (match: string, content: string, key: number) => <del key={key}>{content}</del> },
-      { regex: /__([^_]+)__/g, component: (match: string, content: string, key: number) => <u key={key}>{content}</u> },
-      { regex: /\[([^\]]+)\]\(([^)]+)\)/g, component: (match: string, linkText: string, url: string, key: number) => (
+      { name: 'strong', regex: /\*\*([^*]+)\*\*/g, component: (match: string, content: string, key: number) => <strong key={key}>{content}</strong> },
+      { name: 'em', regex: /\*([^*]+)\*/g, component: (match: string, content: string, key: number) => <em key={key}>{content}</em> },
+      { name: 'code', regex: /`([^`]+)`/g, component: (match: string, content: string, key: number) => <code key={key} className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">{content}</code> },
+      { name: 'del', regex: /~~([^~]+)~~/g, component: (match: string, content: string, key: number) => <del key={key}>{content}</del> },
+      { name: 'u', regex: /__([^_]+)__/g, component: (match: string, content: string, key: number) => <u key={key}>{content}</u> },
+      { name: 'link', regex: /\[([^\]]+)\]\(([^)]+)\)/g, component: (match: string, linkText: string, url: string, key: number) => (
         <a key={key} href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 underline">
           {linkText}
         </a>
       )},
-    ];
+    ] as const;
+
+    // Type guard to differentiate link pattern
+    function isLinkPattern(pattern: typeof patterns[number]): pattern is typeof patterns[5] {
+        return pattern.name === 'link';
+    }
 
     // Find all matches
     const allMatches: Array<{start: number, end: number, replacement: React.ReactNode}> = [];
@@ -243,20 +248,24 @@ export const RichTextRenderer: React.FC<RichTextRendererProps> = ({
       const regex = new RegExp(pattern.regex.source, pattern.regex.flags);
       
       while ((match = regex.exec(text)) !== null) {
-        if (pattern.regex.source.includes('\\[')) {
+        if (isLinkPattern(pattern)) {
           // Link pattern - has 2 capture groups
-          allMatches.push({
-            start: match.index,
-            end: match.index + match[0].length,
-            replacement: pattern.component(match[0], match[1], match[2], allMatches.length)
-          });
+          if (match[1] && match[2]) {
+            allMatches.push({
+              start: match.index,
+              end: match.index + match[0].length,
+              replacement: pattern.component(match[0], match[1], match[2], allMatches.length)
+            });
+          }
         } else {
           // Other patterns - have 1 capture group
-          allMatches.push({
-            start: match.index,
-            end: match.index + match[0].length,
-            replacement: pattern.component(match[0], match[1], allMatches.length)
-          });
+          if (match[1]) {
+            allMatches.push({
+              start: match.index,
+              end: match.index + match[0].length,
+              replacement: pattern.component(match[0], match[1], allMatches.length)
+            });
+          }
         }
       }
     });

@@ -1475,7 +1475,7 @@ const KurdishDialectTranslator: React.FC = () => {
     }
 
     setIsTranslating(true);
-    let text = inputText.trim();
+    const text = inputText.trim();
     
     // Check if it's a single word or multiple words
     const words = text.split(/[\s،؛۔]+/).filter(word => word.length > 0);

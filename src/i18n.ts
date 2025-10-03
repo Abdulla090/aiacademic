@@ -8,7 +8,7 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    debug: true,
+    debug: import.meta.env.VITE_I18N_DEBUG === 'true' || import.meta.env.MODE !== 'production',
     fallbackLng: 'ku',
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default

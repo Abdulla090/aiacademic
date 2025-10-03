@@ -12,7 +12,7 @@ export interface LogEntry {
   message: string;
   timestamp: number;
   category?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   stack?: string;
   userId?: string;
   sessionId?: string;
@@ -97,7 +97,7 @@ export class MonitoringService {
     // Monitor memory usage (if available)
     if ('memory' in performance) {
       setInterval(() => {
-        const memory = (performance as any).memory;
+        const memory = (performance as unknown as { memory: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
         if (memory) {
           const usageRatio = memory.usedJSHeapSize / memory.jsHeapSizeLimit;
           
@@ -117,7 +117,7 @@ export class MonitoringService {
     level: LogLevel,
     message: string,
     category?: string,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): void {
     const entry: LogEntry = {
       level,
@@ -154,7 +154,7 @@ export class MonitoringService {
     }
   }
 
-  public logError(message: string, error: Error, metadata?: Record<string, any>): void {
+  public logError(message: string, error: Error, metadata?: Record<string, unknown>): void {
     this.log(LogLevel.ERROR, message, 'error', {
       ...metadata,
       error: error.message,
@@ -162,15 +162,15 @@ export class MonitoringService {
     });
   }
 
-  public logInfo(message: string, category?: string, metadata?: Record<string, any>): void {
+  public logInfo(message: string, category?: string, metadata?: Record<string, unknown>): void {
     this.log(LogLevel.INFO, message, category, metadata);
   }
 
-  public logWarning(message: string, category?: string, metadata?: Record<string, any>): void {
+  public logWarning(message: string, category?: string, metadata?: Record<string, unknown>): void {
     this.log(LogLevel.WARN, message, category, metadata);
   }
 
-  public logDebug(message: string, category?: string, metadata?: Record<string, any>): void {
+  public logDebug(message: string, category?: string, metadata?: Record<string, unknown>): void {
     if (featureConfig.debug) {
       this.log(LogLevel.DEBUG, message, category, metadata);
     }
@@ -183,8 +183,8 @@ export class MonitoringService {
     }
 
     // Send to Google Analytics for errors
-    if (entry.level === LogLevel.ERROR && (window as any).gtag) {
-      (window as any).gtag('event', 'exception', {
+    if (entry.level === LogLevel.ERROR && (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) {
+      (window as unknown as { gtag: (...args: unknown[]) => void }).gtag('event', 'exception', {
         description: entry.message,
         fatal: false,
         custom_metadata: JSON.stringify(entry.metadata || {}),
@@ -332,7 +332,7 @@ export class MonitoringService {
 
   private checkMemoryUsage(): boolean {
     if ('memory' in performance) {
-      const memory = (performance as any).memory;
+      const memory = (performance as unknown as { memory: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
       const usageRatio = memory.usedJSHeapSize / memory.jsHeapSizeLimit;
       return usageRatio < 0.8;
     }
@@ -341,7 +341,7 @@ export class MonitoringService {
 
   private getMemoryUsage(): string {
     if ('memory' in performance) {
-      const memory = (performance as any).memory;
+      const memory = (performance as unknown as { memory: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
       const usageRatio = memory.usedJSHeapSize / memory.jsHeapSizeLimit;
       return `${Math.round(usageRatio * 100)}% used`;
     }

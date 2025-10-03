@@ -13,25 +13,29 @@ import {
   FileUp,
   Image,
   Minimize,
+  LucideIcon,
   Network,
   MessageSquare,
   FileImage,
   Globe,
   BarChart3,
   Bot,
-  Wand2
+  Wand2,
+  Settings
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { MobileSettingsModal } from "@/components/MobileSettingsModal";
 
 const Index = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [currentTool, setCurrentTool] = useState<string | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
 
   interface AcademicTool {
     title: string;
     description: string;
-    icon: any;
+    icon: LucideIcon;
     image?: string;
     category: string;
     isComingSoon?: boolean;
@@ -226,18 +230,10 @@ const Index = () => {
  if (currentTool && toolsByCategory[currentTool]) {
     const selectedCategoryTools = toolsByCategory[currentTool];
     return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 bg-purple-grid">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 bg-purple-grid" dir={i18n.dir()}>
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10">
             <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4 sm:mb-0">{t(currentTool.toLowerCase())}</h1>
-            <div className="flex items-center space-x-2 sm:space-x-4">
-              <Button variant="outline" className="bg-white dark:bg-gray-800 dark:border-gray-600">
-                <FileUp className="mr-2 h-4 w-4" /> Upload
-              </Button>
-              <Button className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white">
-                + Create new
-              </Button>
-            </div>
           </div>
 
           <div className="mb-6">
@@ -291,11 +287,11 @@ const Index = () => {
         case 'Writing': return '/card-images/writting.png';
         case 'Study': return '/card-images/study.jpeg';
         case 'Tools': return '/card-images/tools.jpeg';
+        case 'Presentation': return '/card-images/presentation.png';
         case 'General': return '/card-images/general.jpeg';
         default: return undefined;
       }
     };
-
     return (
       <AcademicToolCard
         key={categoryName}
@@ -314,16 +310,13 @@ const Index = () => {
  });
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 bg-purple-grid">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 bg-purple-grid" dir={i18n.dir()}>
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10">
           <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4 sm:mb-0">{t('academicTools')}</h1>
-          <div className="flex items-center space-x-2 sm:space-x-4">
-            <Button variant="outline" className="bg-white dark:bg-gray-800 dark:border-gray-600">
-              <FileUp className="mr-2 h-4 w-4" /> Upload
-            </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white">
-              + Create new
+          <div className="flex items-center">
+            <Button onClick={() => setShowSettings(true)} className="btn-3d-primary">
+              <Settings className="h-5 w-5" />
             </Button>
           </div>
         </div>
@@ -332,6 +325,7 @@ const Index = () => {
           {categoryCards}
         </div>
       </main>
+      <MobileSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
     </div>
   );
 };

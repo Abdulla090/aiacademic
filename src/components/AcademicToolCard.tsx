@@ -32,15 +32,15 @@ export const AcademicToolCard = ({
 
   const cardInnerContent = (
     <>
-      <CardHeader className="p-4 border-b border-gray-200 dark:border-gray-700">
+      <CardHeader className="p-4 border-b border-border">
         <div className="flex items-center space-x-3">
-          <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg transition-all duration-300 group-hover:bg-purple-200 dark:group-hover:bg-purple-800/40">
-            <Icon className="h-5 w-5 text-purple-600 dark:text-purple-400 transition-all duration-300 group-hover:text-purple-800 dark:group-hover:text-purple-300" />
+          <div className="p-2 bg-primary/10 rounded-lg transition-all duration-300 group-hover:bg-primary/20">
+            <Icon className="h-5 w-5 text-primary transition-all duration-300" />
           </div>
           <div className="flex-1">
-            <CardTitle className="text-base font-semibold text-gray-800 dark:text-gray-100 transition-colors duration-300 group-hover:text-purple-700 dark:group-hover:text-purple-300">{t(title)}</CardTitle>
+            <CardTitle className="text-base font-semibold text-foreground transition-colors duration-300 group-hover:text-primary">{t(title)}</CardTitle>
             {category && (
-              <Badge variant="secondary" className="text-xs mt-1 bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-700">
+              <Badge variant="secondary" className="text-xs mt-1 bg-secondary/10 text-primary border-secondary/20">
                 {t(category)}
               </Badge>
             )}
@@ -60,17 +60,17 @@ export const AcademicToolCard = ({
           </div>
         ) : null}
 
-        <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed transition-colors duration-300 group-hover:text-gray-800 dark:group-hover:text-gray-200">{t(description)}</p>
+        <p className="text-sm text-muted-foreground leading-relaxed transition-colors duration-300 group-hover:text-foreground">{t(description)}</p>
       </CardContent>
-      <CardFooter className="p-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700">
+      <CardFooter className="p-4 bg-background-secondary border-t border-border">
         {isComingSoon ? (
           <Badge variant="outline" className="text-xs font-medium">
             {t('comingSoon')}
           </Badge>
         ) : (
           <div className="w-full flex justify-end">
-            <Button variant="link" size="sm" className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-semibold transition-all duration-300 transform group-hover:translate-x-1">
-              {t('open')} &rarr;
+            <Button size="sm" className="btn-3d-primary font-semibold">
+              {t('open')}
             </Button>
           </div>
         )}
@@ -79,7 +79,7 @@ export const AcademicToolCard = ({
     </>
   );
 
-  const cardWrapperClass = "h-full flex-col bg-white dark:bg-gray-800 rounded-xl shadow-sm group-hover:shadow-xl transition-shadow duration-300 border border-gray-200 dark:border-gray-700";
+  const cardWrapperClass = "h-full flex-col bg-card rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 border-b-4 border-primary-dark";
 
   const AnimatedCard = ({ children }: { children: React.ReactNode }) => (
     <Card className={`relative h-full overflow-hidden ${cardWrapperClass} animated-border-snake`}>
