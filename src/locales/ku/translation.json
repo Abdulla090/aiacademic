@@ -225,5 +225,6 @@
   "knowledgeGraphGenerator": "دروستکەری نەخشەی زانیاری",
   "knowledgeGraphGeneratorPlaceholder": "دەقەکەت لێرە بنووسە بۆ دروستکردنی نەخشەی زانیاری...",
   "generateKnowledgeGraph": "دروستکردنی نەخشەی زانیاری",
- "general": "گشتی"
+ "general": "گشتی",
+ "dashboard": "داشبۆردی سەرەکی"
 }

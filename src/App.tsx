@@ -3,7 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { useState, lazy, Suspense } from "react";
+import { useState, lazy, Suspense, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import withLoading from "./hocs/withLoading";
 import { CustomSidebar } from "./components/CustomSidebar";
 import { SidebarProvider, SidebarInset } from "./components/ui/sidebar";
@@ -59,6 +60,14 @@ const AppContent = () => {
   const [showMobileSettings, setShowMobileSettings] = useState(false);
   const { showLoadingTransition, setShowLoadingTransition } = useTransition();
   const showSidebar = location.pathname !== '/' && !isMobile;
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    document.documentElement.dir = i18n.language === "ku" ? "rtl" : "ltr";
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
+
+
 
   const ArticleWriterWithLoading = withLoading(ArticleWriter);
   const GrammarCheckerWithLoading = withLoading(GrammarChecker);

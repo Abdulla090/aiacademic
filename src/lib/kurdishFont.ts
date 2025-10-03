@@ -2,60 +2,60 @@ import { jsPDF } from 'jspdf';
 
 // Kurdish font utility for PDF generation
 let kurdishFontLoaded = false;
-let kurdishFontBase64 = '';
 
-// Unicode bidirectional text processing for RTL
-const ARABIC_CHARS = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
-const RTL_CHARS = /[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/;
-
-/**
- * Load Kurdish font for PDF generation
- */
+// Load Kurdish font for PDF generation
 export async function loadKurdishFont(pdf: jsPDF): Promise<void> {
   if (kurdishFontLoaded) {
     return;
   }
 
   try {
-    // Load Kurdish/Arabic font from public directory
-    const response = await fetch('/NotoNaskhArabic-Regular.ttf');
-    if (!response.ok) {
-      console.warn('Kurdish font not found, using default font');
+    // Load normal and bold Kurdish fonts
+    const [normalFontResponse, boldFontResponse] = await Promise.all([
+      fetch('/kurdish-font/Rabar_022.ttf'),
+      fetch('/kurdish-font/Rabar_021.ttf'),
+    ]);
+
+    if (!normalFontResponse.ok || !boldFontResponse.ok) {
+      console.warn('Kurdish font files not found, using default font');
       return;
     }
 
-    const arrayBuffer = await response.arrayBuffer();
-    const base64String = btoa(
-      new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
+    const [normalFont, boldFont] = await Promise.all([
+      normalFontResponse.arrayBuffer(),
+      boldFontResponse.arrayBuffer(),
+    ]);
+
+    const normalBase64 = btoa(
+      new Uint8Array(normalFont).reduce((data, byte) => data + String.fromCharCode(byte), '')
+    );
+    const boldBase64 = btoa(
+      new Uint8Array(boldFont).reduce((data, byte) => data + String.fromCharCode(byte), '')
     );
 
-    // Add font to jsPDF
-    pdf.addFileToVFS('NotoNaskhArabic-Regular.ttf', base64String);
-    pdf.addFont('NotoNaskhArabic-Regular.ttf', 'kurdish-font', 'normal');
-    
-    kurdishFontBase64 = base64String;
+    // Add fonts to jsPDF
+    pdf.addFileToVFS('Rabar-Regular.ttf', normalBase64);
+    pdf.addFont('Rabar-Regular.ttf', 'Rabar', 'normal');
+
+    pdf.addFileToVFS('Rabar-Bold.ttf', boldBase64);
+    pdf.addFont('Rabar-Bold.ttf', 'Rabar', 'bold');
+
     kurdishFontLoaded = true;
   } catch (error) {
     console.warn('Failed to load Kurdish font:', error);
   }
 }
 
-/**
- * Set Kurdish font for PDF text
- */
-export function setKurdishFont(pdf: jsPDF, fontSize: number = 12): void {
+// Set Kurdish font for PDF text
+export function setKurdishFont(pdf: jsPDF, style: 'normal' | 'bold' = 'normal', fontSize: number = 12): void {
   if (kurdishFontLoaded) {
-    pdf.setFont('kurdish-font');
+    pdf.setFont('Rabar', style);
   } else {
-    // Fallback to Arial or similar
-    pdf.setFont('helvetica');
+    pdf.setFont('helvetica', style);
   }
   pdf.setFontSize(fontSize);
 }
 
-/**
- * Process text for RTL display
- */
 export function processRTLText(text: string): string {
   if (!text) return text;
 

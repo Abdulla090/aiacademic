@@ -229,7 +229,7 @@ const Index = () => {
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 bg-purple-grid">
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10">
-            <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4 sm:mb-0">My porta</h1>
+            <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4 sm:mb-0">{t(currentTool.toLowerCase())}</h1>
             <div className="flex items-center space-x-2 sm:space-x-4">
               <Button variant="outline" className="bg-white dark:bg-gray-800 dark:border-gray-600">
                 <FileUp className="mr-2 h-4 w-4" /> Upload
@@ -253,7 +253,6 @@ const Index = () => {
                 title={t(tool.title)}
                 description={t(tool.description)}
                 icon={tool.icon}
-                image={tool.image}
                 category={t(tool.category)}
                 isComingSoon={tool.isComingSoon}
                 path={tool.path}
@@ -287,13 +286,23 @@ const Index = () => {
       }
     };
 
+    const getCategoryImage = (category: string) => {
+      switch(category) {
+        case 'Writing': return '/card-images/writting.png';
+        case 'Study': return '/card-images/study.jpeg';
+        case 'Tools': return '/card-images/tools.jpeg';
+        case 'General': return '/card-images/general.jpeg';
+        default: return undefined;
+      }
+    };
+
     return (
       <AcademicToolCard
         key={categoryName}
-        title={categoryName}
+        title={t(categoryName.toLowerCase())}
         description={`${t(categoryName.toLowerCase())} tools: ${tools.map(tool => t(tool.title)).join(', ')}`}
         icon={getCategoryIcon(categoryName)}
-        image={tools[0]?.image} // Use the image from the first tool in the category
+        image={getCategoryImage(categoryName)}
         category={categoryName}
         path={undefined} // Categories don't have a direct path
         onClick={() => {
@@ -308,7 +317,7 @@ const Index = () => {
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 bg-purple-grid">
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4 sm:mb-0">My porta</h1>
+          <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4 sm:mb-0">{t('academicTools')}</h1>
           <div className="flex items-center space-x-2 sm:space-x-4">
             <Button variant="outline" className="bg-white dark:bg-gray-800 dark:border-gray-600">
               <FileUp className="mr-2 h-4 w-4" /> Upload

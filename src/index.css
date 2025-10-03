@@ -7,9 +7,17 @@
 
 /* Kurdish Font Face */
 @font-face {
-  font-family: 'new-ku-font';
-  src: url('/kurdish-font/DejaVuSans.ttf') format('truetype');
+  font-family: 'Rabar';
+  src: url('/kurdish-font/Rabar_022.ttf') format('truetype');
   font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rabar';
+  src: url('/kurdish-font/Rabar_021.ttf') format('truetype');
+  font-weight: bold;
   font-style: normal;
   font-display: swap;
 }
@@ -188,13 +196,13 @@ suggestion,
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', 'new-ku-font', 'Noto Sans Arabic', system-ui, sans-serif;
+    font-family: 'Inter', 'Rabar', 'Noto Sans Arabic', system-ui, sans-serif;
     font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
   }
 
   /* Kurdish Sorani Text Support */
   .sorani-text {
-    font-family: 'new-ku-font', 'Noto Sans Arabic', 'Inter', system-ui, sans-serif;
+    font-family: 'Rabar', 'Noto Sans Arabic', 'Inter', system-ui, sans-serif;
     direction: rtl;
     text-align: right;
     line-height: 1.8;

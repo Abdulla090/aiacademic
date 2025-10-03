@@ -19,7 +19,7 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				'sorani': ['Noto Sans Arabic', 'Inter', 'system-ui', 'sans-serif'],
+				'sorani': ['Rabar', 'Noto Sans Arabic', 'Inter', 'system-ui', 'sans-serif'],
 				'inter': ['Inter', 'system-ui', 'sans-serif'],
 			},
 			colors: {

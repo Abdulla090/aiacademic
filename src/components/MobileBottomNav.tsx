@@ -23,14 +23,6 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ onSettingsClic
       onClick: () => navigate('/dashboard')
     },
     {
-      id: 'textfixer',
-      label: 'چاککەری دەق',
-      labelEn: 'Text Fixer',
-      icon: Wand2,
-      path: '/text-structure-fixer',
-      onClick: () => navigate('/text-structure-fixer')
-    },
-    {
       id: 'about',
       label: 'دەربارە',
       labelEn: 'About',

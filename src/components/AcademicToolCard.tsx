@@ -6,11 +6,13 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { OptimizedImage } from "./OptimizedImage";
 
+
 interface AcademicToolCardProps {
   title: string;
   description: string;
   icon: LucideIcon;
   image?: string;
+
   category: string;
   isComingSoon?: boolean;
   path?: string;
@@ -22,6 +24,7 @@ export const AcademicToolCard = ({
   description,
   icon: Icon,
   image,
+
   category,
   isComingSoon = false,
   path,
@@ -51,6 +54,7 @@ export const AcademicToolCard = ({
             />
           </div>
         ) : null}
+
         <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed transition-colors duration-300 group-hover:text-gray-800 dark:group-hover:text-gray-200">{t(description)}</p>
       </CardContent>
       <CardFooter className="p-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700">
