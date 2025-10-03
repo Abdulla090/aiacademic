@@ -3,7 +3,20 @@ import { geminiConfig, featureConfig } from '../config/env';
 export interface APIError extends Error {
   status?: number;
   code?: string;
-  details?: any;
+  details?: unknown;
+}
+
+export interface APIResponse<T = unknown> {
+  data?: T;
+  error?: {
+    message: string;
+    code?: string;
+    details?: unknown;
+  };
+}
+
+export interface APIRequestData {
+  [key: string]: unknown;
 }
 
 export class APIService {
@@ -29,7 +42,7 @@ export class APIService {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  private createError(message: string, status?: number, code?: string, details?: any): APIError {
+  private createError(message: string, status?: number, code?: string, details?: unknown): APIError {
     const error = new Error(message) as APIError;
     error.status = status;
     error.code = code;
@@ -37,15 +50,18 @@ export class APIService {
     return error;
   }
 
-  private async handleResponse(response: Response): Promise<any> {
+  private async handleResponse<T = unknown>(response: Response): Promise<T> {
     if (!response.ok) {
       let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-      let errorDetails: any = null;
+      let errorDetails: unknown = null;
 
       try {
         errorDetails = await response.json();
-        if (errorDetails.error?.message) {
-          errorMessage = errorDetails.error.message;
+        if (errorDetails && typeof errorDetails === 'object' && 'error' in errorDetails) {
+          const errorObj = errorDetails as { error?: { message?: string; code?: string } };
+          if (errorObj.error?.message) {
+            errorMessage = errorObj.error.message;
+          }
         }
       } catch {
         // If JSON parsing fails, use the status text
@@ -54,7 +70,7 @@ export class APIService {
       throw this.createError(
         errorMessage,
         response.status,
-        errorDetails?.error?.code,
+        (errorDetails as { error?: { code?: string } })?.error?.code,
         errorDetails
       );
     }
@@ -66,11 +82,11 @@ export class APIService {
     }
   }
 
-  private async makeRequest(
+  private async makeRequest<T = unknown>(
     url: string,
     options: RequestInit,
     attempt: number = 1
-  ): Promise<any> {
+  ): Promise<T> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
@@ -85,28 +101,28 @@ export class APIService {
       });
 
       clearTimeout(timeoutId);
-      return await this.handleResponse(response);
-    } catch (error: any) {
+      return await this.handleResponse<T>(response);
+    } catch (error: unknown) {
       clearTimeout(timeoutId);
 
       // Check if it's a network error and we should retry
       const shouldRetry = attempt < this.retryAttempts && (
-        error.name === 'AbortError' ||
-        error.code === 'NETWORK_ERROR' ||
-        (error.status && error.status >= 500)
+        (error instanceof Error && error.name === 'AbortError') ||
+        (error instanceof Error && error.message.includes('fetch')) ||
+        (error && typeof error === 'object' && 'status' in error && typeof (error as { status?: number }).status === 'number' && (error as { status: number }).status >= 500)
       );
 
       if (shouldRetry) {
         if (featureConfig.debug) {
           console.warn(`API request failed, retrying (${attempt}/${this.retryAttempts})...`, error);
         }
-        
+
         await this.delay(this.retryDelay * attempt);
-        return this.makeRequest(url, options, attempt + 1);
+        return this.makeRequest<T>(url, options, attempt + 1);
       }
 
       // Transform fetch errors
-      if (error.name === 'AbortError') {
+      if (error instanceof Error && error.name === 'AbortError') {
         throw this.createError('Request timeout', 408, 'TIMEOUT');
       }
 
@@ -118,14 +134,14 @@ export class APIService {
     }
   }
 
-  public async post(endpoint: string, data: any, additionalHeaders?: Record<string, string>): Promise<any> {
+  public async post<T = unknown>(endpoint: string, data: APIRequestData, additionalHeaders?: Record<string, string>): Promise<T> {
     if (!geminiConfig.apiKey) {
       throw this.createError('API key not configured', 401, 'MISSING_API_KEY');
     }
 
     const url = `${this.baseURL}${endpoint}?key=${geminiConfig.apiKey}`;
-    
-    return this.makeRequest(url, {
+
+    return this.makeRequest<T>(url, {
       method: 'POST',
       headers: {
         ...additionalHeaders,
@@ -134,7 +150,7 @@ export class APIService {
     });
   }
 
-  public async get(endpoint: string, params?: Record<string, string>): Promise<any> {
+  public async get<T = unknown>(endpoint: string, params?: Record<string, string>): Promise<T> {
     if (!geminiConfig.apiKey) {
       throw this.createError('API key not configured', 401, 'MISSING_API_KEY');
     }
@@ -142,8 +158,8 @@ export class APIService {
     const searchParams = new URLSearchParams(params);
     searchParams.set('key', geminiConfig.apiKey);
     const url = `${this.baseURL}${endpoint}?${searchParams}`;
-    
-    return this.makeRequest(url, {
+
+    return this.makeRequest<T>(url, {
       method: 'GET',
     });
   }
@@ -175,9 +191,9 @@ export class APIService {
     this.requestCount++;
   }
 
-  public async postWithRateLimit(endpoint: string, data: any): Promise<any> {
+  public async postWithRateLimit<T = unknown>(endpoint: string, data: APIRequestData): Promise<T> {
     await this.checkRateLimit();
-    return this.post(endpoint, data);
+    return this.post<T>(endpoint, data);
   }
 }
 
@@ -185,45 +201,57 @@ export class APIService {
 export const apiService = APIService.getInstance();
 
 // Helper function for error handling in components
-export const handleAPIError = (error: any): string => {
-  if (error.code === 'MISSING_API_KEY') {
-    return 'API key not configured. Please check your environment settings.';
+export const handleAPIError = (error: unknown): string => {
+  if (error && typeof error === 'object' && 'code' in error) {
+    const apiError = error as { code?: string; message?: string; status?: number };
+
+    if (apiError.code === 'MISSING_API_KEY') {
+      return 'API key not configured. Please check your environment settings.';
+    }
+
+    if (apiError.code === 'TIMEOUT') {
+      return 'Request timed out. Please check your internet connection and try again.';
+    }
+
+    if (apiError.code === 'NETWORK_ERROR') {
+      return 'Network connection failed. Please check your internet connection.';
+    }
+
+    if (apiError.code === 'RATE_LIMIT_EXCEEDED') {
+      return apiError.message || 'Rate limit exceeded. Please wait and try again.';
+    }
   }
-  
-  if (error.code === 'TIMEOUT') {
-    return 'Request timed out. Please check your internet connection and try again.';
+
+  if (error && typeof error === 'object' && 'status' in error) {
+    const apiError = error as { status?: number; message?: string };
+
+    if (apiError.status === 400) {
+      return 'Invalid request. Please check your input and try again.';
+    }
+
+    if (apiError.status === 401) {
+      return 'Authentication failed. Please check your API key.';
+    }
+
+    if (apiError.status === 403) {
+      return 'Access denied. You may not have permission to perform this action.';
+    }
+
+    if (apiError.status === 429) {
+      return 'Too many requests. Please wait a moment and try again.';
+    }
+
+    if (apiError.status && apiError.status >= 500) {
+      return 'Server error occurred. Please try again later.';
+    }
   }
-  
-  if (error.code === 'NETWORK_ERROR') {
-    return 'Network connection failed. Please check your internet connection.';
-  }
-  
-  if (error.code === 'RATE_LIMIT_EXCEEDED') {
+
+  // Fallback to error message or generic message
+  if (error instanceof Error) {
     return error.message;
   }
-  
-  if (error.status === 400) {
-    return 'Invalid request. Please check your input and try again.';
-  }
-  
-  if (error.status === 401) {
-    return 'Authentication failed. Please check your API key.';
-  }
-  
-  if (error.status === 403) {
-    return 'Access denied. You may not have permission to perform this action.';
-  }
-  
-  if (error.status === 429) {
-    return 'Too many requests. Please wait a moment and try again.';
-  }
-  
-  if (error.status && error.status >= 500) {
-    return 'Server error occurred. Please try again later.';
-  }
-  
-  // Fallback to error message or generic message
-  return error.message || 'An unexpected error occurred. Please try again.';
+
+  return 'An unexpected error occurred. Please try again.';
 };
 
 export default apiService;

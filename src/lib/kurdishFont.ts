@@ -3,6 +3,9 @@ import { jsPDF } from 'jspdf';
 // Kurdish font utility for PDF generation
 let kurdishFontLoaded = false;
 
+// Regular expression to detect RTL (right-to-left) characters
+const RTL_CHARS = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+
 // Load Kurdish font for PDF generation
 export async function loadKurdishFont(pdf: jsPDF): Promise<void> {
   if (kurdishFontLoaded) {
@@ -105,12 +108,12 @@ export function addRTLText(
     
     if (charSpace > 0) {
       // Add character spacing for better readability
-      pdf.text(line, x, lineY, { 
-        align: align as any,
-        charSpace: charSpace 
+      pdf.text(line, x, lineY, {
+        align: align as 'left' | 'center' | 'right',
+        charSpace: charSpace
       });
     } else {
-      pdf.text(line, x, lineY, { align: align as any });
+      pdf.text(line, x, lineY, { align: align as 'left' | 'center' | 'right' });
     }
   });
 }

@@ -223,7 +223,7 @@ export class SecurityService {
   /**
    * Validate API responses
    */
-  public validateAPIResponse(response: any): boolean {
+  public validateAPIResponse(response: unknown): boolean {
     if (typeof response !== 'object' || response === null) {
       return false;
     }

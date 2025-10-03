@@ -2,7 +2,7 @@ import { FC, useState, useEffect, ComponentType } from 'react';
 import { Loader } from '@/components/ui/loader';
 
 interface WithLoadingProps {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const withLoading = <P extends object>(

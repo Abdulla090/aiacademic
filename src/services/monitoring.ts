@@ -62,14 +62,14 @@ export class MonitoringService {
 
     // Console error interception
     const originalConsoleError = console.error;
-    console.error = (...args: any[]) => {
+    console.error = (...args: unknown[]) => {
       this.log(LogLevel.ERROR, args.join(' '), 'console');
       originalConsoleError.apply(console, args);
     };
 
     // Console warning interception
     const originalConsoleWarn = console.warn;
-    console.warn = (...args: any[]) => {
+    console.warn = (...args: unknown[]) => {
       this.log(LogLevel.WARN, args.join(' '), 'console');
       originalConsoleWarn.apply(console, args);
     };
@@ -383,9 +383,10 @@ export const useErrorBoundaryLogger = () => {
   const monitoring = MonitoringService.getInstance();
 
   return {
-    logError: (error: Error, errorInfo: any) => {
+    logError: (error: Error, errorInfo: unknown) => {
+      const info = errorInfo as { componentStack?: string };
       monitoring.logError('React Error Boundary', error, {
-        componentStack: errorInfo.componentStack,
+        componentStack: info.componentStack,
       });
     },
   };

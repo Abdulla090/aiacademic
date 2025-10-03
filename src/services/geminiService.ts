@@ -130,7 +130,7 @@ class GeminiService {
   private baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
   
   // Rate limiting configuration
-  private requestQueue: Array<() => Promise<any>> = [];
+  private requestQueue: Array<() => Promise<unknown>> = [];
   private isProcessingQueue = false;
   private lastRequestTime = 0;
   private readonly minRequestInterval = 1000; // 1 second between requests
@@ -210,9 +210,10 @@ class GeminiService {
         RateLimitNotifier.notifyRetryComplete();
       }
       return result;
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Check if it's a rate limit error (429) and we haven't exceeded max retries
-      if (error.message?.includes('429') && attempt <= this.maxRetries) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage?.includes('429') && attempt <= this.maxRetries) {
         // Try rotating API key if we have more than one
         if (this.apiKeys.length > 1 && attempt === 1) {
           console.log('Rate limit hit, trying alternate API key...');
@@ -346,9 +347,10 @@ class GeminiService {
               text: data.candidates[0].content.parts[0].text
             };
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Gemini API Error:', error);
-          if (error.message?.includes('429')) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          if (errorMessage?.includes('429')) {
             throw error; // Re-throw 429 errors for retry logic
           }
           throw new Error('Failed to communicate with AI service');
@@ -719,16 +721,19 @@ class GeminiService {
       const errors = JSON.parse(response.text);
       
       // Add unique IDs and validate structure
-      return errors.map((error: any, index: number) => ({
-        id: `error_${Date.now()}_${index}`,
-        start: Number(error.start) || 0,
-        end: Number(error.end) || 0,
-        text: error.text || '',
-        message: error.message || 'Grammar issue detected',
-        suggestions: Array.isArray(error.suggestions) ? error.suggestions : ['No suggestions available'],
-        type: ['grammar', 'spelling', 'style', 'punctuation'].includes(error.type) ? error.type : 'grammar',
-        severity: ['error', 'warning', 'suggestion'].includes(error.severity) ? error.severity : 'warning'
-      }));
+      return errors.map((error: unknown, index: number) => {
+        const err = error as Record<string, unknown>;
+        return {
+          id: `error_${Date.now()}_${index}`,
+          start: Number(err.start) || 0,
+          end: Number(err.end) || 0,
+          text: String(err.text || ''),
+          message: String(err.message || 'Grammar issue detected'),
+          suggestions: Array.isArray(err.suggestions) ? err.suggestions.map(String) : ['No suggestions available'],
+          type: ['grammar', 'spelling', 'style', 'punctuation'].includes(String(err.type)) ? String(err.type) : 'grammar',
+          severity: ['error', 'warning', 'suggestion'].includes(String(err.severity)) ? String(err.severity) : 'warning'
+        };
+      });
     } catch (error) {
       console.error('Error parsing grammar check response:', error);
       return [];
@@ -996,18 +1001,21 @@ class GeminiService {
       }
       
       // Ensure all tasks have required fields
-      return parsed.map((task: any) => ({
-        title: task.title || 'Untitled Task',
-        description: task.description || 'No description provided',
-        deadline: task.deadline || new Date().toISOString().split('T')[0],
-        priority: task.priority || 'medium',
-        status: task.status || 'pending',
-        duration: task.duration || '1 hour',
-        category: task.category || 'study',
-        difficulty: task.difficulty || 'medium',
-        resources: task.resources || [],
-        dailyTime: task.dailyTime || 'flexible'
-      }));
+      return parsed.map((task: unknown) => {
+        const t = task as Record<string, unknown>;
+        return {
+          title: String(t.title || 'Untitled Task'),
+          description: String(t.description || 'No description provided'),
+          deadline: String(t.deadline || new Date().toISOString().split('T')[0]),
+          priority: (['high', 'medium', 'low'] as const).includes(t.priority as 'high' | 'medium' | 'low') ? t.priority as 'high' | 'medium' | 'low' : 'medium',
+          status: (['pending', 'in-progress', 'completed'] as const).includes(t.status as 'pending' | 'in-progress' | 'completed') ? t.status as 'pending' | 'in-progress' | 'completed' : 'pending',
+          duration: String(t.duration || '1 hour'),
+          category: String(t.category || 'study'),
+          difficulty: (['easy', 'medium', 'hard'] as const).includes(t.difficulty as 'easy' | 'medium' | 'hard') ? t.difficulty as 'easy' | 'medium' | 'hard' : 'medium',
+          resources: Array.isArray(t.resources) ? t.resources.map(String) : [],
+          dailyTime: String(t.dailyTime || 'flexible')
+        };
+      });
     } catch (error) {
       console.error('Failed to parse AI response:', error);
       console.error('Raw response text:', response.text);
@@ -1555,8 +1563,8 @@ Extract the text with correct Kurdish grammar, spelling, AND ORIGINAL LINE BREAK
 
           if (response.status === 429) {
             const errorData = await response.json().catch(() => ({}));
-            const retryAfter = errorData.error?.details?.find((d: any) => 
-              d['@type'] === 'type.googleapis.com/google.rpc.RetryInfo'
+            const retryAfter = errorData.error?.details?.find((d: unknown) =>
+              (d as Record<string, unknown>)['@type'] === 'type.googleapis.com/google.rpc.RetryInfo'
             )?.retryDelay;
             
             if (retryAfter && attempt < maxRetries - 1) {
@@ -1653,8 +1661,8 @@ Extract the text with correct Kurdish grammar, spelling, AND ORIGINAL LINE BREAK
   private getRetryDelay(errorText: string): number | null {
     try {
       const errorData = JSON.parse(errorText);
-      const retryInfo = errorData.error?.details?.find((detail: any) => 
-        detail['@type'] === 'type.googleapis.com/google.rpc.RetryInfo'
+      const retryInfo = errorData.error?.details?.find((detail: unknown) =>
+        (detail as Record<string, unknown>)['@type'] === 'type.googleapis.com/google.rpc.RetryInfo'
       );
       if (retryInfo?.retryDelay) {
         // Parse delay like "49s" to milliseconds
@@ -1790,20 +1798,26 @@ Query: "${query}"
             credibilityScore: researchData.credibilityScore || 75,
             keyFindings: researchData.keyFindings || [],
             relatedTopics: researchData.relatedTopics || [],
-            sources: (researchData.sources || []).map((source: any, index: number) => ({
-              id: (index + 1).toString(),
-              title: source.title || 'Unknown Source',
-              author: source.author || 'Unknown Author',
-              type: source.type || 'other',
-              credibilityScore: source.credibilityScore || 70,
-              publishDate: source.publishDate || new Date().toISOString().split('T')[0],
-              url: source.url || '#'
-            })),
-            citations: (researchData.citations || []).map((citation: any, index: number) => ({
-              id: (index + 1).toString(),
-              format: citation.format || 'APA',
-              citation: citation.citation || 'Citation not available'
-            }))
+            sources: (researchData.sources || []).map((source: unknown, index: number) => {
+              const s = source as Record<string, unknown>;
+              return {
+                id: (index + 1).toString(),
+                title: String(s.title || 'Unknown Source'),
+                author: String(s.author || 'Unknown Author'),
+                type: String(s.type || 'other'),
+                credibilityScore: Number(s.credibilityScore) || 70,
+                publishDate: String(s.publishDate || new Date().toISOString().split('T')[0]),
+                url: String(s.url || '#')
+              };
+            }),
+            citations: (researchData.citations || []).map((citation: unknown, index: number) => {
+              const c = citation as Record<string, unknown>;
+              return {
+                id: (index + 1).toString(),
+                format: String(c.format || 'APA'),
+                citation: String(c.citation || 'Citation not available')
+              };
+            })
           };
           
           return result;

@@ -247,11 +247,12 @@ export const usePerformanceTracker = (componentName: string) => {
 export const performanceMonitor = PerformanceMonitor.getInstance();
 
 // Web Vitals integration
-export const reportWebVitals = (metric: any) => {
+export const reportWebVitals = (metric: unknown) => {
+  const m = metric as { name: string; value: number; id: string; delta: number };
   if (featureConfig.analytics) {
-    performanceMonitor.recordMetric(metric.name, metric.value, {
-      id: metric.id,
-      delta: metric.delta,
+    performanceMonitor.recordMetric(m.name, m.value, {
+      id: m.id,
+      delta: m.delta,
     });
   }
 };

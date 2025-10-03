@@ -12,8 +12,7 @@ interface AcademicToolCardProps {
   description: string;
   icon: LucideIcon;
   image?: string;
-
-  category: string;
+  category?: string;
   isComingSoon?: boolean;
   path?: string;
   onClick?: () => void;
@@ -24,7 +23,6 @@ export const AcademicToolCard = ({
   description,
   icon: Icon,
   image,
-
   category,
   isComingSoon = false,
   path,
@@ -39,7 +37,14 @@ export const AcademicToolCard = ({
           <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg transition-all duration-300 group-hover:bg-purple-200 dark:group-hover:bg-purple-800/40">
             <Icon className="h-5 w-5 text-purple-600 dark:text-purple-400 transition-all duration-300 group-hover:text-purple-800 dark:group-hover:text-purple-300" />
           </div>
-          <CardTitle className="text-base font-semibold text-gray-800 dark:text-gray-100 transition-colors duration-300 group-hover:text-purple-700 dark:group-hover:text-purple-300">{t(title)}</CardTitle>
+          <div className="flex-1">
+            <CardTitle className="text-base font-semibold text-gray-800 dark:text-gray-100 transition-colors duration-300 group-hover:text-purple-700 dark:group-hover:text-purple-300">{t(title)}</CardTitle>
+            {category && (
+              <Badge variant="secondary" className="text-xs mt-1 bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-700">
+                {t(category)}
+              </Badge>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent className="flex-grow p-4">

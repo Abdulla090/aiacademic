@@ -86,7 +86,7 @@ export class PDFTextExtractor {
 
       // Extract metadata
       const metadata = await pdf.getMetadata();
-      const metadataInfo = metadata.info as any;
+      const metadataInfo = metadata.info as Record<string, unknown>;
 
       // Extract text from all pages
       for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
@@ -94,7 +94,7 @@ export class PDFTextExtractor {
         const textContent = await page.getTextContent();
         
         const pageText = textContent.items
-          .map((item: any) => item.str)
+          .map((item: unknown) => (item as { str: string }).str)
           .join(' ');
         
         extractedText += pageText + '\n\n';
@@ -104,13 +104,13 @@ export class PDFTextExtractor {
         text: extractedText.trim(),
         totalPages,
         metadata: {
-          title: metadataInfo?.Title,
-          author: metadataInfo?.Author,
-          subject: metadataInfo?.Subject,
-          creator: metadataInfo?.Creator,
-          producer: metadataInfo?.Producer,
-          creationDate: metadataInfo?.CreationDate ? new Date(metadataInfo.CreationDate) : undefined,
-          modificationDate: metadataInfo?.ModDate ? new Date(metadataInfo.ModDate) : undefined,
+          title: String(metadataInfo?.Title || ''),
+          author: String(metadataInfo?.Author || ''),
+          subject: String(metadataInfo?.Subject || ''),
+          creator: String(metadataInfo?.Creator || ''),
+          producer: String(metadataInfo?.Producer || ''),
+          creationDate: metadataInfo?.CreationDate ? new Date(String(metadataInfo.CreationDate)) : undefined,
+          modificationDate: metadataInfo?.ModDate ? new Date(String(metadataInfo.ModDate)) : undefined,
         }
       };
     } catch (error) {
@@ -127,7 +127,7 @@ export class PDFTextExtractor {
 
       // Extract metadata
       const metadata = await pdf.getMetadata();
-      const metadataInfo = metadata.info as any;
+      const metadataInfo = metadata.info as Record<string, unknown>;
 
       // Extract text from all pages
       for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
@@ -135,7 +135,7 @@ export class PDFTextExtractor {
         const textContent = await page.getTextContent();
         
         const pageText = textContent.items
-          .map((item: any) => item.str)
+          .map((item: unknown) => (item as { str: string }).str)
           .join(' ');
         
         extractedText += pageText + '\n\n';
@@ -145,13 +145,13 @@ export class PDFTextExtractor {
         text: extractedText.trim(),
         totalPages,
         metadata: {
-          title: metadataInfo?.Title,
-          author: metadataInfo?.Author,
-          subject: metadataInfo?.Subject,
-          creator: metadataInfo?.Creator,
-          producer: metadataInfo?.Producer,
-          creationDate: metadataInfo?.CreationDate ? new Date(metadataInfo.CreationDate) : undefined,
-          modificationDate: metadataInfo?.ModDate ? new Date(metadataInfo.ModDate) : undefined,
+          title: String(metadataInfo?.Title || ''),
+          author: String(metadataInfo?.Author || ''),
+          subject: String(metadataInfo?.Subject || ''),
+          creator: String(metadataInfo?.Creator || ''),
+          producer: String(metadataInfo?.Producer || ''),
+          creationDate: metadataInfo?.CreationDate ? new Date(String(metadataInfo.CreationDate)) : undefined,
+          modificationDate: metadataInfo?.ModDate ? new Date(String(metadataInfo.ModDate)) : undefined,
         }
       };
     } catch (error) {

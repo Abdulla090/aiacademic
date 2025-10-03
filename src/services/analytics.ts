@@ -2,9 +2,9 @@ import { analyticsConfig, featureConfig } from '../config/env';
 
 declare global {
   interface Window {
-    gtag?: (...args: any[]) => void;
-    dataLayer?: any[];
-    hj?: (...args: any[]) => void;
+    gtag?: (...args: unknown[]) => void;
+    dataLayer?: unknown[];
+    hj?: (...args: unknown[]) => void;
   }
 }
 
@@ -52,7 +52,7 @@ export class AnalyticsService {
 
       // Initialize dataLayer
       window.dataLayer = window.dataLayer || [];
-      window.gtag = function gtag(...args: any[]) {
+      window.gtag = function gtag(...args: unknown[]) {
         window.dataLayer!.push(args);
       };
 
@@ -123,7 +123,7 @@ export class AnalyticsService {
     category: string = 'general',
     label?: string,
     value?: number,
-    customParameters?: Record<string, any>
+    customParameters?: Record<string, unknown>
   ): void {
     if (!this.initialized || !featureConfig.analytics) return;
 
@@ -146,7 +146,7 @@ export class AnalyticsService {
     }
   }
 
-  public trackFeatureUsage(featureName: string, metadata?: Record<string, any>): void {
+  public trackFeatureUsage(featureName: string, metadata?: Record<string, unknown>): void {
     this.trackEvent('feature_used', 'features', featureName, undefined, metadata);
   }
 
@@ -165,7 +165,7 @@ export class AnalyticsService {
     this.trackEvent(action, 'engagement', element);
   }
 
-  public setUserProperties(properties: Record<string, any>): void {
+  public setUserProperties(properties: Record<string, unknown>): void {
     if (!this.initialized || !featureConfig.analytics) return;
 
     try {
@@ -183,7 +183,7 @@ export class AnalyticsService {
     }
   }
 
-  public identify(userId: string, userProperties?: Record<string, any>): void {
+  public identify(userId: string, userProperties?: Record<string, unknown>): void {
     if (!this.initialized || !featureConfig.analytics) return;
 
     try {
@@ -221,7 +221,7 @@ export const useFeatureTracking = (featureName: string) => {
   }, [featureName]);
 
   return {
-    trackAction: (action: string, metadata?: Record<string, any>) => {
+    trackAction: (action: string, metadata?: Record<string, unknown>) => {
       analyticsService.trackEvent(action, 'features', featureName, undefined, metadata);
     },
   };

@@ -8,7 +8,7 @@ export interface CacheOptions {
 
 export class CacheService {
   private static instance: CacheService;
-  private memoryCache = new Map<string, { data: any; expiry: number; size: number }>();
+  private memoryCache = new Map<string, { data: unknown; expiry: number; size: number }>();
   private cacheSize = 0;
   private maxCacheSize = 50 * 1024 * 1024; // 50MB
 
@@ -24,7 +24,7 @@ export class CacheService {
   /**
    * Set item in cache
    */
-  public set(key: string, data: any, options: CacheOptions = {}): void {
+  public set<T = unknown>(key: string, data: T, options: CacheOptions = {}): void {
     try {
       const ttl = options.ttl || cacheConfig.duration;
       const expiry = Date.now() + ttl;
@@ -58,7 +58,7 @@ export class CacheService {
   /**
    * Get item from cache
    */
-  public get<T = any>(key: string): T | null {
+  public get<T = unknown>(key: string): T | null {
     try {
       const item = this.memoryCache.get(key);
       
@@ -76,7 +76,7 @@ export class CacheService {
         console.log(`Cache: Hit ${key}`);
       }
 
-      return item.data;
+      return item.data as T;
     } catch (error) {
       console.error('Cache: Failed to get item:', error);
       return null;
@@ -141,7 +141,7 @@ export class CacheService {
   /**
    * Calculate approximate size of data
    */
-  private calculateSize(data: any): number {
+  private calculateSize(data: unknown): number {
     if (typeof data === 'string') {
       return data.length * 2; // 2 bytes per character
     }
@@ -188,7 +188,7 @@ export class CacheService {
 /**
  * Memoization decorator for functions
  */
-export function memoize<T extends (...args: any[]) => any>(
+export function memoize<T extends (...args: unknown[]) => unknown>(
   fn: T,
   options: CacheOptions = {}
 ): T {
@@ -197,9 +197,9 @@ export function memoize<T extends (...args: any[]) => any>(
   return ((...args: Parameters<T>): ReturnType<T> => {
     const key = `memoize_${fn.name}_${JSON.stringify(args)}`;
     
-    let result = cache.get(key);
+    let result = cache.get<ReturnType<T>>(key);
     if (result === null) {
-      result = fn(...args);
+      result = fn(...args) as ReturnType<T>;
       cache.set(key, result, options);
     }
     
@@ -210,25 +210,25 @@ export function memoize<T extends (...args: any[]) => any>(
 /**
  * Async function memoization
  */
-export function memoizeAsync<T extends (...args: any[]) => Promise<any>>(
+export function memoizeAsync<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
   options: CacheOptions = {}
 ): T {
   const cache = CacheService.getInstance();
-  const pendingPromises = new Map<string, Promise<any>>();
+  const pendingPromises = new Map<string, Promise<unknown>>();
   
   return (async (...args: Parameters<T>): Promise<Awaited<ReturnType<T>>> => {
     const key = `memoize_async_${fn.name}_${JSON.stringify(args)}`;
     
     // Check cache first
-    let result = cache.get(key);
+    const result = cache.get<Awaited<ReturnType<T>>>(key);
     if (result !== null) {
       return result;
     }
 
     // Check if there's a pending promise for the same key
     if (pendingPromises.has(key)) {
-      return pendingPromises.get(key)!;
+      return pendingPromises.get(key)! as Promise<Awaited<ReturnType<T>>>;
     }
 
     // Create new promise and cache it
@@ -242,7 +242,7 @@ export function memoizeAsync<T extends (...args: any[]) => Promise<any>>(
     });
 
     pendingPromises.set(key, promise);
-    return promise;
+    return promise as Promise<Awaited<ReturnType<T>>>;
   }) as T;
 }
 
@@ -277,7 +277,7 @@ export class ImageOptimizer {
 
       img.onload = () => {
         // Calculate new dimensions
-        let { width, height } = this.calculateDimensions(
+        const { width, height } = this.calculateDimensions(
           img.width,
           img.height,
           maxWidth,
@@ -465,8 +465,8 @@ export const useCache = () => {
     return () => clearInterval(interval);
   }, [cache]);
 
-  const memoizedCallback = useCallback((fn: Function, deps: any[], options?: CacheOptions) => {
-    return useMemo(() => memoize(fn as any, options), deps);
+  const memoizedCallback = useCallback((fn: (...args: unknown[]) => unknown, deps: unknown[], options?: CacheOptions) => {
+    return memoize(fn, options);
   }, []);
 
   return {

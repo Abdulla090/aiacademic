@@ -104,13 +104,14 @@ export class PWAService {
     }
   }
 
-  private handleServiceWorkerMessage(data: any): void {
+  private handleServiceWorkerMessage(data: unknown): void {
+    const messageData = data as Record<string, unknown>;
     if (featureConfig.debug) {
-      console.log('PWA: Message from Service Worker:', data);
+      console.log('PWA: Message from Service Worker:', messageData);
     }
 
     // Handle different message types
-    switch (data.type) {
+    switch (messageData.type) {
       case 'CACHE_UPDATED':
         // Handle cache updates
         break;

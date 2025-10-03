@@ -249,7 +249,7 @@ export class SEOManager {
     return pageData[page] || this.defaultData;
   }
 
-  public addStructuredData(data: any): void {
+  public addStructuredData(data: unknown): void {
     const script = document.createElement('script');
     script.type = 'application/ld+json';
     script.textContent = JSON.stringify(data);
