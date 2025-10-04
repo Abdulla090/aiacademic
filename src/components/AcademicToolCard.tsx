@@ -28,17 +28,18 @@ export const AcademicToolCard = ({
   path,
   onClick
 }: AcademicToolCardProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.dir() === 'rtl';
 
   const cardInnerContent = (
     <>
       <CardHeader className="p-4 border-b border-border">
-        <div className="flex items-center space-x-3">
+        <div className={`flex items-center ${isRTL ? 'space-x-reverse flex-row-reverse' : ''} space-x-3`}>
           <div className="p-2 bg-primary/10 rounded-lg transition-all duration-300 group-hover:bg-primary/20">
             <Icon className="h-5 w-5 text-primary transition-all duration-300" />
           </div>
           <div className="flex-1">
-            <CardTitle className="text-base font-semibold text-foreground transition-colors duration-300 group-hover:text-primary">{t(title)}</CardTitle>
+            <CardTitle className={`text-base font-semibold text-foreground transition-colors duration-300 group-hover:text-primary ${isRTL ? 'text-right' : 'text-left'}`}>{t(title)}</CardTitle>
             {category && (
               <Badge variant="secondary" className="text-xs mt-1 bg-secondary/10 text-primary border-secondary/20">
                 {t(category)}
@@ -60,7 +61,7 @@ export const AcademicToolCard = ({
           </div>
         ) : null}
 
-        <p className="text-sm text-muted-foreground leading-relaxed transition-colors duration-300 group-hover:text-foreground">{t(description)}</p>
+        <p className={`text-sm text-muted-foreground leading-relaxed transition-colors duration-300 group-hover:text-foreground ${isRTL ? 'text-right' : 'text-left'}`}>{t(description)}</p>
       </CardContent>
       <CardFooter className="p-4 bg-background-secondary border-t border-border">
         {isComingSoon ? (
@@ -68,7 +69,7 @@ export const AcademicToolCard = ({
             {t('comingSoon')}
           </Badge>
         ) : (
-          <div className="w-full flex justify-end">
+          <div className={`w-full flex ${isRTL ? 'justify-start' : 'justify-end'}`}>
             <Button size="sm" className="btn-3d-primary font-semibold">
               {t('open')}
             </Button>

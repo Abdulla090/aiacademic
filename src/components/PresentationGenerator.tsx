@@ -122,7 +122,7 @@ export const PresentationGenerator = () => {
             placeholder="دەقی پێشکەشکردنەکەت لێرە بنووسە یان فایلێک باربکە..."
             className={`input-academic sorani-text ${isMobile ? 'min-h-[120px]' : 'h-32'} text-sm sm:text-base`}
             />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-3 sm:gap-4">
               <div>
                 <Label htmlFor="slide-count">ژمارەی سلایدەکان: {slideCount}</Label>
                 <Slider

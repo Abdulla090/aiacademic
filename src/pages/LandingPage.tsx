@@ -5,9 +5,10 @@ import { ArrowRight, CheckCircle, BrainCircuit, Wand2 } from "lucide-react";
 import { useTransition } from "../contexts/TransitionContext";
 
 const LandingPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { setShowLoadingTransition } = useTransition();
+  const isRTL = i18n.dir() === 'rtl';
 
   const handleNavigateToDashboard = () => {
     setShowLoadingTransition(true);
@@ -25,9 +26,9 @@ const LandingPage = () => {
   ];
 
   return (
-    <div className="bg-background text-foreground">
+    <div className="bg-background text-foreground" dir={i18n.dir()}>
       {/* Header */}
-      <header className="py-3 sm:py-4 px-4 sm:px-8 flex justify-between items-center border-b border-border">
+      <header className={`py-3 sm:py-4 px-4 sm:px-8 flex justify-between items-center border-b border-border ${isRTL ? 'flex-row-reverse' : ''}`}>
         <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-primary">{t('appName')}</h1>
         <Button 
           variant="outline" 
@@ -52,7 +53,17 @@ const LandingPage = () => {
           className="btn-academic-primary group text-sm sm:text-base"
           onClick={handleNavigateToDashboard}
         >
-          {t('quickActionsTitle')} <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:translate-x-1" />
+          {isRTL ? (
+            <>
+              <ArrowRight className={`${isRTL ? 'mr-2 rotate-180' : 'ml-2'} h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:translate-x-1`} />
+              {t('quickActionsTitle')}
+            </>
+          ) : (
+            <>
+              {t('quickActionsTitle')} 
+              <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:translate-x-1" />
+            </>
+          )}
         </Button>
       </main>
 

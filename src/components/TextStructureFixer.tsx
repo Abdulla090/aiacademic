@@ -628,9 +628,9 @@ ${text}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6">
         {/* Settings Panel */}
-        <Card className="lg:col-span-1">
+        <Card className="w-full">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Settings className="h-5 w-5" />
@@ -747,20 +747,23 @@ ${text}
         </Card>
 
         {/* Main Content */}
-        <div className="lg:col-span-3">
+        <div className="w-full">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="input" className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                {t('inputTab')}
+            <TabsList className="grid w-full grid-cols-3 gap-1">
+              <TabsTrigger value="input" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">{t('inputTab')}</span>
+                <span className="sm:hidden">📝</span>
               </TabsTrigger>
-              <TabsTrigger value="result" disabled={!fixedText} className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4" />
-                {t('fixedText')}
+              <TabsTrigger value="result" disabled={!fixedText} className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">{t('fixedText')}</span>
+                <span className="sm:hidden">✨</span>
               </TabsTrigger>
-              <TabsTrigger value="comparison" disabled={!fixedText} className="flex items-center gap-2">
-                <Layers className="h-4 w-4" />
-                {t('comparisonTab')}
+              <TabsTrigger value="comparison" disabled={!fixedText} className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                <Layers className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">{t('comparisonTab')}</span>
+                <span className="sm:hidden">📊</span>
               </TabsTrigger>
             </TabsList>
 
@@ -801,7 +804,7 @@ ${text}
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     placeholder={t('pasteOrTypeText')}
-                    className="min-h-[400px] text-base leading-relaxed"
+                    className="min-h-[250px] sm:min-h-[400px] text-sm sm:text-base leading-relaxed"
                   />
                   <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
                     <span>{inputText.length} {t('characters')}</span>

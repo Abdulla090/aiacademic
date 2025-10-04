@@ -1609,24 +1609,27 @@ Provide only the translated text, without any additional explanations.
         </div>
 
         <Tabs defaultValue="translator" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="translator">
-              <ArrowRightLeft className="w-4 h-4 ml-2" />
-              وەرگێڕ (Translator)
+          <TabsList className="grid w-full grid-cols-3 gap-1">
+            <TabsTrigger value="translator" className="text-xs sm:text-sm">
+              <ArrowRightLeft className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
+              <span className="hidden sm:inline">وەرگێڕ</span>
+              <span className="sm:hidden">↔️</span>
             </TabsTrigger>
-            <TabsTrigger value="dictionary">
-              <BookOpen className="w-4 h-4 ml-2" />
-              فەرهەنگ (Dictionary)
+            <TabsTrigger value="dictionary" className="text-xs sm:text-sm">
+              <BookOpen className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
+              <span className="hidden sm:inline">فەرهەنگ</span>
+              <span className="sm:hidden">📖</span>
             </TabsTrigger>
-            <TabsTrigger value="settings">
-               <Settings2 className="w-4 h-4 ml-2" />
-               ڕێکخستنەکان
+            <TabsTrigger value="settings" className="text-xs sm:text-sm">
+               <Settings2 className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
+               <span className="hidden sm:inline">ڕێکخستنەکان</span>
+               <span className="sm:hidden">⚙️</span>
             </TabsTrigger>
           </TabsList>
 
           {/* Translator Tab */}
           <TabsContent value="translator">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-4 sm:gap-6">
               {/* Input Section */}
               <Card className="bg-purple-200/70 backdrop-blur border-purple-300">
                 <CardHeader>
@@ -1652,7 +1655,7 @@ Provide only the translated text, without any additional explanations.
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     placeholder={sourceDialect === 'sorani' ? 'دەقی سۆرانی لێرە بنووسە...' : 'دەقی کورمانجی لێرە بنووسە...'}
-                    className="min-h-[200px] text-right text-lg bg-purple-100/80 border-purple-300 text-black placeholder:text-gray-600"
+                    className="min-h-[150px] sm:min-h-[200px] text-right text-sm sm:text-base md:text-lg bg-purple-100/80 border-purple-300 text-black placeholder:text-gray-600"
                     dir="rtl"
                   />
                   <div className="flex gap-2">
@@ -1721,7 +1724,7 @@ Provide only the translated text, without any additional explanations.
                     value={translatedText}
                     readOnly
                     placeholder="وەرگێڕانەکە لێرە دەردەکەوێت..."
-                    className="min-h-[200px] text-right text-lg bg-indigo-100/80 border-purple-300 text-black placeholder:text-gray-600"
+                    className="min-h-[150px] sm:min-h-[200px] text-right text-sm sm:text-base md:text-lg bg-indigo-100/80 border-purple-300 text-black placeholder:text-gray-600"
                     dir="rtl"
                   />
                   {translatedText && (
@@ -1769,9 +1772,9 @@ Provide only the translated text, without any additional explanations.
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {filteredDictionary.map((item, index) => (
-                    <div key={index} className="border border-purple-300 bg-white/90 backdrop-blur rounded-lg p-4 hover:shadow-md hover:bg-purple-50/90 transition-all duration-200">
+                    <div key={index} className="border border-purple-300 bg-white/90 backdrop-blur rounded-lg p-3 sm:p-4 hover:shadow-md hover:bg-purple-50/90 transition-all duration-200">
                       <div className="space-y-2">
                         <div className="flex justify-between items-start">
                           <Badge variant="secondary" className="text-xs bg-purple-600 text-white border-purple-600">

@@ -43,17 +43,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onSendMessage, messages, 
 
   return (
     <div className="flex flex-col h-full w-full bg-gray-50 rounded-2xl shadow-lg">
-      <div className="flex-grow p-6 overflow-y-auto">
+      <div className="flex-grow p-3 sm:p-4 md:p-6 overflow-y-auto">
         {messages.length === 0 && !isLoading && (
-          <div className="flex flex-col items-center justify-center h-full text-center">
-            <h2 className="text-xl font-semibold text-gray-700 mb-2">Chat with your document</h2>
-            <p className="text-gray-500 mb-6">Ask anything or use a quick action to start.</p>
-            <div className="grid grid-cols-2 gap-3 w-full max-w-md">
+          <div className="flex flex-col items-center justify-center h-full text-center px-4">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-700 mb-2">Chat with your document</h2>
+            <p className="text-sm sm:text-base text-gray-500 mb-4 sm:mb-6">Ask anything or use a quick action to start.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 w-full max-w-md">
               {quickActions.map((action, index) => (
                 <button
                   key={index}
                   onClick={() => onSendMessage(action)}
-                  className="p-3 bg-white rounded-lg shadow-md hover:bg-gray-100 transition-colors text-sm text-gray-700"
+                  className="p-2 sm:p-3 bg-white rounded-lg shadow-md hover:bg-gray-100 transition-colors text-xs sm:text-sm text-gray-700"
                 >
                   {action}
                 </button>
@@ -71,12 +71,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onSendMessage, messages, 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="p-4 bg-white border-t border-gray-200"
+        className="p-3 sm:p-4 bg-white border-t border-gray-200"
       >
-        <div className="flex items-center">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-0">
           <input
             type="text"
-            className="w-full px-4 py-2 text-sm text-black bg-gray-100 border border-transparent rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 sm:px-4 py-2 text-sm text-black bg-gray-100 border border-transparent rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Type your message..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -84,7 +84,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ onSendMessage, messages, 
             disabled={isLoading || isDisabled}
           />
           <button
-            className="ml-3 px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 disabled:bg-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="sm:ml-3 px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 disabled:bg-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 whitespace-nowrap"
             onClick={handleSend}
             disabled={isLoading || isDisabled || !input.trim()}
           >

@@ -273,14 +273,14 @@ OUTPUT: Return the humanized version with the same structure and language, just 
           <BackButton />
         </div>
         {/* Header */}
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-3 sm:space-y-4 px-3">
           <div className="flex items-center justify-center gap-2">
-            <Zap className="h-8 w-8 text-blue-600" />
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <Zap className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               AI Content Humanizer
             </h1>
           </div>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-3xl mx-auto">
             Transform AI-generated content into natural, human-like text while preserving the original structure, 
             language, and meaning. No bullet points, no reformatting - just subtle humanization.
           </p>
@@ -288,8 +288,8 @@ OUTPUT: Return the humanized version with the same structure and language, just 
 
         {/* Progress Bar */}
         {progress > 0 && (
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
+          <div className="space-y-2 px-3">
+            <div className="flex justify-between text-xs sm:text-sm">
               <span>Processing...</span>
               <span>{progress}%</span>
             </div>
@@ -297,9 +297,9 @@ OUTPUT: Return the humanized version with the same structure and language, just 
           </div>
         )}
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6">
           {/* Input Section */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">

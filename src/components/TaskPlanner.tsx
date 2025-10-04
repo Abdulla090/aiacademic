@@ -335,7 +335,7 @@ export const TaskPlanner = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:gap-8">
         {/* Input Panel */}
         <Card className="card-academic">
           <CardHeader>
@@ -362,7 +362,7 @@ export const TaskPlanner = () => {
                 <Brain className="h-4 w-4" />
                 جۆری ئەرک
               </label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {taskTypes.map((type) => {
                   const IconComponent = type.icon;
                   return (
@@ -482,7 +482,7 @@ export const TaskPlanner = () => {
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
                 placeholder="وردەکارییەکانی پڕۆژەکە بنووسە..."
-                className="min-h-[100px] sorani-text"
+                className="min-h-[80px] sm:min-h-[100px] text-sm sm:text-base sorani-text"
               />
             </div>
 
@@ -788,7 +788,7 @@ export const TaskPlanner = () => {
                 ))}
               </div>
             ) : (
-              <div className="flex items-center justify-center h-[400px] text-muted-foreground">
+              <div className="flex items-center justify-center h-[250px] sm:h-[400px] text-muted-foreground text-sm sm:text-base">
                 <div className="text-center">
                   <div className="relative">
                     <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />

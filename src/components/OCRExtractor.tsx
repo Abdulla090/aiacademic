@@ -323,12 +323,12 @@ export function OCRExtractor() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6">
         {/* Image Upload Section */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Upload className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+              <Upload className="h-4 w-4 sm:h-5 sm:w-5" />
               {targetLanguage === 'ku' ? 'وێنە بارکردن' : 'Upload Image'}
             </CardTitle>
           </CardHeader>
@@ -460,7 +460,7 @@ export function OCRExtractor() {
               placeholder={targetLanguage === 'ku'
                 ? 'دەقی دەرهێنراو لێرە دەردەکەوێت...'
                 : 'Extracted text will appear here...'}
-              className="min-h-[300px] resize-none"
+              className="min-h-[200px] sm:min-h-[300px] text-sm sm:text-base resize-none"
               dir={targetLanguage === 'ku' ? 'rtl' : 'ltr'}
             />
 

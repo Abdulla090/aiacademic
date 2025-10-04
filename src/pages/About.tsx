@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, Shield, Users, BookOpen } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 
 const About = () => {
@@ -43,33 +43,24 @@ const About = () => {
           {/* Features Section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
             <div className="card-academic p-5 sm:p-6 text-center">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                </svg>
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 text-primary-foreground">
+                <Shield className="w-6 h-6 sm:w-8 sm:h-8" />
               </div>
               <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">{t('freeAccess')}</h3>
               <p className="text-sm sm:text-base text-muted-foreground">{t('freeAccessDescription')}</p>
             </div>
             
             <div className="card-academic p-5 sm:p-6 text-center">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-secondary rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                  <path d="M23 21v-2a4 0 0 0-3-3.87"></path>
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-secondary rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 text-secondary-foreground">
+                <Users className="w-6 h-6 sm:w-8 sm:h-8" />
               </div>
               <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">{t('community')}</h3>
               <p className="text-sm sm:text-base text-muted-foreground">{t('communityDescription')}</p>
             </div>
             
             <div className="card-academic p-5 sm:p-6 text-center">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-accent rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M4 19.5v-15A2.5 0 0 1 6.5 2H20v20H6.5a2.5 0 0 1 0-5H20"></path>
-                </svg>
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-accent rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 text-accent-foreground">
+                <BookOpen className="w-6 h-6 sm:w-8 sm:h-8" />
               </div>
               <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">{t('knowledge')}</h3>
               <p className="text-sm sm:text-base text-muted-foreground">{t('knowledgeDescription')}</p>

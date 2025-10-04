@@ -10,6 +10,7 @@ import { CustomSidebar } from "./components/CustomSidebar";
 import { SidebarProvider, SidebarInset } from "./components/ui/sidebar";
 import { MobileBottomNav } from "./components/MobileBottomNav";
 import { MobileSettingsModal } from "./components/MobileSettingsModal";
+import { ScrollToTop } from "./components/ScrollToTop";
 import { useIsMobile } from "./hooks/use-mobile";
 import { TransitionProvider, useTransition } from "./contexts/TransitionContext";
 import { LoadingTransition } from "./components/LoadingTransition";
@@ -166,6 +167,7 @@ const App = () => {
             v7_relativeSplatPath: true,
             v7_startTransition: true
           }}>
+            <ScrollToTop />
             <TransitionProvider>
               <AppContent key={i18n.language} i18n={i18n} />
             </TransitionProvider>

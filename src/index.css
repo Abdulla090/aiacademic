@@ -707,4 +707,77 @@ suggestion,
     0% { transform: translateY(100%); }
     100% { transform: translateY(-100%); }
   }
+
+  /* RTL Support Utilities */
+  [dir="rtl"] {
+    direction: rtl;
+  }
+
+  [dir="ltr"] {
+    direction: ltr;
+  }
+
+  /* RTL-aware spacing utilities */
+  [dir="rtl"] .rtl\:space-x-reverse > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 1;
+  }
+
+  [dir="rtl"] .space-x-3 > :not([hidden]) ~ :not([hidden]) {
+    margin-right: calc(0.75rem * var(--tw-space-x-reverse, 0));
+    margin-left: calc(0.75rem * calc(1 - var(--tw-space-x-reverse, 0)));
+  }
+
+  /* RTL flex utilities */
+  [dir="rtl"] .flex-row {
+    flex-direction: row-reverse;
+  }
+
+  [dir="rtl"] .flex-row-reverse {
+    flex-direction: row;
+  }
+
+  /* RTL text alignment */
+  [dir="rtl"] .text-left {
+    text-align: right;
+  }
+
+  [dir="rtl"] .text-right {
+    text-align: left;
+  }
+
+  /* RTL justify utilities */
+  [dir="rtl"] .justify-end {
+    justify-content: flex-start;
+  }
+
+  [dir="rtl"] .justify-start {
+    justify-content: flex-end;
+  }
+
+  /* RTL margin and padding utilities */
+  [dir="rtl"] .ml-1 { margin-right: 0.25rem; margin-left: 0; }
+  [dir="rtl"] .ml-2 { margin-right: 0.5rem; margin-left: 0; }
+  [dir="rtl"] .ml-3 { margin-right: 0.75rem; margin-left: 0; }
+  [dir="rtl"] .ml-4 { margin-right: 1rem; margin-left: 0; }
+  [dir="rtl"] .mr-1 { margin-left: 0.25rem; margin-right: 0; }
+  [dir="rtl"] .mr-2 { margin-left: 0.5rem; margin-right: 0; }
+  [dir="rtl"] .mr-3 { margin-left: 0.75rem; margin-right: 0; }
+  [dir="rtl"] .mr-4 { margin-left: 1rem; margin-right: 0; }
+
+  [dir="rtl"] .pl-1 { padding-right: 0.25rem; padding-left: 0; }
+  [dir="rtl"] .pl-2 { padding-right: 0.5rem; padding-left: 0; }
+  [dir="rtl"] .pl-3 { padding-right: 0.75rem; padding-left: 0; }
+  [dir="rtl"] .pl-4 { padding-right: 1rem; padding-left: 0; }
+  [dir="rtl"] .pr-1 { padding-left: 0.25rem; padding-right: 0; }
+  [dir="rtl"] .pr-2 { padding-left: 0.5rem; padding-right: 0; }
+  [dir="rtl"] .pr-3 { padding-left: 0.75rem; padding-right: 0; }
+  [dir="rtl"] .pr-4 { padding-left: 1rem; padding-right: 0; }
+
+  /* RTL rounded corners */
+  [dir="rtl"] .rounded-l { border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem; border-top-left-radius: 0; border-bottom-left-radius: 0; }
+  [dir="rtl"] .rounded-r { border-top-left-radius: 0.25rem; border-bottom-left-radius: 0.25rem; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+
+  /* RTL border utilities */
+  [dir="rtl"] .border-l { border-right-width: 1px; border-left-width: 0; }
+  [dir="rtl"] .border-r { border-left-width: 1px; border-right-width: 0; }
 }

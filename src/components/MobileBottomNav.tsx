@@ -11,7 +11,8 @@ interface MobileBottomNavProps {
 export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ onSettingsClick }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.dir() === 'rtl';
 
   const navItems = [
     {
@@ -49,8 +50,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ onSettingsClic
   };
 
   return (
-    <div className="mobile-bottom-nav fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 md:hidden">
-      <div className="flex justify-around items-center py-2 px-4 safe-area-pb">
+    <div className="mobile-bottom-nav fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 md:hidden" dir={i18n.dir()}>
+      <div className={`flex justify-around items-center py-2 px-4 safe-area-pb ${isRTL ? 'flex-row-reverse' : ''}`}>
         {navItems.map((item) => {
           const IconComponent = item.icon;
           const active = item.path ? isActive(item.path) : false;
@@ -84,7 +85,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ onSettingsClic
                     ? 'text-purple-600'
                     : 'text-gray-600'
               }`}>
-                {item.label}
+                {isRTL ? item.label : item.labelEn}
               </span>
             </Button>
           );
