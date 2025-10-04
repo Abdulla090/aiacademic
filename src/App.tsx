@@ -5,22 +5,25 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useState, lazy, Suspense, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import withLoading from "./hocs/withLoading";
 import { CustomSidebar } from "./components/CustomSidebar";
 import { SidebarProvider, SidebarInset } from "./components/ui/sidebar";
 import { MobileBottomNav } from "./components/MobileBottomNav";
 import { MobileSettingsModal } from "./components/MobileSettingsModal";
+import { ScrollToTop } from "./components/ScrollToTop";
 import { useIsMobile } from "./hooks/use-mobile";
 import { TransitionProvider, useTransition } from "./contexts/TransitionContext";
 import { LoadingTransition } from "./components/LoadingTransition";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { PageLoading } from "./components/LoadingSpinner";
-
+import { AuthProvider } from "./contexts/AuthContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 // Eager load essential pages
 import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import About from "./pages/About";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 
 // Lazy load feature pages for better performance
 const ArticleWriter = lazy(() => import("./pages/ArticleWriter"));
@@ -69,29 +72,7 @@ const AppContent = ({ i18n }: { i18n: any }) => {
 
 
 
-  const ArticleWriterWithLoading = withLoading(ArticleWriter);
-  const GrammarCheckerWithLoading = withLoading(GrammarChecker);
-  const ReportGeneratorWithLoading = withLoading(ReportGenerator);
-  const TaskPlannerWithLoading = withLoading(TaskPlanner);
-  const SummarizerParaphraserWithLoading = withLoading(SummarizerParaphraser);
-  const MindMapGeneratorWithLoading = withLoading(MindMapGenerator);
-  const FlashcardGeneratorWithLoading = withLoading(FlashcardGenerator);
-  const QuizGeneratorWithLoading = withLoading(QuizGenerator);
-  const PresentationGeneratorWithLoading = withLoading(PresentationGenerator);
-  const WritingSupervisorWithLoading = withLoading(WritingSupervisor);
-  const FileConverterWithLoading = withLoading(FileConverter);
-  const ImageConverterWithLoading = withLoading(ImageConverter);
-  const CompressorWithLoading = withLoading(Compressor);
-  const CitationGeneratorWithLoading = withLoading(CitationGenerator);
-  const KnowledgeGraphPageWithLoading = withLoading(KnowledgeGraphPage);
-  const ChatWithFileWithLoading = withLoading(ChatWithFile);
-  const OCRExtractorWithLoading = withLoading(OCRExtractor);
-  const KurdishDialectTranslatorWithLoading = withLoading(KurdishDialectTranslator);
-  const StudyAnalyticsDashboardWithLoading = withLoading(StudyAnalyticsDashboard);
-  const AIResearchAssistantWithLoading = withLoading(AIResearchAssistant);
-  const TextStructureFixerWithLoading = withLoading(TextStructureFixerPage);
-  const AIContentHumanizerWithLoading = withLoading(AIContentHumanizer);
-  const KurdishFontTestWithLoading = withLoading(KurdishFontTest);
+
  
   return (
     <>
@@ -106,31 +87,33 @@ const AppContent = ({ i18n }: { i18n: any }) => {
         <Suspense fallback={<PageLoadingFallback />}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/file-converter" element={<FileConverterWithLoading />} />
-          <Route path="/image-converter" element={<ImageConverterWithLoading />} />
-          <Route path="/compressor" element={<CompressorWithLoading />} />
-          <Route path="/citation-generator" element={<CitationGeneratorWithLoading />} />
-          <Route path="/article-writer" element={<ArticleWriterWithLoading />} />
-          <Route path="/grammar-checker" element={<GrammarCheckerWithLoading />} />
-          <Route path="/report-generator" element={<ReportGeneratorWithLoading />} />
-          <Route path="/task-planner" element={<TaskPlannerWithLoading />} />
-          <Route path="/summarizer-paraphraser" element={<SummarizerParaphraserWithLoading />} />
-          <Route path="/mind-map-generator" element={<MindMapGeneratorWithLoading />} />
-          <Route path="/flashcard-generator" element={<FlashcardGeneratorWithLoading />} />
-          <Route path="/quiz-generator" element={<QuizGeneratorWithLoading />} />
-          <Route path="/presentation-generator" element={<PresentationGeneratorWithLoading />} />
-          <Route path="/writing-supervisor" element={<WritingSupervisorWithLoading />} />
-          <Route path="/knowledge-graph" element={<KnowledgeGraphPageWithLoading />} />
-          <Route path="/ocr-extractor" element={<OCRExtractorWithLoading />} />
-          <Route path="/kurdish-dialect-translator" element={<KurdishDialectTranslatorWithLoading />} />
-          <Route path="/study-analytics-dashboard" element={<StudyAnalyticsDashboardWithLoading />} />
-          <Route path="/ai-research-assistant" element={<AIResearchAssistantWithLoading />} />
-          <Route path="/text-structure-fixer" element={<TextStructureFixerWithLoading />} />
-          <Route path="/ai-content-humanizer" element={<AIContentHumanizerWithLoading />} />
-          <Route path="/kurdish-font-test" element={<KurdishFontTestWithLoading />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/file-converter" element={<ProtectedRoute><FileConverter /></ProtectedRoute>} />
+          <Route path="/image-converter" element={<ProtectedRoute><ImageConverter /></ProtectedRoute>} />
+          <Route path="/compressor" element={<ProtectedRoute><Compressor /></ProtectedRoute>} />
+          <Route path="/citation-generator" element={<ProtectedRoute><CitationGenerator /></ProtectedRoute>} />
+          <Route path="/article-writer" element={<ProtectedRoute><ArticleWriter /></ProtectedRoute>} />
+          <Route path="/grammar-checker" element={<ProtectedRoute><GrammarChecker /></ProtectedRoute>} />
+          <Route path="/report-generator" element={<ProtectedRoute><ReportGenerator /></ProtectedRoute>} />
+          <Route path="/task-planner" element={<ProtectedRoute><TaskPlanner /></ProtectedRoute>} />
+          <Route path="/summarizer-paraphraser" element={<ProtectedRoute><SummarizerParaphraser /></ProtectedRoute>} />
+          <Route path="/mind-map-generator" element={<ProtectedRoute><MindMapGenerator /></ProtectedRoute>} />
+          <Route path="/flashcard-generator" element={<ProtectedRoute><FlashcardGenerator /></ProtectedRoute>} />
+          <Route path="/quiz-generator" element={<ProtectedRoute><QuizGenerator /></ProtectedRoute>} />
+          <Route path="/presentation-generator" element={<ProtectedRoute><PresentationGenerator /></ProtectedRoute>} />
+          <Route path="/writing-supervisor" element={<ProtectedRoute><WritingSupervisor /></ProtectedRoute>} />
+          <Route path="/knowledge-graph" element={<ProtectedRoute><KnowledgeGraphPage /></ProtectedRoute>} />
+          <Route path="/ocr-extractor" element={<ProtectedRoute><OCRExtractor /></ProtectedRoute>} />
+          <Route path="/kurdish-dialect-translator" element={<ProtectedRoute><KurdishDialectTranslator /></ProtectedRoute>} />
+          <Route path="/study-analytics-dashboard" element={<ProtectedRoute><StudyAnalyticsDashboard /></ProtectedRoute>} />
+          <Route path="/ai-research-assistant" element={<ProtectedRoute><AIResearchAssistant /></ProtectedRoute>} />
+          <Route path="/text-structure-fixer" element={<ProtectedRoute><TextStructureFixerPage /></ProtectedRoute>} />
+          <Route path="/ai-content-humanizer" element={<ProtectedRoute><AIContentHumanizer /></ProtectedRoute>} />
+          <Route path="/kurdish-font-test" element={<ProtectedRoute><KurdishFontTest /></ProtectedRoute>} />
           <Route path="/about" element={<About />} />
-          <Route path="/chat-with-file" element={<ChatWithFileWithLoading />} />
+          <Route path="/chat-with-file" element={<ProtectedRoute><ChatWithFile /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
@@ -166,9 +149,12 @@ const App = () => {
             v7_relativeSplatPath: true,
             v7_startTransition: true
           }}>
-            <TransitionProvider>
-              <AppContent key={i18n.language} i18n={i18n} />
-            </TransitionProvider>
+            <ScrollToTop />
+            <AuthProvider>
+              <TransitionProvider>
+                <AppContent key={i18n.language} i18n={i18n} />
+              </TransitionProvider>
+            </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>

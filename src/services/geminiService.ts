@@ -463,6 +463,65 @@ class GeminiService {
     return response.text;
   }
 
+  async generateReportTitles(topic: string, language: string): Promise<string[]> {
+    const prompt = `
+    Generate exactly 5 academic and professional titles for a report about: "${topic}".
+
+    The titles should be:
+    - Clear and descriptive
+    - Academic and professional in tone
+    - Written in ${language === 'ku' ? 'Sorani Kurdish' : language}
+    - Varied in style (some can be questions, some statements)
+    - Between 5-15 words each
+
+    IMPORTANT: Respond ONLY with a valid JSON array of strings. Do not include any other text, explanations, or markdown formatting.
+
+    JSON Format:
+    [
+      "Title 1 about the topic",
+      "Title 2 about the topic",
+      "Title 3 about the topic",
+      "Title 4 about the topic",
+      "Title 5 about the topic"
+    ]
+    `;
+
+    const response = await this.makeRequest(prompt);
+    try {
+      const cleanedText = response.text.replace(/```json/g, '').replace(/```/g, '').trim();
+      
+      // Log the raw response for debugging
+      console.log("Raw AI response for titles:", response.text);
+      console.log("Cleaned text:", cleanedText);
+      
+      const jsonMatch = cleanedText.match(/(\[[\s\S]*\])/);
+      if (jsonMatch && jsonMatch[0]) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        
+        // Log the parsed response for debugging
+        console.log("Parsed titles:", parsed);
+        
+        // Validate that we got an array of 5 strings
+        if (Array.isArray(parsed) && parsed.length === 5 && parsed.every(t => typeof t === 'string')) {
+          console.log("Returning", parsed.length, "titles");
+          return parsed;
+        }
+        throw new Error("Invalid titles structure");
+      }
+      throw new Error("Failed to find JSON array in AI response.");
+    } catch (error) {
+      console.error("Failed to parse report titles JSON:", error, "Raw response:", response.text);
+      // Fallback titles
+      return [
+        `Understanding ${topic}: A Comprehensive Report`,
+        `An In-Depth Analysis of ${topic}`,
+        `${topic}: Key Insights and Findings`,
+        `Exploring ${topic}: Current State and Future Directions`,
+        `${topic}: A Detailed Study and Review`
+      ];
+    }
+  }
+
   async generateReportOutline(topic: string, language: string): Promise<ReportOutline> {
     const prompt = `
     Create a detailed, content-focused report outline for the topic: "${topic}".

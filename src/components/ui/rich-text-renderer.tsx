@@ -64,17 +64,17 @@ export const RichTextRenderer: React.FC<RichTextRendererProps> = ({
       if (currentListItems.length > 0) {
         elements.push(
           currentListType === 'ol' ? (
-            <ol key={`list-${elements.length}`} className="list-decimal list-inside space-y-1 my-4 pr-6">
+            <ol key={`list-${elements.length}`} className="list-decimal list-inside space-y-1 my-3 md:my-4 pr-4 md:pr-6 w-full max-w-full overflow-hidden">
               {currentListItems.map((item, index) => (
-                <li key={index} className="text-base leading-relaxed">
+                <li key={index} className="text-xs md:text-base leading-relaxed break-words overflow-wrap-anywhere w-full max-w-full" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                   {formatInlineText(item)}
                 </li>
               ))}
             </ol>
           ) : (
-            <ul key={`list-${elements.length}`} className="list-disc list-inside space-y-1 my-4 pr-6">
+            <ul key={`list-${elements.length}`} className="list-disc list-inside space-y-1 my-3 md:my-4 pr-4 md:pr-6 w-full max-w-full overflow-hidden">
               {currentListItems.map((item, index) => (
-                <li key={index} className="text-base leading-relaxed">
+                <li key={index} className="text-xs md:text-base leading-relaxed break-words overflow-wrap-anywhere w-full max-w-full" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                   {formatInlineText(item)}
                 </li>
               ))}
@@ -89,8 +89,8 @@ export const RichTextRenderer: React.FC<RichTextRendererProps> = ({
     const flushCodeBlock = () => {
       if (codeBlockContent.length > 0) {
         elements.push(
-          <pre key={`code-${elements.length}`} className="bg-muted p-4 rounded-lg overflow-x-auto my-4 border">
-            <code className={`text-sm ${codeBlockLanguage ? `language-${codeBlockLanguage}` : ''}`}>
+          <pre key={`code-${elements.length}`} className="bg-muted p-2 md:p-4 rounded-lg overflow-x-auto my-3 md:my-4 border break-words">
+            <code className={`text-xs md:text-sm ${codeBlockLanguage ? `language-${codeBlockLanguage}` : ''}`}>
               {codeBlockContent.join('\n')}
             </code>
           </pre>
@@ -129,12 +129,13 @@ export const RichTextRenderer: React.FC<RichTextRendererProps> = ({
         elements.push(
           <HeaderTag 
             key={`header-${elements.length}`} 
-            className={`font-bold my-4 ${
-              level === 1 ? 'text-2xl' : 
-              level === 2 ? 'text-xl' : 
-              level === 3 ? 'text-lg' : 
-              'text-base'
+            className={`font-bold my-3 md:my-4 break-words overflow-wrap-anywhere w-full max-w-full ${
+              level === 1 ? 'text-sm md:text-2xl' : 
+              level === 2 ? 'text-xs md:text-xl' : 
+              level === 3 ? 'text-xs md:text-lg' : 
+              'text-xs md:text-base'
             }`}
+            style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
           >
             {formatInlineText(text)}
           </HeaderTag>
@@ -171,9 +172,9 @@ export const RichTextRenderer: React.FC<RichTextRendererProps> = ({
         elements.push(
           <blockquote 
             key={`quote-${elements.length}`} 
-            className="border-l-4 border-primary/30 pl-4 py-2 my-4 bg-muted/30 rounded-r-lg"
+            className="border-l-4 border-primary/30 pl-3 md:pl-4 py-2 my-3 md:my-4 bg-muted/30 rounded-r-lg w-full max-w-full overflow-hidden"
           >
-            <p className="text-base leading-relaxed italic">
+            <p className="text-xs md:text-base leading-relaxed italic break-words overflow-wrap-anywhere w-full max-w-full" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
               {formatInlineText(quoteText)}
             </p>
           </blockquote>
@@ -202,7 +203,7 @@ export const RichTextRenderer: React.FC<RichTextRendererProps> = ({
       // Handle regular paragraphs
       flushList();
       elements.push(
-        <p key={`p-${elements.length}`} className="text-base leading-relaxed my-2">
+        <p key={`p-${elements.length}`} className="text-xs md:text-base leading-relaxed my-2 break-words overflow-wrap-anywhere w-full max-w-full" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
           {formatInlineText(line)}
         </p>
       );
@@ -225,7 +226,7 @@ export const RichTextRenderer: React.FC<RichTextRendererProps> = ({
     const patterns = [
       { name: 'strong', regex: /\*\*([^*]+)\*\*/g, component: (match: string, content: string, key: number) => <strong key={key}>{content}</strong> },
       { name: 'em', regex: /\*([^*]+)\*/g, component: (match: string, content: string, key: number) => <em key={key}>{content}</em> },
-      { name: 'code', regex: /`([^`]+)`/g, component: (match: string, content: string, key: number) => <code key={key} className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">{content}</code> },
+      { name: 'code', regex: /`([^`]+)`/g, component: (match: string, content: string, key: number) => <code key={key} className="bg-muted px-1 md:px-1.5 py-0.5 rounded text-xs md:text-sm font-mono break-all">{content}</code> },
       { name: 'del', regex: /~~([^~]+)~~/g, component: (match: string, content: string, key: number) => <del key={key}>{content}</del> },
       { name: 'u', regex: /__([^_]+)__/g, component: (match: string, content: string, key: number) => <u key={key}>{content}</u> },
       { name: 'link', regex: /\[([^\]]+)\]\(([^)]+)\)/g, component: (match: string, linkText: string, url: string, key: number) => (
@@ -311,37 +312,37 @@ export const RichTextRenderer: React.FC<RichTextRendererProps> = ({
   };
 
   return (
-    <div className={`rich-text-content relative ${className}`}>
+    <div className={`rich-text-content relative w-full max-w-full overflow-x-hidden ${className}`} style={{ maxWidth: '100%', overflowX: 'hidden' }}>
       {showCopyButton && content && (
-        <div className="flex justify-end mb-2">
+        <div className="flex justify-end mb-2 w-full max-w-full overflow-hidden">
           <Button
             size="sm"
             variant="outline"
             onClick={handleCopy}
-            className="gap-2"
+            className="gap-1 md:gap-2 text-xs md:text-sm flex-shrink-0"
             disabled={!content}
           >
             {copied ? (
               <>
                 <Check className="h-3 w-3" />
-                کۆپی کرا
+                <span className="hidden sm:inline">کۆپی کرا</span>
               </>
             ) : (
               <>
                 <Copy className="h-3 w-3" />
-                کۆپی
+                <span className="hidden sm:inline">کۆپی</span>
               </>
             )}
           </Button>
         </div>
       )}
       
-      <div className="formatted-content">
+      <div className="formatted-content overflow-x-hidden w-full max-w-full" style={{ maxWidth: '100%', overflowX: 'hidden', wordBreak: 'break-word' }}>
         {renderFormattedText(content)}
         
         {/* Blinking cursor for streaming */}
         {isStreaming && (
-          <span className="inline-block w-0.5 h-5 bg-primary ml-1 animate-pulse" />
+          <span className="inline-block w-0.5 h-4 md:h-5 bg-primary ml-1 animate-pulse" />
         )}
       </div>
     </div>

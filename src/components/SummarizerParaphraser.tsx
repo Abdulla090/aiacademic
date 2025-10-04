@@ -335,18 +335,18 @@ export const SummarizerParaphraser = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:gap-8">
         {/* Input Panel */}
         <Card className="card-academic">
           <CardHeader>
-            <CardTitle className="sorani-text">نووسینی سەرەتایی</CardTitle>
+            <CardTitle className="sorani-text text-lg sm:text-xl">نووسینی سەرەتایی</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <Textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="نووسینەکەت لێرە بنووسە بۆ کورتکردنەوە یان نووسینەوە..."
-              className="min-h-[400px] sorani-text text-base leading-relaxed"
+              className="min-h-[250px] sm:min-h-[400px] sorani-text text-sm sm:text-base leading-relaxed"
             />
              <LanguageSelection
                selectedLanguage={responseLanguage}
@@ -354,7 +354,7 @@ export const SummarizerParaphraser = () => {
              />
             
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-2 gap-1">
                 <TabsTrigger value="summarize" className="sorani-text">کورتکردنەوە</TabsTrigger>
                 <TabsTrigger value="paraphrase" className="sorani-text">نووسینەوە</TabsTrigger>
               </TabsList>
@@ -449,44 +449,44 @@ export const SummarizerParaphraser = () => {
             {activeTab === 'summarize' ? (
               summarizedText ? (
                 <div className="space-y-4">
-                  <Badge variant="secondary" className="mb-4">
+                  <Badge variant="secondary" className="mb-4 text-xs sm:text-sm">
                     کورتکردنەوە - {summaryLength === 'short' ? 'کورت' : summaryLength === 'medium' ? 'ناوەند' : 'ورد'}
                   </Badge>
-                  <div className="min-h-[400px] p-4 border border-border rounded-lg bg-background overflow-y-auto">
+                  <div className="min-h-[250px] sm:min-h-[400px] p-3 sm:p-4 border border-border rounded-lg bg-background overflow-y-auto">
                     <RichTextRenderer
                       content={summarizedText}
                       showCopyButton={true}
-                      className="sorani-text"
+                      className="report-content sorani-text text-sm sm:text-base"
                     />
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center justify-center h-[400px] text-muted-foreground">
+                <div className="flex items-center justify-center h-[250px] sm:h-[400px] text-muted-foreground">
                   <div className="text-center">
-                    <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p className="sorani-text">کورتکردنەوەکە لێرە دەردەکەوێت</p>
+                    <FileText className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 opacity-50" />
+                    <p className="sorani-text text-sm sm:text-base">کورتکردنەوەکە لێرە دەردەکەوێت</p>
                   </div>
                 </div>
               )
             ) : (
               paraphrasedText ? (
                 <div className="space-y-4">
-                  <Badge variant="secondary" className="mb-4">
+                  <Badge variant="secondary" className="mb-4 text-xs sm:text-sm">
                     نووسینەوە
                   </Badge>
-                  <div className="min-h-[400px] p-4 border border-border rounded-lg bg-background overflow-y-auto">
+                  <div className="min-h-[250px] sm:min-h-[400px] p-3 sm:p-4 border border-border rounded-lg bg-background overflow-y-auto">
                     <RichTextRenderer
                       content={paraphrasedText}
                       showCopyButton={true}
-                      className="sorani-text"
+                      className="report-content sorani-text text-sm sm:text-base"
                     />
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center justify-center h-[400px] text-muted-foreground">
+                <div className="flex items-center justify-center h-[250px] sm:h-[400px] text-muted-foreground">
                   <div className="text-center">
-                    <RotateCcw className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p className="sorani-text">نووسینەوەکە لێرە دەردەکەوێت</p>
+                    <RotateCcw className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 opacity-50" />
+                    <p className="sorani-text text-sm sm:text-base">نووسینەوەکە لێرە دەردەکەوێت</p>
                   </div>
                 </div>
               )

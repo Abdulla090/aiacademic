@@ -1,7 +1,7 @@
 import { ArticleWriter as ArticleWriterComponent } from "@/components/ArticleWriter";
 import { MobileSidebarTrigger } from "@/components/MobileSidebarTrigger";
 import { BackButton } from "@/components/BackButton";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { PenTool } from "lucide-react";
@@ -9,10 +9,6 @@ const ArticleWriter = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [currentTool, setCurrentTool] = useState<string | null>(null);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-subtle bg-purple-grid">

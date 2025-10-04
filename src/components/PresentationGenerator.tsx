@@ -16,6 +16,9 @@ import { RichTextRenderer } from '@/components/ui/rich-text-renderer';
 import { ResponsiveLayout, ResponsiveButtonGroup } from '@/components/ui/responsive-layout';
 import { useResponsive } from '@/hooks/useResponsive';
 import { LanguageSelection } from './LanguageSelection';
+import { ToolHeader } from '@/components/ToolHeader';
+import { useAuth } from '@/contexts/AuthContext';
+import { CREDIT_COSTS } from '@/config/credits';
 
 export const PresentationGenerator = () => {
   const [text, setText] = useState('');
@@ -30,6 +33,7 @@ export const PresentationGenerator = () => {
   const deckRef = useRef<Reveal.Api | null>(null);
   const { toast } = useToast();
   const { isMobile, isTablet } = useResponsive();
+  const { deductCredits } = useAuth();
 
   useEffect(() => {
     if (slides.length > 0 && deckDivRef.current) {
@@ -59,6 +63,15 @@ export const PresentationGenerator = () => {
       });
       return;
     }
+
+    // Check and deduct credits
+    const success = await deductCredits(
+      CREDIT_COSTS.PRESENTATION_GENERATOR,
+      'Presentation Generator',
+      `Generated ${slideCount} slides in ${style} style`
+    );
+    if (!success) return;
+
     setLoading(true);
     try {
       const result = await geminiService.generatePresentation(contentText, slideCount, style, core);
@@ -109,6 +122,15 @@ export const PresentationGenerator = () => {
 
   return (
     <ResponsiveLayout>
+      <ToolHeader 
+        toolName="دروستکەری پێشکەشکردن"
+        creditCost={CREDIT_COSTS.PRESENTATION_GENERATOR}
+        icon={
+          <div className="p-3 bg-gradient-primary rounded-xl text-primary-foreground">
+            <Upload className="h-6 w-6" />
+          </div>
+        }
+      />
       <Card className="card-academic">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -122,7 +144,7 @@ export const PresentationGenerator = () => {
             placeholder="دەقی پێشکەشکردنەکەت لێرە بنووسە یان فایلێک باربکە..."
             className={`input-academic sorani-text ${isMobile ? 'min-h-[120px]' : 'h-32'} text-sm sm:text-base`}
             />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-3 sm:gap-4">
               <div>
                 <Label htmlFor="slide-count">ژمارەی سلایدەکان: {slideCount}</Label>
                 <Slider
@@ -190,47 +212,47 @@ export const PresentationGenerator = () => {
                           <RichTextRenderer
                             content={slide.title}
                             showCopyButton={false}
-                            className="text-5xl font-bold mb-4"
+                            className="report-content text-3xl md:text-5xl font-bold mb-4"
                           />
                           <RichTextRenderer
                             content={slide.content}
                             showCopyButton={false}
-                            className="text-xl"
+                            className="report-content text-base md:text-xl"
                           />
                         </>
                       ) : slide.layout === 'image-right' ? (
-                        <div className="flex items-center w-full">
-                          <div className="w-1/2 pr-8">
+                        <div className="flex flex-col md:flex-row items-center w-full gap-4 md:gap-0">
+                          <div className="w-full md:w-1/2 md:pr-8">
                             <RichTextRenderer
                               content={slide.title}
                               showCopyButton={false}
-                              className="text-4xl font-semibold mb-4"
+                              className="report-content text-2xl md:text-4xl font-semibold mb-4"
                             />
                             <RichTextRenderer
                               content={slide.content}
                               showCopyButton={false}
-                              className=""
+                              className="report-content text-sm md:text-base"
                             />
                           </div>
-                          <div className="w-1/2">
-                            <img src={`https://source.unsplash.com/800x600/?${slide.imageSearchTerm}`} alt={slide.title} className="rounded-lg shadow-lg" />
+                          <div className="w-full md:w-1/2">
+                            <img src={`https://source.unsplash.com/800x600/?${slide.imageSearchTerm}`} alt={slide.title} className="rounded-lg shadow-lg w-full h-auto" />
                           </div>
                         </div>
                       ) : slide.layout === 'image-left' ? (
-                        <div className="flex items-center w-full">
-                          <div className="w-1/2">
-                            <img src={`https://source.unsplash.com/800x600/?${slide.imageSearchTerm}`} alt={slide.title} className="rounded-lg shadow-lg" />
+                        <div className="flex flex-col md:flex-row items-center w-full gap-4 md:gap-0">
+                          <div className="w-full md:w-1/2">
+                            <img src={`https://source.unsplash.com/800x600/?${slide.imageSearchTerm}`} alt={slide.title} className="rounded-lg shadow-lg w-full h-auto" />
                           </div>
-                          <div className="w-1/2 pl-8">
+                          <div className="w-full md:w-1/2 md:pl-8">
                             <RichTextRenderer
                               content={slide.title}
                               showCopyButton={false}
-                              className="text-4xl font-semibold mb-4"
+                              className="report-content text-2xl md:text-4xl font-semibold mb-4"
                             />
                             <RichTextRenderer
                               content={slide.content}
                               showCopyButton={false}
-                              className=""
+                              className="report-content text-sm md:text-base"
                             />
                           </div>
                         </div>
@@ -239,12 +261,12 @@ export const PresentationGenerator = () => {
                           <RichTextRenderer
                             content={slide.title}
                             showCopyButton={false}
-                            className="text-4xl font-semibold mb-4"
+                            className="report-content text-2xl md:text-4xl font-semibold mb-4"
                           />
                           <RichTextRenderer
                             content={slide.content}
                             showCopyButton={false}
-                            className="max-w-4xl"
+                            className="report-content max-w-4xl text-sm md:text-base"
                           />
                         </>
                       )}

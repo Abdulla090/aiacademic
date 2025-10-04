@@ -23,14 +23,26 @@ import {
   Wand2,
   Settings
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 import { MobileSettingsModal } from "@/components/MobileSettingsModal";
 
 const Index = () => {
   const { t, i18n } = useTranslation();
+  const location = useLocation();
   const [currentTool, setCurrentTool] = useState<string | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+
+  // Check if we're being navigated to with a specific category selected
+  useEffect(() => {
+    const state = location.state as { selectedCategory?: string };
+    if (state?.selectedCategory) {
+      setCurrentTool(state.selectedCategory);
+      // Clear the state so it doesn't persist on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   interface AcademicTool {
     title: string;
@@ -229,6 +241,8 @@ const Index = () => {
   // If a specific category is selected, show the tools within that category
  if (currentTool && toolsByCategory[currentTool]) {
     const selectedCategoryTools = toolsByCategory[currentTool];
+    const isRTL = i18n.dir() === 'rtl';
+    
     return (
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 bg-purple-grid" dir={i18n.dir()}>
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -237,8 +251,12 @@ const Index = () => {
           </div>
 
           <div className="mb-6">
-            <Button variant="outline" onClick={() => setCurrentTool(null)} className="dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100">
-              &larr; Back to Categories
+            <Button 
+              variant="outline" 
+              onClick={() => setCurrentTool(null)} 
+              className="dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"
+            >
+              {isRTL ? '→' : '←'} {t('backToCategories') || 'Back to Categories'}
             </Button>
           </div>
 
@@ -252,11 +270,6 @@ const Index = () => {
                 category={t(tool.category)}
                 isComingSoon={tool.isComingSoon}
                 path={tool.path}
-                onClick={() => {
-                  if (!tool.isComingSoon && tool.path) {
-                    setCurrentTool(tool.title);
-                  }
-                }}
               />
             ))}
           </div>

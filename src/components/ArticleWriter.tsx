@@ -19,6 +19,9 @@ import { ResponsiveLayout, ResponsiveCard, ResponsiveButtonGroup, ResponsiveText
 import { useResponsive } from '@/hooks/useResponsive';
 import { useRateLimitStatus, formatRetryMessage } from '@/utils/rateLimitUtils';
 import { LanguageSelection } from './LanguageSelection';
+import { ToolHeader } from '@/components/ToolHeader';
+import { useAuth } from '@/contexts/AuthContext';
+import { CREDIT_COSTS } from '@/config/credits';
 
 type ArticleWriterProps = object;
 
@@ -40,12 +43,15 @@ export const ArticleWriter = () => {
   const { toast } = useToast();
   const { isMobile, isTablet } = useResponsive();
   const rateLimitStatus = useRateLimitStatus();
+  const { deductCredits } = useAuth();
 
-  // Function to convert Markdown to HTML
+  // Function to convert Markdown to HTML with proper formatting
   const convertMarkdownToHtml = (markdown: string): string => {
+    if (!markdown) return '';
+    
     let html = markdown;
     
-    // Convert headers
+    // Convert headers (h6 to h1 order matters - largest first to avoid conflicts)
     html = html.replace(/^######\s+(.+)$/gm, '<h6>$1</h6>');
     html = html.replace(/^#####\s+(.+)$/gm, '<h5>$1</h5>');
     html = html.replace(/^####\s+(.+)$/gm, '<h4>$1</h4>');
@@ -53,14 +59,17 @@ export const ArticleWriter = () => {
     html = html.replace(/^##\s+(.+)$/gm, '<h2>$1</h2>');
     html = html.replace(/^#\s+(.+)$/gm, '<h1>$1</h1>');
     
-    // Convert bold and italic
-    html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
-    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    
-    // Convert code blocks
-    html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+    // Convert code blocks BEFORE inline code (to avoid conflicts)
+    html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
     html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+    
+    // Convert bold and italic (bold+italic first, then bold, then italic)
+    html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+    html = html.replace(/___(.+?)___/g, '<strong><em>$1</em></strong>');
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    html = html.replace(/_(.+?)_/g, '<em>$1</em>');
     
     // Convert blockquotes
     html = html.replace(/^>\s*(.+)$/gm, '<blockquote>$1</blockquote>');
@@ -68,26 +77,68 @@ export const ArticleWriter = () => {
     // Convert horizontal rules
     html = html.replace(/^[-*_]{3,}$/gm, '<hr>');
     
-    // Convert unordered lists
-    html = html.replace(/^\s*[-*+]\s+(.+)$/gm, '<li>$1</li>');
-    html = html.replace(/(<li>.*<\/li>)/gs, (match) => {
-      if (!match.includes('<ul>') && !match.includes('<ol>')) {
-        return `<ul>${match}</ul>`;
+    // Convert lists - need to group consecutive list items
+    const lines = html.split('\n');
+    const processedLines: string[] = [];
+    let inUnorderedList = false;
+    let inOrderedList = false;
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const unorderedMatch = line.match(/^\s*[-*+]\s+(.+)$/);
+      const orderedMatch = line.match(/^\s*\d+\.\s+(.+)$/);
+      
+      if (unorderedMatch) {
+        if (!inUnorderedList) {
+          processedLines.push('<ul>');
+          inUnorderedList = true;
+        }
+        processedLines.push(`<li>${unorderedMatch[1]}</li>`);
+      } else {
+        if (inUnorderedList) {
+          processedLines.push('</ul>');
+          inUnorderedList = false;
+        }
+        
+        if (orderedMatch) {
+          if (!inOrderedList) {
+            processedLines.push('<ol>');
+            inOrderedList = true;
+          }
+          processedLines.push(`<li>${orderedMatch[1]}</li>`);
+        } else {
+          if (inOrderedList) {
+            processedLines.push('</ol>');
+            inOrderedList = false;
+          }
+          processedLines.push(line);
+        }
       }
-      return match;
-    });
+    }
     
-    // Convert ordered lists
-    html = html.replace(/^\s*\d+\.\s+(.+)$/gm, '<li>$1</li>');
-    // Note: This is simplified - a more robust solution would handle nested lists properly
+    // Close any open lists
+    if (inUnorderedList) processedLines.push('</ul>');
+    if (inOrderedList) processedLines.push('</ol>');
     
-    // Convert line breaks to paragraphs
+    html = processedLines.join('\n');
+    
+    // Convert line breaks to paragraphs (only for text that's not already in a tag)
     html = html.split('\n\n').map(paragraph => {
-      if (paragraph.trim() && !paragraph.includes('<h') && !paragraph.includes('<ul>') && !paragraph.includes('<ol>') && !paragraph.includes('<blockquote>') && !paragraph.includes('<pre>') && !paragraph.includes('<hr>')) {
-        return `<p>${paragraph.replace(/\n/g, '<br>')}</p>`;
+      const trimmed = paragraph.trim();
+      if (trimmed && 
+          !trimmed.startsWith('<h') && 
+          !trimmed.startsWith('<ul>') && 
+          !trimmed.startsWith('<ol>') && 
+          !trimmed.startsWith('<blockquote>') && 
+          !trimmed.startsWith('<pre>') && 
+          !trimmed.startsWith('<hr>') &&
+          !trimmed.startsWith('</ul>') &&
+          !trimmed.startsWith('</ol>') &&
+          !trimmed.includes('<li>')) {
+        return `<p>${trimmed.replace(/\n/g, '<br>')}</p>`;
       }
-      return paragraph.replace(/\n/g, '<br>');
-    }).join('\n');
+      return trimmed;
+    }).join('\n\n');
     
     return html;
   };
@@ -101,6 +152,14 @@ export const ArticleWriter = () => {
       });
       return;
     }
+
+    // Check and deduct credits
+    const success = await deductCredits(
+      CREDIT_COSTS.ARTICLE_WRITER,
+      'Article Writer',
+      `Generated article: ${request.topic}`
+    );
+    if (!success) return;
 
     setLoading(true);
     setArticle('');
@@ -210,36 +269,71 @@ export const ArticleWriter = () => {
                 font-weight: bold;
                 text-align: center;
                 margin-bottom: 30px;
+                margin-top: 0;
                 color: #2c3e50;
                 border-bottom: 2px solid #3498db;
                 padding-bottom: 10px;
-                page-break-before: always;
+                page-break-after: avoid;
+                page-break-inside: avoid;
               }
               
               h2, h3, h4, h5, h6 {
                 color: #34495e;
-                margin-top: 1em;
-                margin-bottom: 0.5em;
+                margin-top: 1.5em;
+                margin-bottom: 0.6em;
                 font-weight: bold;
+                page-break-after: avoid;
                 page-break-inside: avoid;
+                orphans: 3;
+                widows: 3;
               }
-              h2 { font-size: 20px; }
+              h2 { 
+                font-size: 20px; 
+                border-bottom: 1px solid #ddd; 
+                padding-bottom: 5px;
+                page-break-before: auto;
+              }
               h3 { font-size: 18px; }
               h4 { font-size: 16px; }
+              h5 { font-size: 15px; }
+              h6 { font-size: 14px; }
 
               p {
                 margin-bottom: 12px;
+                margin-top: 8px;
                 text-align: justify;
-                page-break-inside: avoid;
+                line-height: 1.8;
+                orphans: 3;
+                widows: 3;
+              }
+              
+              strong {
+                font-weight: bold;
+                color: #2c3e50;
+              }
+              
+              em {
+                font-style: italic;
+                color: #555;
+              }
+              
+              strong em, em strong {
+                font-weight: bold;
+                font-style: italic;
               }
               
               ul, ol {
                 margin-bottom: 15px;
+                margin-top: 10px;
                 padding-${language === 'ku' || language === 'ar' ? 'right' : 'left'}: 25px;
-                page-break-inside: avoid;
+                page-break-inside: auto;
               }
               
-              li { margin-bottom: 8px; }
+              li { 
+                margin-bottom: 8px;
+                orphans: 2;
+                widows: 2;
+              }
               
               blockquote {
                 border-${language === 'ku' || language === 'ar' ? 'right' : 'left'}: 4px solid #3498db;
@@ -248,6 +342,8 @@ export const ArticleWriter = () => {
                 background-color: #f8f9fa;
                 font-style: italic;
                 page-break-inside: avoid;
+                orphans: 3;
+                widows: 3;
               }
               
               code {
@@ -264,21 +360,28 @@ export const ArticleWriter = () => {
                 border-radius: 5px;
                 overflow-x: auto;
                 margin: 15px 0;
+                page-break-inside: avoid;
+              }
+              
+              /* Ensure content after headings stays with heading */
+              h1 + p, h1 + ul, h1 + ol, h1 + blockquote,
+              h2 + p, h2 + ul, h2 + ol, h2 + blockquote,
+              h3 + p, h3 + ul, h3 + ol, h3 + blockquote,
+              h4 + p, h4 + ul, h4 + ol, h4 + blockquote,
+              h5 + p, h5 + ul, h5 + ol, h5 + blockquote,
+              h6 + p, h6 + ul, h6 + ol, h6 + blockquote {
+                page-break-before: avoid;
               }
             </style>
           </head>
           <body>
-            <div class="header-info" style="text-align: center; font-size: 12px; color: #666; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
-              <strong>AI Academic Hub</strong><br>
-              Generated on: ${new Date().toLocaleDateString(language === 'ku' ? 'ku-Arab-IQ' : language === 'ar' ? 'ar-IQ' : 'en-US')}
-            </div>
-            
-            <div class="article-meta" style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 25px; font-size: 12px; color: #666;">
+            <div class="article-meta" style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 25px; margin-top: 0; font-size: 12px; color: #666; page-break-after: avoid;">
               <strong>${language === 'ku' ? 'زانیاری بابەت:' : language === 'ar' ? 'معلومات المقال:' : 'Article Information:'}</strong><br>
               ${language === 'ku' ? 'بابەت:' : language === 'ar' ? 'الموضوع:' : 'Topic:'} ${request.topic}<br>
               ${language === 'ku' ? 'درێژی:' : language === 'ar' ? 'الطول:' : 'Length:'} ${request.length}<br>
               ${language === 'ku' ? 'شێوازی سەرچاوە:' : language === 'ar' ? 'نمط الاستشهاد:' : 'Citation Style:'} ${request.citationStyle}<br>
-              ${language === 'ku' ? 'زمان:' : language === 'ar' ? 'اللغة:' : 'Language:'} ${language === 'ku' ? 'کوردی' : language === 'ar' ? 'العربية' : 'English'}
+              ${language === 'ku' ? 'زمان:' : language === 'ar' ? 'اللغة:' : 'Language:'} ${language === 'ku' ? 'کوردی' : language === 'ar' ? 'العربية' : 'English'}<br>
+              <span style="font-size: 10px; color: #999;">Generated: ${new Date().toLocaleDateString(language === 'ku' ? 'ku-Arab-IQ' : language === 'ar' ? 'ar-IQ' : 'en-US')}</span>
             </div>
             
             <h1>${request.topic || 'Article'}</h1>
@@ -305,8 +408,24 @@ export const ArticleWriter = () => {
             margin: [0.5, 0.5, 0.5, 0.5],
             filename: `${(request.topic || 'article').substring(0, 50)}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            html2canvas: { 
+              scale: 2, 
+              useCORS: true,
+              letterRendering: true,
+              logging: false
+            },
+            jsPDF: { 
+              unit: 'in', 
+              format: 'a4', 
+              orientation: 'portrait',
+              compress: true
+            },
+            pagebreak: { 
+              mode: ['avoid-all', 'css', 'legacy'],
+              before: ['h1', 'h2'],
+              after: [],
+              avoid: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre']
+            }
           };
           await html2pdf().set(options).from(htmlContent).save();
         }
@@ -344,19 +463,15 @@ export const ArticleWriter = () => {
 
   return (
     <ResponsiveLayout maxWidth="6xl">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="p-3 bg-gradient-primary rounded-xl text-primary-foreground">
-          <PenTool className="h-6 w-6" />
-        </div>
-        <div>
-          <ResponsiveText variant="h1">
-            {language === 'ku' ? 'نووسەری بابەت' : language === 'ar' ? 'كاتب المقال' : 'Article Writer'}
-          </ResponsiveText>
-          <ResponsiveText variant="caption">
-            {language === 'ku' ? 'بابەتی ئەکادیمی دروست بکە' : language === 'ar' ? 'إنشاء مقالات أكاديمية' : 'Create academic articles'}
-          </ResponsiveText>
-        </div>
-      </div>
+      <ToolHeader 
+        toolName={language === 'ku' ? 'نووسەری بابەت' : language === 'ar' ? 'كاتب المقال' : 'Article Writer'}
+        creditCost={CREDIT_COSTS.ARTICLE_WRITER}
+        icon={
+          <div className="p-3 bg-gradient-primary rounded-xl text-primary-foreground">
+            <PenTool className="h-6 w-6" />
+          </div>
+        }
+      />
 
       <ResponsiveLayout 
         variant="grid" 
@@ -477,32 +592,34 @@ export const ArticleWriter = () => {
 
         <Card className="flex flex-col">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
+            <div className={`flex ${isMobile ? 'flex-col gap-3' : 'items-center justify-between'}`}>
+              <CardTitle className="flex items-center gap-2 flex-wrap">
                 <PenTool className="h-5 w-5" />
-                {language === 'ku' ? 'بابەت' : language === 'ar' ? 'المقال' : 'Article'}
+                <span className="break-words">{language === 'ku' ? 'بابەت' : language === 'ar' ? 'المقال' : 'Article'}</span>
                 {article && (
-                  <Badge variant="secondary" className="ml-2">
+                  <Badge variant="secondary" className={isMobile ? "" : "ml-2"}>
                     {article.split(' ').length} {language === 'ku' ? 'وشە' : language === 'ar' ? 'كلمة' : 'words'}
                   </Badge>
                 )}
               </CardTitle>
-              <div className="flex items-center gap-2">
+              <div className={`flex items-center gap-2 ${isMobile ? 'w-full' : ''}`}>
                 {loading && (
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleStop}
+                    className={isMobile ? "flex-1" : ""}
                   >
                     {isStreaming ? <Pause className="h-4 w-4" /> : <Square className="h-4 w-4" />}
                   </Button>
                 )}
-                <div className="flex items-center gap-1">
+                <div className={`flex items-center gap-1 ${isMobile ? 'flex-1' : ''}`}>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setPreviewMode(previewMode === 'edit' ? 'preview' : 'edit')}
                     disabled={!article}
+                    className={isMobile ? "flex-1 text-xs" : ""}
                   >
                     {previewMode === 'edit' ? 'Preview' : 'Edit'}
                   </Button>
@@ -510,13 +627,14 @@ export const ArticleWriter = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => setShowFormatting(!showFormatting)}
+                    className={isMobile ? "flex-1 text-xs" : ""}
                   >
                     Fmt
                   </Button>
                 </div>
               </div>
             </div>
-            {showFormatting && (
+            {showFormatting && !isMobile && (
               <FormattingControls 
                 showFormatting={showFormatting} 
                 onToggleFormatting={setShowFormatting} 
@@ -526,8 +644,11 @@ export const ArticleWriter = () => {
           <CardContent className="flex-1 flex flex-col">
             <div className="flex-1 relative">
               {previewMode === 'preview' ? (
-                <div className={`overflow-auto border rounded-md p-4 ${isMobile ? 'h-64' : 'h-full'}`}>
-                  <RichTextRenderer content={article || displayText} />
+                <div className={`overflow-auto border rounded-md p-3 md:p-4 bg-white dark:bg-gray-900 ${isMobile ? 'h-64' : 'h-full'}`}>
+                  <RichTextRenderer 
+                    content={article || displayText} 
+                    className="report-content prose prose-sm md:prose-base max-w-none dark:prose-invert"
+                  />
                 </div>
               ) : (
                 <>
@@ -544,35 +665,35 @@ export const ArticleWriter = () => {
             </div>
             
             {(article || displayText) && (
-              <ResponsiveButtonGroup className="mt-4">
+              <div className={`mt-4 ${isMobile ? 'flex flex-col gap-2' : 'flex flex-wrap gap-2'}`}>
                 <Button
                   variant="outline"
                   size={isMobile ? "sm" : "default"}
                   onClick={handleCopy}
-                  className={isMobile ? "flex-1" : ""}
+                  className={isMobile ? "w-full" : ""}
                 >
                   <Copy className="mr-2 h-4 w-4" />
-                  {language === 'ku' ? 'کۆپی' : language === 'ar' ? 'نسخ' : 'Copy'}
+                  <span className="text-xs sm:text-sm">{language === 'ku' ? 'کۆپی' : language === 'ar' ? 'نسخ' : 'Copy'}</span>
                 </Button>
                 <Button
                   variant="outline"
                   size={isMobile ? "sm" : "default"}
                   onClick={() => handleDownload('text')}
-                  className={isMobile ? "flex-1" : ""}
+                  className={isMobile ? "w-full" : ""}
                 >
                   <Download className="mr-2 h-4 w-4" />
-                  {language === 'ku' ? 'دابەزاندن TXT' : language === 'ar' ? 'تحميل TXT' : 'Download TXT'}
+                  <span className="text-xs sm:text-sm">{language === 'ku' ? 'دابەزاندن TXT' : language === 'ar' ? 'تحميل TXT' : 'Download TXT'}</span>
                 </Button>
                 <Button
                   variant="outline"
                   size={isMobile ? "sm" : "default"}
                   onClick={() => handleDownload('pdf')}
-                  className={isMobile ? "flex-1" : ""}
+                  className={isMobile ? "w-full" : ""}
                 >
                   <Download className="mr-2 h-4 w-4" />
-                  {language === 'ku' ? 'دابەزاندن PDF' : language === 'ar' ? 'تحميل PDF' : 'Download PDF'}
+                  <span className="text-xs sm:text-sm">{language === 'ku' ? 'دابەزاندن PDF' : language === 'ar' ? 'تحميل PDF' : 'Download PDF'}</span>
                 </Button>
-              </ResponsiveButtonGroup>
+              </div>
             )}
           </CardContent>
         </Card>

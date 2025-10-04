@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { BrainCircuit, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { OptimizedImage } from './OptimizedImage';
+import { getDashboardImages } from '@/hooks/useImagePreloader';
 
 interface LoadingTransitionProps {
   onComplete: () => void;
@@ -25,22 +25,29 @@ export const LoadingTransition: React.FC<LoadingTransitionProps> = ({
     t('almostReady')
   ], [t]);
 
-  // Preload images during loading (non-blocking)
+  // Preload ALL dashboard images during loading (non-blocking)
   useEffect(() => {
-    const imagesToPreload = [
-      '/card-images/article.png',
-      '/card-images/new-report.png',
-      '/card-images/grammar-fix.jpeg',
-      '/card-images/mindmap.png',
-      '/card-images/summarizer.png'
-    ];
+    const imagesToPreload = getDashboardImages();
 
-    // Preload images asynchronously without blocking the loading progress
-    imagesToPreload.forEach(src => {
-      const img = new Image();
-      img.src = src;
-      // No need to wait for these to complete
-    });
+    // Use requestIdleCallback for non-blocking image preload
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => {
+        imagesToPreload.forEach((src, index) => {
+          setTimeout(() => {
+            const img = new Image();
+            img.src = src;
+          }, index * 50); // Stagger loads by 50ms
+        });
+      });
+    } else {
+      // Fallback for browsers without requestIdleCallback
+      imagesToPreload.forEach((src, index) => {
+        setTimeout(() => {
+          const img = new Image();
+          img.src = src;
+        }, index * 50);
+      });
+    }
   }, []);
 
   useEffect(() => {

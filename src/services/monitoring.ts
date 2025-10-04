@@ -25,6 +25,11 @@ export class MonitoringService {
   private sessionId: string;
   private errorCount = 0;
   private warningCount = 0;
+  private originalConsole = {
+    log: console.log.bind(console),
+    error: console.error.bind(console),
+    warn: console.warn.bind(console),
+  };
 
   private constructor() {
     this.sessionId = this.generateSessionId();
@@ -61,17 +66,15 @@ export class MonitoringService {
     });
 
     // Console error interception
-    const originalConsoleError = console.error;
     console.error = (...args: unknown[]) => {
       this.log(LogLevel.ERROR, args.join(' '), 'console');
-      originalConsoleError.apply(console, args);
+      this.originalConsole.error(...args);
     };
 
     // Console warning interception
-    const originalConsoleWarn = console.warn;
     console.warn = (...args: unknown[]) => {
       this.log(LogLevel.WARN, args.join(' '), 'console');
-      originalConsoleWarn.apply(console, args);
+      this.originalConsole.warn(...args);
     };
   }
 
@@ -90,7 +93,7 @@ export class MonitoringService {
 
         longTaskObserver.observe({ entryTypes: ['longtask'] });
       } catch (error) {
-        console.warn('Long task observer not supported');
+        this.originalConsole.warn('Long task observer not supported');
       }
     }
 
@@ -146,11 +149,11 @@ export class MonitoringService {
     // Send to external services if configured
     this.sendToExternalServices(entry);
 
-    // Console output in development
+    // Console output in development - Use original console to avoid recursion
     if (featureConfig.debug) {
-      const logMethod = level === LogLevel.ERROR ? 'error' : 
-                       level === LogLevel.WARN ? 'warn' : 'log';
-      console[logMethod](`[${category || 'APP'}] ${message}`, metadata || '');
+      const logMethod = level === LogLevel.ERROR ? this.originalConsole.error : 
+                       level === LogLevel.WARN ? this.originalConsole.warn : this.originalConsole.log;
+      logMethod(`[${category || 'APP'}] ${message}`, metadata || '');
     }
   }
 
@@ -195,7 +198,7 @@ export class MonitoringService {
   private sendToSentry(entry: LogEntry): void {
     // This would be implemented with actual Sentry SDK
     if (featureConfig.debug) {
-      console.log('Would send to Sentry:', entry);
+      this.originalConsole.log('Would send to Sentry:', entry);
     }
   }
 
@@ -267,7 +270,7 @@ export class MonitoringService {
 
       // In a real implementation, this would send to your bug tracking system
       if (featureConfig.debug) {
-        console.log('Bug report:', report);
+        this.originalConsole.log('Bug report:', report);
       }
 
       // For now, just log to monitoring

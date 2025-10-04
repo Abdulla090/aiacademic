@@ -227,27 +227,27 @@ const StudyAnalyticsDashboard: React.FC = () => {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <Card className="bg-gradient-to-br from-blue-400 to-blue-600 text-white">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100 text-sm">کۆی کاتی خوێندن</p>
-                  <p className="text-2xl font-bold">{formatTime(totalStudyTime)}</p>
+                  <p className="text-blue-100 text-xs sm:text-sm">کۆی کاتی خوێندن</p>
+                  <p className="text-xl sm:text-2xl font-bold">{formatTime(totalStudyTime)}</p>
                 </div>
-                <Clock className="w-8 h-8 text-blue-200" />
+                <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-blue-200" />
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-br from-green-400 to-green-600 text-white">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-green-100 text-sm">ئامانجە تەواوکراوەکان</p>
-                  <p className="text-2xl font-bold">{completedGoals}/{learningGoals.length}</p>
+                  <p className="text-green-100 text-xs sm:text-sm">ئامانجە تەواوکراوەکان</p>
+                  <p className="text-xl sm:text-2xl font-bold">{completedGoals}/{learningGoals.length}</p>
                 </div>
-                <Target className="w-8 h-8 text-green-200" />
+                <Target className="w-6 h-6 sm:w-8 sm:h-8 text-green-200" />
               </div>
             </CardContent>
           </Card>
@@ -278,16 +278,18 @@ const StudyAnalyticsDashboard: React.FC = () => {
         </div>
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">
-              <BarChart3 className="w-4 h-4 ml-2" />
-              گشتی
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1">
+            <TabsTrigger value="overview" className="text-xs sm:text-sm">
+              <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
+              <span className="hidden sm:inline">گشتی</span>
+              <span className="sm:hidden">📊</span>
             </TabsTrigger>
-            <TabsTrigger value="goals">
-              <Target className="w-4 h-4 ml-2" />
-              ئامانجەکان
+            <TabsTrigger value="goals" className="text-xs sm:text-sm">
+              <Target className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
+              <span className="hidden sm:inline">ئامانجەکان</span>
+              <span className="sm:hidden">🎯</span>
             </TabsTrigger>
-            <TabsTrigger value="tools">
+            <TabsTrigger value="tools" className="text-xs sm:text-sm">
               <Brain className="w-4 h-4 ml-2" />
               ئامرازەکان
             </TabsTrigger>
@@ -299,7 +301,7 @@ const StudyAnalyticsDashboard: React.FC = () => {
 
           {/* Overview Tab */}
           <TabsContent value="overview">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-4 sm:gap-6">
               {/* Weekly Progress Chart */}
               <Card className="bg-white/80 backdrop-blur border-indigo-200">
                 <CardHeader>

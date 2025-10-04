@@ -1,0 +1,34 @@
+// Credit costs for different tools
+export const CREDIT_COSTS = {
+  // Major tools - 10 credits
+  REPORT_GENERATOR: 10,
+  ARTICLE_WRITER: 10,
+  PRESENTATION_GENERATOR: 10,
+  WRITING_SUPERVISOR: 10,
+  AI_RESEARCH_ASSISTANT: 10,
+  
+  // Medium tools - 5 credits
+  MIND_MAP_GENERATOR: 5,
+  QUIZ_GENERATOR: 5,
+  FLASHCARD_GENERATOR: 5,
+  SUMMARIZER: 5,
+  PARAPHRASER: 5,
+  GRAMMAR_CHECKER: 5,
+  OCR_EXTRACTOR: 5,
+  CHAT_WITH_FILE: 5,
+  KNOWLEDGE_GRAPH: 5,
+  
+  // Small tools - 2 credits
+  CITATION_GENERATOR: 2,
+  TASK_PLANNER: 2,
+  KURDISH_DIALECT_TRANSLATOR: 2,
+  TEXT_STRUCTURE_FIXER: 2,
+  AI_CONTENT_HUMANIZER: 2,
+  
+  // File tools - 1 credit
+  FILE_CONVERTER: 1,
+  IMAGE_CONVERTER: 1,
+  COMPRESSOR: 1,
+} as const;
+
+export type ToolName = keyof typeof CREDIT_COSTS;

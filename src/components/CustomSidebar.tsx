@@ -12,6 +12,7 @@ import {
   SidebarProvider,
   useSidebar
 } from "@/components/ui/sidebar";
+import { CreditDisplay } from "./CreditDisplay";
 import {
   Settings,
   User,
@@ -126,6 +127,11 @@ export function CustomSidebar() {
             )}
             <SidebarTrigger className="h-8 w-8" />
           </div>
+          {state === "expanded" && (
+            <div className="px-4 pb-4">
+              <CreditDisplay />
+            </div>
+          )}
         </SidebarHeader>
         
         <SidebarContent>

@@ -28,4 +28,11 @@ i18n
     }
   });
 
+// Add RTL direction support
+i18n.dir = (lng?: string) => {
+  const language = lng || i18n.language;
+  // Kurdish and Arabic use RTL
+  return ['ku', 'ar', 'ckb', 'ar-SA'].includes(language) ? 'rtl' : 'ltr';
+};
+
 export default i18n;

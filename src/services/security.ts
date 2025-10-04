@@ -83,6 +83,7 @@ export class SecurityService {
       'connect-src': [
         "'self'",
         'https://generativelanguage.googleapis.com',
+        'https://api.perplexity.ai',
         'https://www.google-analytics.com',
         'https://static.hotjar.com',
         'wss:', // For WebSocket connections

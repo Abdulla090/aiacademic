@@ -220,5 +220,7 @@
   "processTime": "Process Time",
   "changesApplied": "Changes Applied",
   "beforeAfterComparison": "Before & After Comparison",
-  "selectLanguage": "Select Language"
+  "selectLanguage": "Select Language",
+  "back": "Back",
+  "backToCategories": "Back to Categories"
 }

@@ -95,9 +95,9 @@ export const ImageConverter = () => {
             <span className="sorani-text">گۆڕینی فۆرماتی وێنە</span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-border rounded-lg">
+        <CardContent className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 gap-4 sm:gap-6">
+            <div className="flex flex-col items-center justify-center p-6 sm:p-8 border-2 border-dashed border-border rounded-lg">
               {preview ? (
                 <img src={preview} alt="Image Preview" className="max-h-64 rounded-lg" />
               ) : (
@@ -148,19 +148,19 @@ export const ImageConverter = () => {
                   onValueChange={(value) => setQuality(value[0])}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <Label htmlFor="width">پانی</Label>
+                  <Label htmlFor="width" className="text-sm">پانی</Label>
                   <input
                     id="width"
                     type="number"
                     value={width}
                     onChange={(e) => setWidth(Number(e.target.value))}
-                    className="input-academic w-full"
+                    className="input-academic w-full text-sm"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="height">بەرزی</Label>
+                  <Label htmlFor="height" className="text-sm">بەرزی</Label>
                   <input
                     id="height"
                     type="number"

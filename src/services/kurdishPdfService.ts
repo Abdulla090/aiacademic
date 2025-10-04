@@ -1,8 +1,9 @@
 import { jsPDF } from 'jspdf';
+import ArabicReshaper from 'arabic-reshaper';
 
 // Kurdish character mapping for proper rendering
-const KURDISH_CHAR_MAP = {
-  // Kurdish specific characters
+const KURDISH_CHAR_MAP: { [key: string]: string } = {
+  // Kurdish specific characters - ensure they are in NFC normalization
   'ڕ': '\u0695', // Kurdish R
   'ۆ': '\u06C6', // Kurdish O  
   'ڤ': '\u06A4', // Kurdish V
@@ -52,37 +53,32 @@ export class KurdishPDFService {
     return this.fontLoaded;
   }
 
-  // Process Kurdish text for proper rendering
-  async processKurdishText(text: string): Promise<string> {
+  // Process Kurdish text for proper rendering with RTL and character connections
+  processKurdishText(text: string): string {
     if (!text) return '';
     
-    console.log('Original text:', text);
-    
-    // Normalize the text using Unicode Normalization Form C
+    // Normalize the text using Unicode Normalization Form C for consistency
     let processedText = text.normalize('NFC');
-    console.log('Normalized text:', processedText);
     
     // Ensure all Kurdish characters are properly encoded
     processedText = processedText.split('').map(char => {
-      return KURDISH_CHAR_MAP[char] || char;
+      return KURDISH_CHAR_MAP[char as keyof typeof KURDISH_CHAR_MAP] || char;
     }).join('');
-    console.log('Mapped text:', processedText);
     
-    // Use Arabic reshaper to handle contextual forms and connections
     try {
-      const { default: ArabicReshaper } = await import('arabic-reshaper');
+      // Use Arabic reshaper to handle contextual forms and character connections
+      // This makes characters connect properly (isolated, initial, medial, final forms)
       const reshaped = ArabicReshaper.convert(processedText);
-      console.log('Reshaped text:', reshaped);
       
       // Reverse the text for proper RTL display in jsPDF
+      // jsPDF renders LTR, so we reverse the string to simulate RTL
       const reversed = reshaped.split('').reverse().join('');
-      console.log('Final processed text:', reversed);
       
       return reversed;
     } catch (error) {
-      console.warn('Arabic reshaper failed, using fallback:', error);
-      // Fallback to simple RTL processing
-      return '\u202B' + processedText + '\u202C';
+      console.error('Arabic reshaper failed:', error);
+      // Fallback: just reverse the text
+      return processedText.split('').reverse().join('');
     }
   }
 
@@ -130,6 +126,172 @@ export class KurdishPDFService {
     }
   }
 
+  // Remove markdown formatting from text
+  private stripMarkdown(text: string): string {
+    return text
+      .replace(/\*\*\*(.+?)\*\*\*/g, '$1') // Bold + Italic
+      .replace(/\*\*(.+?)\*\*/g, '$1')     // Bold
+      .replace(/\*(.+?)\*/g, '$1')         // Italic
+      .replace(/^#+\s+/gm, '')             // Headers
+      .replace(/^[-*+]\s+/gm, '')          // Bullet points
+      .replace(/^\d+\.\s+/gm, '')          // Numbered lists
+      .replace(/^>\s+/gm, '');             // Blockquotes
+  }
+
+  // Check if text contains markdown bold
+  private isBold(text: string): boolean {
+    return /\*\*(.+?)\*\*/.test(text);
+  }
+
+  private parseAndAddKurdishContent(content: string, language: 'ku' | 'en', pageWidth: number, y: number): number {
+    const lines = content.split('\n');
+    const isRTL = language === 'ku';
+    const margin = 20;
+    
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      
+      if (!trimmedLine) {
+        y += 5;
+        continue;
+      }
+      
+      // Check page break
+      if (y > this.doc.internal.pageSize.getHeight() - margin) {
+        this.doc.addPage();
+        y = margin;
+      }
+      
+      // Headers
+      if (trimmedLine.startsWith('######')) {
+        this.doc.setFontSize(12);
+        const text = this.stripMarkdown(trimmedLine.substring(6).trim());
+        const processedText = isRTL ? this.processKurdishText(text) : text;
+        this.doc.text(processedText, isRTL ? pageWidth - margin : margin, y, { align: isRTL ? 'right' : 'left' });
+        y += 8;
+      } else if (trimmedLine.startsWith('#####')) {
+        this.doc.setFontSize(13);
+        const text = this.stripMarkdown(trimmedLine.substring(5).trim());
+        const processedText = isRTL ? this.processKurdishText(text) : text;
+        this.doc.text(processedText, isRTL ? pageWidth - margin : margin, y, { align: isRTL ? 'right' : 'left' });
+        y += 9;
+      } else if (trimmedLine.startsWith('####')) {
+        this.doc.setFontSize(14);
+        const text = this.stripMarkdown(trimmedLine.substring(4).trim());
+        const processedText = isRTL ? this.processKurdishText(text) : text;
+        this.doc.text(processedText, isRTL ? pageWidth - margin : margin, y, { align: isRTL ? 'right' : 'left' });
+        y += 10;
+      } else if (trimmedLine.startsWith('###')) {
+        this.doc.setFontSize(15);
+        const text = this.stripMarkdown(trimmedLine.substring(3).trim());
+        const processedText = isRTL ? this.processKurdishText(text) : text;
+        this.doc.text(processedText, isRTL ? pageWidth - margin : margin, y, { align: isRTL ? 'right' : 'left' });
+        y += 11;
+      } else if (trimmedLine.startsWith('##')) {
+        this.doc.setFontSize(16);
+        const text = this.stripMarkdown(trimmedLine.substring(2).trim());
+        const processedText = isRTL ? this.processKurdishText(text) : text;
+        this.doc.text(processedText, isRTL ? pageWidth - margin : margin, y, { align: isRTL ? 'right' : 'left' });
+        y += 12;
+      } else if (trimmedLine.startsWith('#')) {
+        this.doc.setFontSize(18);
+        const text = this.stripMarkdown(trimmedLine.substring(1).trim());
+        const processedText = isRTL ? this.processKurdishText(text) : text;
+        this.doc.text(processedText, isRTL ? pageWidth - margin : margin, y, { align: isRTL ? 'right' : 'left' });
+        y += 14;
+      }
+      // Bullet points
+      else if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* ') || trimmedLine.startsWith('+ ')) {
+        this.doc.setFontSize(12);
+        const text = this.stripMarkdown(trimmedLine.substring(2).trim());
+        const processedText = isRTL ? this.processKurdishText(text) : text;
+        
+        // Add bullet
+        this.doc.text('•', isRTL ? pageWidth - margin - 5 : margin + 5, y);
+        
+        // Split text if too long
+        const splitLines = this.doc.splitTextToSize(processedText, pageWidth - 2 * margin - 20);
+        for (const splitLine of splitLines) {
+          if (y > this.doc.internal.pageSize.getHeight() - margin) {
+            this.doc.addPage();
+            y = margin;
+          }
+          this.doc.text(splitLine, isRTL ? pageWidth - margin - 15 : margin + 15, y, { align: isRTL ? 'right' : 'left' });
+          y += 7;
+        }
+      }
+      // Numbered lists
+      else if (/^\d+\.\s/.test(trimmedLine)) {
+        this.doc.setFontSize(12);
+        const match = trimmedLine.match(/^(\d+)\.\s(.+)$/);
+        if (match) {
+          const number = match[1];
+          const text = this.stripMarkdown(match[2]);
+          const processedText = isRTL ? this.processKurdishText(text) : text;
+          
+          // Add number
+          this.doc.text(number + '.', isRTL ? pageWidth - margin - 5 : margin + 5, y);
+          
+          // Split text if too long
+          const splitLines = this.doc.splitTextToSize(processedText, pageWidth - 2 * margin - 20);
+          for (const splitLine of splitLines) {
+            if (y > this.doc.internal.pageSize.getHeight() - margin) {
+              this.doc.addPage();
+              y = margin;
+            }
+            this.doc.text(splitLine, isRTL ? pageWidth - margin - 15 : margin + 15, y, { align: isRTL ? 'right' : 'left' });
+            y += 7;
+          }
+        }
+      }
+      // Blockquotes
+      else if (trimmedLine.startsWith('> ')) {
+        this.doc.setFontSize(11);
+        this.doc.setDrawColor(100, 100, 100);
+        this.doc.setLineWidth(2);
+        
+        const text = this.stripMarkdown(trimmedLine.substring(2).trim());
+        const processedText = isRTL ? this.processKurdishText(text) : text;
+        
+        // Draw quote line
+        const quoteX = isRTL ? pageWidth - margin - 10 : margin + 10;
+        this.doc.line(quoteX, y - 3, quoteX, y + 12);
+        
+        // Split text if too long
+        const splitLines = this.doc.splitTextToSize(processedText, pageWidth - 2 * margin - 20);
+        for (const splitLine of splitLines) {
+          if (y > this.doc.internal.pageSize.getHeight() - margin) {
+            this.doc.addPage();
+            y = margin;
+          }
+          this.doc.text(splitLine, isRTL ? pageWidth - margin - 15 : margin + 15, y, { align: isRTL ? 'right' : 'left' });
+          y += 7;
+        }
+        y += 5;
+      }
+      // Regular paragraphs
+      else {
+        this.doc.setFontSize(12);
+        const text = this.stripMarkdown(trimmedLine);
+        const processedText = isRTL ? this.processKurdishText(text) : text;
+        
+        // Split text if too long
+        const splitLines = this.doc.splitTextToSize(processedText, pageWidth - 2 * margin);
+        for (const splitLine of splitLines) {
+          if (y > this.doc.internal.pageSize.getHeight() - margin) {
+            this.doc.addPage();
+            y = margin;
+          }
+          this.doc.text(splitLine, isRTL ? pageWidth - margin : margin, y, { align: isRTL ? 'right' : 'left' });
+          y += 7;
+        }
+        y += 3;
+      }
+    }
+    
+    return y;
+  }
+
   async createKurdishReport(
     title: string,
     sections: Array<{ title: string; content: string }>,
@@ -147,44 +309,38 @@ export class KurdishPDFService {
 
     const pageWidth = this.doc.internal.pageSize.getWidth();
     let y = 20;
+    const isRTL = language === 'ku';
 
     // Add header if requested
     if (options?.showHeader) {
       this.doc.setFontSize(10);
       const headerText = language === 'ku' ? options.headerText?.kurdish : options.headerText?.english;
       if (headerText) {
-        const processedHeader = language === 'ku' ? await this.processKurdishText(headerText) : headerText;
-        this.doc.text(processedHeader, language === 'ku' ? pageWidth - 20 : 20, y, { align: language === 'ku' ? 'right' : 'left' });
+        const processedHeader = language === 'ku' ? this.processKurdishText(headerText) : headerText;
+        this.doc.text(processedHeader, isRTL ? pageWidth - 20 : 20, y, { align: isRTL ? 'right' : 'left' });
         y += 15;
       }
     }
 
     if (title) {
-      this.doc.setFontSize(18);
-      const processedTitle = language === 'ku' ? await this.processKurdishText(title) : title;
-      this.doc.text(processedTitle, language === 'ku' ? pageWidth - 20 : 20, y, { align: language === 'ku' ? 'right' : 'left' });
+      this.doc.setFontSize(20);
+      const strippedTitle = this.stripMarkdown(title);
+      const processedTitle = language === 'ku' ? this.processKurdishText(strippedTitle) : strippedTitle;
+      this.doc.text(processedTitle, isRTL ? pageWidth - 20 : 20, y, { align: isRTL ? 'right' : 'left' });
       y += 20;
     }
 
     for (const section of sections) {
       if (section.title) {
         this.doc.setFontSize(16);
-        const processedSectionTitle = language === 'ku' ? await this.processKurdishText(section.title) : section.title;
-        this.doc.text(processedSectionTitle, language === 'ku' ? pageWidth - 20 : 20, y, { align: language === 'ku' ? 'right' : 'left' });
+        const strippedSectionTitle = this.stripMarkdown(section.title);
+        const processedSectionTitle = language === 'ku' ? this.processKurdishText(strippedSectionTitle) : strippedSectionTitle;
+        this.doc.text(processedSectionTitle, isRTL ? pageWidth - 20 : 20, y, { align: isRTL ? 'right' : 'left' });
         y += 15;
       }
 
       if (section.content) {
-        this.doc.setFontSize(14);
-        const lines = this.doc.splitTextToSize(section.content, pageWidth - 40);
-        
-        for (const line of lines) {
-          if (line.trim()) {
-            const processedLine = language === 'ku' ? await this.processKurdishText(line.trim()) : line.trim();
-            this.doc.text(processedLine, language === 'ku' ? pageWidth - 20 : 20, y, { align: language === 'ku' ? 'right' : 'left' });
-            y += 8;
-          }
-        }
+        y = this.parseAndAddKurdishContent(section.content, language, pageWidth, y);
         y += 10;
       }
     }

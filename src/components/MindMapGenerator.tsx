@@ -155,13 +155,13 @@ const MindMapInternal: React.FC<MindMapInternalProps> = ({ initialNodes, initial
 
   return (
     <div className="h-[70vh] w-full">
-       <div className="flex gap-2 mb-4">
-        <Button onClick={toggleFullscreen} variant="outline">
+       <div className="flex flex-col sm:flex-row gap-2 mb-4">
+        <Button onClick={toggleFullscreen} variant="outline" size="sm" className="w-full sm:w-auto">
           {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
         </Button>
         <div className="space-y-2">
-          <label className="text-sm font-medium">Layout</label>
-          <div className="grid grid-cols-2 gap-2">
+          <label className="text-xs sm:text-sm font-medium">Layout</label>
+          <div className="grid grid-cols-2 gap-1 sm:gap-2">
             <div
               className={`border-2 p-2 rounded-lg cursor-pointer ${layoutDirection === 'TB' ? 'border-primary' : 'border-border'}`}
               onClick={() => handleLayoutChange('TB')}

@@ -4,6 +4,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -57,6 +58,9 @@ export const MobileSettingsModal: React.FC<MobileSettingsModalProps> = ({
             <Settings2 className="h-5 w-5" />
             ڕێکخستنەکان
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            گۆڕینی ڕێکخستنەکانی بەرنامەکە وەک ڕووکار، زمان، و فۆنت
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-6 py-4">

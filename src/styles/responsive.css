@@ -305,3 +305,63 @@
     @apply max-w-4xl;
   }
 }
+
+/* Report Generator Responsive Styles */
+.report-content {
+  @apply w-full overflow-hidden;
+}
+
+.report-content * {
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.report-content pre,
+.report-content code {
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.report-content img,
+.report-content video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Mobile-specific adjustments for report content */
+@media (max-width: 640px) {
+  .report-content {
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.6;
+  }
+  
+  .report-content h1 {
+    @apply text-lg;
+  }
+  
+  .report-content h2 {
+    @apply text-base;
+  }
+  
+  .report-content h3,
+  .report-content h4,
+  .report-content h5,
+  .report-content h6 {
+    @apply text-sm;
+  }
+  
+  .report-content pre {
+    @apply text-xs p-2;
+  }
+  
+  .report-content blockquote {
+    @apply pl-3 py-2;
+  }
+  
+  .report-content ul,
+  .report-content ol {
+    @apply pr-4;
+  }
+}

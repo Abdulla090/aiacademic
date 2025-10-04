@@ -5,6 +5,46 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prevent horizontal scroll globally */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+#root {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Force all text to wrap */
+* {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* Force all inputs to stay within bounds */
+input, textarea, select {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Prevent any element from causing horizontal scroll */
+* {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Hide any debug/info overlays that might appear */
+[class*="debug"],
+[class*="info-box"],
+[class*="dev-tools"],
+[id*="debug"],
+[data-debug] {
+  display: none !important;
+}
+
 /* Kurdish Font Face */
 @font-face {
   font-family: 'Rabar';
@@ -206,12 +246,18 @@ suggestion,
     direction: rtl;
     text-align: right;
     line-height: 1.8;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .latin-text {
     font-family: 'Inter', system-ui, sans-serif;
     direction: ltr;
     text-align: left;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
   
   /* PDF Viewer Styles */
@@ -348,6 +394,15 @@ suggestion,
   /* Academic Card Variants */
   .card-academic {
     @apply bg-card border border-card-border rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+  
+  .card-academic * {
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .card-academic-primary {
@@ -636,6 +691,13 @@ suggestion,
   background-size: 40px 40px;
 }
 @layer utilities {
+  /* Word breaking utilities for responsive text */
+  .overflow-wrap-anywhere {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    hyphens: auto;
+  }
+
   .animated-border-snake {
     position: relative;
     overflow: hidden;
@@ -706,5 +768,147 @@ suggestion,
   @keyframes snake-border-left {
     0% { transform: translateY(100%); }
     100% { transform: translateY(-100%); }
+  }
+
+  /* RTL Support Utilities */
+  [dir="rtl"] {
+    direction: rtl;
+  }
+
+  [dir="ltr"] {
+    direction: ltr;
+  }
+
+  /* RTL-aware spacing utilities */
+  [dir="rtl"] .rtl\:space-x-reverse > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 1;
+  }
+
+  [dir="rtl"] .space-x-3 > :not([hidden]) ~ :not([hidden]) {
+    margin-right: calc(0.75rem * var(--tw-space-x-reverse, 0));
+    margin-left: calc(0.75rem * calc(1 - var(--tw-space-x-reverse, 0)));
+  }
+
+  /* RTL flex utilities */
+  [dir="rtl"] .flex-row {
+    flex-direction: row-reverse;
+  }
+
+  [dir="rtl"] .flex-row-reverse {
+    flex-direction: row;
+  }
+
+  /* RTL text alignment */
+  [dir="rtl"] .text-left {
+    text-align: right;
+  }
+
+  [dir="rtl"] .text-right {
+    text-align: left;
+  }
+
+  /* RTL justify utilities */
+  [dir="rtl"] .justify-end {
+    justify-content: flex-start;
+  }
+
+  [dir="rtl"] .justify-start {
+    justify-content: flex-end;
+  }
+
+  /* RTL margin and padding utilities */
+  [dir="rtl"] .ml-1 { margin-right: 0.25rem; margin-left: 0; }
+  [dir="rtl"] .ml-2 { margin-right: 0.5rem; margin-left: 0; }
+  [dir="rtl"] .ml-3 { margin-right: 0.75rem; margin-left: 0; }
+  [dir="rtl"] .ml-4 { margin-right: 1rem; margin-left: 0; }
+  [dir="rtl"] .mr-1 { margin-left: 0.25rem; margin-right: 0; }
+  [dir="rtl"] .mr-2 { margin-left: 0.5rem; margin-right: 0; }
+  [dir="rtl"] .mr-3 { margin-left: 0.75rem; margin-right: 0; }
+  [dir="rtl"] .mr-4 { margin-left: 1rem; margin-right: 0; }
+
+  [dir="rtl"] .pl-1 { padding-right: 0.25rem; padding-left: 0; }
+  [dir="rtl"] .pl-2 { padding-right: 0.5rem; padding-left: 0; }
+  [dir="rtl"] .pl-3 { padding-right: 0.75rem; padding-left: 0; }
+  [dir="rtl"] .pl-4 { padding-right: 1rem; padding-left: 0; }
+  [dir="rtl"] .pr-1 { padding-left: 0.25rem; padding-right: 0; }
+  [dir="rtl"] .pr-2 { padding-left: 0.5rem; padding-right: 0; }
+  [dir="rtl"] .pr-3 { padding-left: 0.75rem; padding-right: 0; }
+  [dir="rtl"] .pr-4 { padding-left: 1rem; padding-right: 0; }
+
+  /* RTL rounded corners */
+  [dir="rtl"] .rounded-l { border-top-right-radius: 0.25rem; border-bottom-right-radius: 0.25rem; border-top-left-radius: 0; border-bottom-left-radius: 0; }
+  [dir="rtl"] .rounded-r { border-top-left-radius: 0.25rem; border-bottom-left-radius: 0.25rem; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+
+  /* RTL border utilities */
+  [dir="rtl"] .border-l { border-right-width: 1px; border-left-width: 0; }
+  [dir="rtl"] .border-r { border-left-width: 1px; border-right-width: 0; }
+
+  /* 3D Card Effects for Flashcards */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* Striped background for progress bar */
+  .bg-striped {
+    background-image: linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.2) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0.2) 75%,
+      transparent 75%,
+      transparent
+    );
+    background-size: 1rem 1rem;
+    animation: progress-stripes 1s linear infinite;
+  }
+
+  @keyframes progress-stripes {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 1rem 0;
+    }
+  }
+
+  /* Shimmer animation for progress bar */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
+  }
+
+  /* Confetti animation - GPU accelerated */
+  @keyframes confetti-fall {
+    0% {
+      transform: translateY(0) translateX(0) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(var(--final-y, 100vh)) translateX(var(--final-x, 0)) rotate(720deg);
+      opacity: 0;
+    }
+  }
+
+  .confetti-piece {
+    will-change: transform, opacity;
   }
 }

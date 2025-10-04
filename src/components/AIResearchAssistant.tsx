@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 import { useToast } from "@/hooks/use-toast";
-import { researchQuery } from "@/services/geminiService";
+import { researchQuery } from "@/services/perplexityService";
 import { LanguageSelection } from './LanguageSelection';
 
 interface ResearchQuery {
@@ -241,37 +241,42 @@ export const AIResearchAssistant: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-3">
+    <div className="container mx-auto p-3 sm:p-4 md:p-6 max-w-7xl">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-2 sm:mb-3">
           🤖 یاریدەدەری تویژینەوەی AI
         </h1>
-        <p className="text-lg text-muted-foreground">
+        <p className="text-sm sm:text-base md:text-lg text-muted-foreground">
           یاریدەدەری پێشکەوتوو بۆ تویژینەوە لەگەڵ پشتڕاستکردنەوەی سەرچاوەکان و پشتگیری تەواو
         </p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="search" className="flex items-center gap-2">
-            <Search className="h-4 w-4" />
-            گەڕان
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1">
+          <TabsTrigger value="search" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+            <Search className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">گەڕان</span>
+            <span className="sm:hidden">🔍</span>
           </TabsTrigger>
-          <TabsTrigger value="results" className="flex items-center gap-2">
-            <Brain className="h-4 w-4" />
-            ئەنجامەکان
+          <TabsTrigger value="results" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+            <Brain className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">ئەنجامەکان</span>
+            <span className="sm:hidden">📊</span>
           </TabsTrigger>
-          <TabsTrigger value="sources" className="flex items-center gap-2">
-            <Bookmark className="h-4 w-4" />
-            سەرچاوەکان
+          <TabsTrigger value="sources" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+            <Bookmark className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">سەرچاوەکان</span>
+            <span className="sm:hidden">📚</span>
           </TabsTrigger>
-          <TabsTrigger value="history" className="flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            مێژوو
+          <TabsTrigger value="history" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+            <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">مێژوو</span>
+            <span className="sm:hidden">⏱️</span>
           </TabsTrigger>
-          <TabsTrigger value="settings" className="flex items-center gap-2">
-            <Settings2 className="h-4 w-4" />
-            ڕێکخستنەکان
+          <TabsTrigger value="settings" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+            <Settings2 className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">ڕێکخستنەکان</span>
+            <span className="sm:hidden">⚙️</span>
           </TabsTrigger>
         </TabsList>
 
@@ -293,7 +298,7 @@ export const AIResearchAssistant: React.FC = () => {
                     placeholder="بۆ نموونە: کاریگەری گۆڕانی کەشوهەوا لەسەر وزەی نوێکردنەوە چییە؟"
                     value={currentQuery}
                     onChange={(e) => setCurrentQuery(e.target.value)}
-                    className="min-h-[100px] text-right"
+                    className="min-h-[80px] sm:min-h-[100px] text-sm sm:text-base text-right"
                     dir="rtl"
                   />
                 </div>
@@ -346,7 +351,7 @@ export const AIResearchAssistant: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-2 sm:gap-3">
                 {[
                   "کاریگەری AI لەسەر پەروەردە",
                   "ڕێگاکانی چارەسەری گۆڕانی کەشوهەوا",
@@ -356,11 +361,11 @@ export const AIResearchAssistant: React.FC = () => {
                   <Button
                     key={index}
                     variant="outline"
-                    className="justify-start text-right h-auto p-3"
+                    className="justify-start text-right h-auto p-2 sm:p-3"
                     onClick={() => setCurrentQuery(suggestion)}
                     dir="rtl"
                   >
-                    <span className="text-sm">{suggestion}</span>
+                    <span className="text-xs sm:text-sm">{suggestion}</span>
                   </Button>
                 ))}
               </div>
@@ -368,10 +373,10 @@ export const AIResearchAssistant: React.FC = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="results" className="space-y-6">
+        <TabsContent value="results" className="space-y-4 sm:space-y-6">
           {selectedResult ? (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-6">
+            <div className="grid grid-cols-1 gap-4 sm:gap-6">
+              <div className="space-y-4 sm:space-y-6">
                 <Card>
                   <CardHeader>
                     <div className="flex items-start justify-between">
@@ -539,7 +544,7 @@ export const AIResearchAssistant: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {[
                   { name: "گۆڤاری نەیچەر", type: "ئەکادیمی", score: 98 },
                   { name: "ڕێکخراوی وزەی نێودەوڵەتی", type: "حکومی", score: 95 },
@@ -549,7 +554,7 @@ export const AIResearchAssistant: React.FC = () => {
                   { name: "ڕۆیتەرز", type: "هەواڵ", score: 85 }
                 ].map((source, index) => (
                   <Card key={index} className="border">
-                    <CardContent className="p-4">
+                    <CardContent className="p-3 sm:p-4">
                       <div className="flex items-center justify-between mb-2">
                         <h4 className="font-medium text-sm">{source.name}</h4>
                         <Badge className={getCredibilityColor(source.score)}>
@@ -576,7 +581,7 @@ export const AIResearchAssistant: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-[400px]">
+              <ScrollArea className="h-[300px] sm:h-[400px]">
                 <div className="space-y-4">
                   {researchQueries.map((query) => (
                     <div key={query.id} className="border rounded-lg p-4">

@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { RefreshCw } from 'lucide-react';
 import { Suggestion } from './SuggestionMark';
+import { ToolHeader } from '@/components/ToolHeader';
+import { useAuth } from '@/contexts/AuthContext';
+import { CREDIT_COSTS } from '@/config/credits';
 
 export const WritingSupervisor = () => {
   const [topic, setTopic] = useState('');
