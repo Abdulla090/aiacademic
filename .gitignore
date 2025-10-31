@@ -12,6 +12,30 @@ dist
 dist-ssr
 *.local
 
+# Environment Variables - CRITICAL: Never commit these!
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+.env.*.local
+
+# Database and Auth
+supabase/.env
+supabase/.env.local
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# API Keys and Secrets
+secrets.json
+config.local.js
+config.local.ts
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -24,3 +48,12 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# Backup files
+*.bak
+*.backup
+*.tmp
+
+# OS Files
+Thumbs.db
+.DS_Store
