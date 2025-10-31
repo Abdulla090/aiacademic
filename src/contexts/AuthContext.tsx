@@ -157,6 +157,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Deduct credits
   const deductCredits = async (amount: number, toolName: string, description?: string): Promise<boolean> => {
+    // TEMPORARILY DISABLED FOR TESTING - Credit system bypassed
+    console.log(`[TESTING MODE] Would deduct ${amount} credits for ${toolName}`);
+    return true;
+
+    // Original credit logic (commented out for testing)
+    /*
     if (!user) {
       toast({
         title: 'هەڵە',
@@ -216,6 +222,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       return false;
     }
+    */
   };
 
   const value = {

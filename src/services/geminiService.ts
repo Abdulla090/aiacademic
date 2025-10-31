@@ -122,23 +122,13 @@ export interface ResearchCitation {
 }
 
 class GeminiService {
-  private apiKeys: string[];
+  // TEMPORARY: Hardcoded for testing (TODO: Move back to env vars for production)
+  private apiKeys = [
+    'AIzaSyBocGIDbzHW-O3L_Th2DkgGh9mIIjJ6bcw', // Primary API key
+    'AIzaSyBsMPe_MEasu7x3u9EK85ULYDHZ3oykklM'  // Secondary API key (fallback)
+  ];
   private currentKeyIndex = 0;
   private baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
-
-  constructor() {
-    // Load API keys from environment variables (SECURE)
-    const primaryKey = import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY_PRIMARY;
-    const secondaryKey = import.meta.env.VITE_GEMINI_API_KEY_SECONDARY;
-    
-    this.apiKeys = [primaryKey, secondaryKey].filter(Boolean);
-    
-    if (this.apiKeys.length === 0) {
-      throw new Error('No Gemini API keys found. Please set VITE_GEMINI_API_KEY in your .env file.');
-    }
-    
-    console.log(`✅ Initialized with ${this.apiKeys.length} API key(s)`);
-  }
   
   // Rate limiting configuration
   private requestQueue: Array<() => Promise<unknown>> = [];
