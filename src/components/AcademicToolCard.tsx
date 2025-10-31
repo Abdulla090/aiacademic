@@ -34,12 +34,12 @@ export const AcademicToolCard = ({
   const cardInnerContent = (
     <>
       <CardHeader className="p-4 border-b border-border">
-        <div className={`flex items-center ${isRTL ? 'space-x-reverse flex-row-reverse' : ''} space-x-3`}>
-          <div className="p-2 bg-primary/10 rounded-lg transition-all duration-300 group-hover:bg-primary/20">
+        <div className={`flex items-center gap-3`}>
+          <div className="p-2 bg-primary/10 rounded-lg transition-all duration-300 group-hover:bg-primary/20 flex-shrink-0">
             <Icon className="h-5 w-5 text-primary transition-all duration-300" />
           </div>
-          <div className="flex-1">
-            <CardTitle className={`text-base font-semibold text-foreground transition-colors duration-300 group-hover:text-primary ${isRTL ? 'text-right' : 'text-left'}`}>{t(title)}</CardTitle>
+          <div className={`flex-1 ${isRTL ? 'flex flex-col items-end' : ''}`}>
+            <CardTitle className={`text-base font-semibold text-foreground transition-colors duration-300 group-hover:text-primary ${isRTL ? 'text-right w-full' : 'text-left'}`}>{t(title)}</CardTitle>
             {category && (
               <Badge variant="secondary" className="text-xs mt-1 bg-secondary/10 text-primary border-secondary/20">
                 {t(category)}
@@ -65,9 +65,11 @@ export const AcademicToolCard = ({
       </CardContent>
       <CardFooter className="p-4 bg-background-secondary border-t border-border">
         {isComingSoon ? (
-          <Badge variant="outline" className="text-xs font-medium">
-            {t('comingSoon')}
-          </Badge>
+          <div className={`w-full flex ${isRTL ? 'justify-end' : 'justify-start'}`}>
+            <Badge variant="outline" className="text-xs font-medium">
+              {t('comingSoon')}
+            </Badge>
+          </div>
         ) : (
           <div className={`w-full flex ${isRTL ? 'justify-start' : 'justify-end'}`}>
             <Button size="sm" className="btn-3d-primary font-semibold">

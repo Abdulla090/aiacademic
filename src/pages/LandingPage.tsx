@@ -82,8 +82,8 @@ const LandingPage = () => {
           <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12">{t('tools')}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {features.map((feature, index) => (
-              <div key={index} className="p-5 sm:p-6 md:p-8 rounded-lg border border-border bg-card shadow-lg text-center">
-                <div className="flex justify-center mb-3 sm:mb-4">{feature.icon}</div>
+              <div key={index} className={`p-5 sm:p-6 md:p-8 rounded-lg border border-border bg-card shadow-lg ${isRTL ? 'text-right' : 'text-center'}`}>
+                <div className={`flex mb-3 sm:mb-4 ${isRTL ? 'justify-end' : 'justify-center'}`}>{feature.icon}</div>
                 <h4 className="text-lg sm:text-xl md:text-2xl font-semibold mb-2">{feature.title}</h4>
                 <p className="text-sm sm:text-base text-muted-foreground">{feature.description}</p>
               </div>
