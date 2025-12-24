@@ -10,11 +10,16 @@ export const ScrollToTop = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    // Scroll to top on route change
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'instant' // Use 'instant' for immediate scroll, 'smooth' for animated
+    // Force immediate scroll to top on route change
+    // Using multiple methods to ensure it works across all browsers
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    
+    // Also scroll any scrollable containers
+    const scrollContainers = document.querySelectorAll('[data-scroll-container]');
+    scrollContainers.forEach(container => {
+      container.scrollTop = 0;
     });
   }, [pathname]);
 

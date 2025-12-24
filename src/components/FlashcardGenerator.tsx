@@ -14,6 +14,7 @@ import { LanguageSelection } from './LanguageSelection';
 import { ConfettiEffect } from '@/components/ui/confetti-effect';
 import { AchievementBadge } from '@/components/ui/achievement-badge';
 import { ProgressBar } from '@/components/ui/progress-bar';
+import { useTranslation } from 'react-i18next';
 
 type StudyMode = 'learning' | 'review' | 'timed';
 type CardDifficulty = 'easy' | 'medium' | 'hard' | 'unknown';
@@ -45,6 +46,8 @@ export const FlashcardGenerator = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { isMobile, isTablet } = useResponsive();
+  const { i18n } = useTranslation();
+  const isRTL = i18n.dir() === 'rtl';
 
   const triggerGeneration = async (contentText: string) => {
     if (!contentText.trim()) {
@@ -433,18 +436,18 @@ export const FlashcardGenerator = () => {
                     >
                         {/* Front Side */}
                         <Card className={`absolute w-full h-full backface-hidden bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 border-2 border-blue-200 dark:border-blue-800 ${isMobile ? 'p-4' : 'p-8'} flex flex-col items-center justify-center shadow-xl transition-shadow hover:shadow-2xl`}>
-                            <div className="text-sm text-gray-500 dark:text-gray-400 mb-4 sorani-text">پرسیار</div>
-                            <div className={`report-content ${isMobile ? 'text-lg' : 'text-2xl'} font-bold text-center leading-relaxed w-full overflow-auto text-gray-900 dark:text-gray-100`}>
+                            <div className={`text-sm text-gray-500 dark:text-gray-400 mb-4 sorani-text ${isRTL ? 'text-right w-full' : 'text-center'}`}>پرسیار</div>
+                            <div className={`report-content ${isMobile ? 'text-lg' : 'text-2xl'} font-bold leading-relaxed w-full overflow-auto text-gray-900 dark:text-gray-100 ${isRTL ? 'text-right' : 'text-center'}`}>
                               {flashcards[currentCard].question}
                             </div>
-                            <div className="mt-6 text-xs text-gray-400 dark:text-gray-500 sorani-text">کرتەبکە بۆ وەڵام</div>
+                            <div className={`mt-6 text-xs text-gray-400 dark:text-gray-500 sorani-text ${isRTL ? 'text-right w-full' : 'text-center'}`}>کرتەبکە بۆ وەڵام</div>
                         </Card>
 
                         {/* Back Side */}
                         <Card className={`absolute w-full h-full backface-hidden bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-950 dark:to-teal-950 border-2 border-green-200 dark:border-green-800 ${isMobile ? 'p-4' : 'p-8'} flex flex-col items-center justify-center shadow-xl transition-shadow hover:shadow-2xl`}
                               style={{ transform: 'rotateY(180deg)' }}>
-                            <div className="text-sm text-gray-500 dark:text-gray-400 mb-4 sorani-text">وەڵام</div>
-                            <div className={`report-content ${isMobile ? 'text-base' : 'text-xl'} text-center leading-relaxed w-full overflow-auto text-gray-900 dark:text-gray-100`}>
+                            <div className={`text-sm text-gray-500 dark:text-gray-400 mb-4 sorani-text ${isRTL ? 'text-right w-full' : 'text-center'}`}>وەڵام</div>
+                            <div className={`report-content ${isMobile ? 'text-base' : 'text-xl'} leading-relaxed w-full overflow-auto text-gray-900 dark:text-gray-100 ${isRTL ? 'text-right' : 'text-center'}`}>
                               {flashcards[currentCard].answer}
                             </div>
                         </Card>

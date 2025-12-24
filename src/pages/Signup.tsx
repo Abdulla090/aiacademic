@@ -43,7 +43,7 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen bg-gradient-subtle bg-purple-grid flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md" style={{ borderColor: 'hsl(265 60% 50% / 0.75)' }}>
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 p-3 bg-gradient-primary rounded-xl text-primary-foreground w-fit">
             <UserPlus className="h-8 w-8" />

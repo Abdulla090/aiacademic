@@ -452,7 +452,7 @@ export const SummarizerParaphraser = () => {
                   <Badge variant="secondary" className="mb-4 text-xs sm:text-sm">
                     کورتکردنەوە - {summaryLength === 'short' ? 'کورت' : summaryLength === 'medium' ? 'ناوەند' : 'ورد'}
                   </Badge>
-                  <div className="min-h-[250px] sm:min-h-[400px] p-3 sm:p-4 border border-border rounded-lg bg-background overflow-y-auto">
+                  <div className="min-h-[250px] sm:min-h-[400px] p-3 sm:p-4 border-2 rounded-lg bg-background overflow-y-auto" style={{ borderColor: 'hsl(265 60% 50% / 0.7)' }}>
                     <RichTextRenderer
                       content={summarizedText}
                       showCopyButton={true}
@@ -474,7 +474,7 @@ export const SummarizerParaphraser = () => {
                   <Badge variant="secondary" className="mb-4 text-xs sm:text-sm">
                     نووسینەوە
                   </Badge>
-                  <div className="min-h-[250px] sm:min-h-[400px] p-3 sm:p-4 border border-border rounded-lg bg-background overflow-y-auto">
+                  <div className="min-h-[250px] sm:min-h-[400px] p-3 sm:p-4 border-2 rounded-lg bg-background overflow-y-auto" style={{ borderColor: 'hsl(265 60% 50% / 0.7)' }}>
                     <RichTextRenderer
                       content={paraphrasedText}
                       showCopyButton={true}

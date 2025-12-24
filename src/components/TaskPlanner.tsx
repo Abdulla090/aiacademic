@@ -501,7 +501,7 @@ export const TaskPlanner = () => {
               <div
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
-                className="border-2 border-dashed border-purple-300 rounded-lg p-6 text-center hover:border-purple-500 transition-colors cursor-pointer bg-gradient-to-br from-purple-50 to-purple-100"
+                className="border-2 border-dashed border-primary/40 rounded-lg p-6 text-center hover:border-primary/70 transition-colors cursor-pointer bg-gradient-to-br from-purple-50 to-purple-100"
               >
                 <input
                   type="file"

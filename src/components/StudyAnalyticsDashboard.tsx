@@ -228,7 +228,7 @@ const StudyAnalyticsDashboard: React.FC = () => {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          <Card className="bg-gradient-to-br from-blue-400 to-blue-600 text-white">
+          <Card className="bg-gradient-to-br from-blue-400 to-blue-600 text-white border-2 border-blue-300">
             <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -240,7 +240,7 @@ const StudyAnalyticsDashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-400 to-green-600 text-white">
+          <Card className="bg-gradient-to-br from-green-400 to-green-600 text-white border-2 border-green-300">
             <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -252,7 +252,7 @@ const StudyAnalyticsDashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-400 to-purple-600 text-white">
+          <Card className="bg-gradient-to-br from-purple-400 to-purple-600 text-white border-2 border-purple-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -264,7 +264,7 @@ const StudyAnalyticsDashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-orange-400 to-orange-600 text-white">
+          <Card className="bg-gradient-to-br from-orange-400 to-orange-600 text-white border-2 border-orange-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -303,7 +303,7 @@ const StudyAnalyticsDashboard: React.FC = () => {
           <TabsContent value="overview">
             <div className="grid grid-cols-1 gap-4 sm:gap-6">
               {/* Weekly Progress Chart */}
-              <Card className="bg-white/80 backdrop-blur border-indigo-200">
+              <Card className="bg-white/80 backdrop-blur border-2 border-primary/30">
                 <CardHeader>
                   <CardTitle className="text-gray-800">پێشکەوتنی حەفتانە</CardTitle>
                 </CardHeader>
@@ -323,7 +323,7 @@ const StudyAnalyticsDashboard: React.FC = () => {
               </Card>
 
               {/* Recent Achievements */}
-              <Card className="bg-white/80 backdrop-blur border-indigo-200">
+              <Card className="bg-white/80 backdrop-blur border-2 border-primary/30">
                 <CardHeader>
                   <CardTitle className="text-gray-800 flex items-center gap-2">
                     <Award className="w-5 h-5 text-yellow-500" />
@@ -361,14 +361,14 @@ const StudyAnalyticsDashboard: React.FC = () => {
 
           {/* Goals Tab */}
           <TabsContent value="goals">
-            <Card className="bg-white/80 backdrop-blur border-indigo-200">
+            <Card className="bg-white/80 backdrop-blur border-2 border-primary/30">
               <CardHeader>
                 <CardTitle className="text-gray-800">ئامانجەکانی فێربوون</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {learningGoals.map((goal) => (
-                    <div key={goal.id} className="p-4 border border-indigo-200 rounded-lg bg-indigo-50/50">
+                    <div key={goal.id} className="p-4 border-2 rounded-lg bg-indigo-50/50" style={{ borderColor: 'hsl(265 60% 50% / 0.6)' }}>
                       <div className="flex justify-between items-start mb-2">
                         <div className="flex-1">
                           <h3 className="font-semibold text-gray-800 flex items-center gap-2">
@@ -401,14 +401,14 @@ const StudyAnalyticsDashboard: React.FC = () => {
 
           {/* Tools Tab */}
           <TabsContent value="tools">
-            <Card className="bg-white/80 backdrop-blur border-indigo-200">
+            <Card className="bg-white/80 backdrop-blur border-2 border-primary/30">
               <CardHeader>
                 <CardTitle className="text-gray-800">ئامارەکانی ئامرازەکان</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {toolStats.map((tool, index) => (
-                    <div key={index} className="p-4 border border-indigo-200 rounded-lg bg-gradient-to-br from-indigo-50 to-purple-50">
+                    <div key={index} className="p-4 border-2 rounded-lg bg-gradient-to-br from-indigo-50 to-purple-50" style={{ borderColor: 'hsl(265 60% 50% / 0.6)' }}>
                       <h3 className="font-semibold text-gray-800 mb-3">{tool.toolName}</h3>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
@@ -441,14 +441,14 @@ const StudyAnalyticsDashboard: React.FC = () => {
 
           {/* Sessions Tab */}
           <TabsContent value="sessions">
-            <Card className="bg-white/80 backdrop-blur border-indigo-200">
+            <Card className="bg-white/80 backdrop-blur border-2 border-primary/30">
               <CardHeader>
                 <CardTitle className="text-gray-800">دانیشتنە نوێیەکانی خوێندن</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {studySessions.map((session) => (
-                    <div key={session.id} className="flex items-center justify-between p-3 border border-indigo-200 rounded-lg bg-indigo-50/30">
+                    <div key={session.id} className="flex items-center justify-between p-3 border-2 rounded-lg bg-indigo-50/30" style={{ borderColor: 'hsl(265 60% 50% / 0.6)' }}>
                       <div className="flex items-center gap-4">
                         <div className={`w-3 h-3 rounded-full ${getQualityColor(session.quality)}`}></div>
                         <div>

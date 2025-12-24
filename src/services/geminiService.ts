@@ -65,12 +65,20 @@ export interface TaskPlan {
 export interface Flashcard {
   question: string;
   answer: string;
+  hint?: string;
+  mnemonic?: string;
+  topicTag?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
 }
 
 export interface QuizQuestion {
   question: string;
   options: string[];
   correctAnswer: string;
+  hint?: string;
+  explanation?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  category?: string;
 }
 
 export interface PresentationSlide {
@@ -1133,7 +1141,13 @@ class GeminiService {
 
   async generateFlashcards(text: string): Promise<Flashcard[]> {
     const prompt = `
-    Based on the following text, generate a set of flashcards. Each flashcard should have a "question" and a concise "answer".
+    You are an expert instructional designer. Based on the following text, generate a rich set of flashcards. Each flashcard must include:
+    - "question": a focused prompt using clear academic language
+    - "answer": a concise yet complete response grounded in the source text
+    - "hint": a gentle nudge that helps recall without giving away the answer
+    - "mnemonic": a memorable hook or association (wordplay, acronym, vivid image, etc.)
+    - "topicTag": a short topical label (e.g. "Photosynthesis", "World War II")
+    - "difficulty": one of "easy", "medium", or "hard" chosen based on the concept's complexity
 
     Text: "${text}"
 
@@ -1143,13 +1157,23 @@ class GeminiService {
     [
       {
         "question": "What is the capital of Iraq?",
-        "answer": "Baghdad"
+        "answer": "Baghdad",
+        "hint": "It's the largest city in Iraq.",
+        "mnemonic": "Think of \"Bag dad\" visiting the capital.",
+        "topicTag": "Geography",
+        "difficulty": "easy"
       },
       {
         "question": "What is the main river in Iraq?",
-        "answer": "The Tigris"
+        "answer": "The Tigris",
+        "hint": "It flows alongside the Euphrates.",
+        "mnemonic": "\"Ti\" for Tigris, just like \"Ti\" in tiger stripes that follow a path.",
+        "topicTag": "Geography",
+        "difficulty": "medium"
       }
     ]
+
+    Ensure the set covers different subtopics from the text and varies the difficulty to support spaced repetition.
     `;
 
     const response = await this.makeRequest(prompt);
@@ -1168,10 +1192,27 @@ class GeminiService {
     }
   }
 
-  async generateQuiz(text: string, questionCount: number = 5): Promise<QuizQuestion[]> {
+  async generateQuiz(
+    text: string,
+    questionCount: number = 5,
+    targetDifficulty: 'easy' | 'medium' | 'hard' | 'mixed' = 'medium'
+  ): Promise<QuizQuestion[]> {
+    const difficultyDirective =
+      targetDifficulty === 'mixed'
+        ? 'Ensure the quiz includes a balanced mix of easy, medium, and hard questions so learners experience a natural progression.'
+        : `Keep the overall quiz feeling ${targetDifficulty} while still including a couple of questions that stretch adjacent levels.`;
+
     const prompt = `
-    Based on the following text, generate a ${questionCount}-question multiple-choice quiz.
-    Each question must have four options and one correct answer.
+    You are an assessment author. Based on the following text, generate a ${questionCount}-question multiple-choice quiz that feels classroom ready.
+    ${difficultyDirective}
+    Requirements for each question:
+    - Provide exactly four high-quality, clearly distinct options.
+    - Include "correctAnswer" that matches one of the options verbatim.
+    - Add a concise "hint" that unlocks the idea without revealing the answer.
+    - Add a 1-2 sentence "explanation" describing why the correct answer is right and why the distractors are not.
+    - Assign a "difficulty" of "easy", "medium", or "hard" based on cognitive load.
+    - Add a short "category" tag (e.g. "Key Concept", "Historical Detail") derived from the source.
+    - Whenever possible, vary difficulty and topic coverage across the quiz.
 
     Text: "${text}"
 
@@ -1182,14 +1223,24 @@ class GeminiService {
       {
         "question": "Which of these is a primary color?",
         "options": ["Green", "Orange", "Blue", "Purple"],
-        "correctAnswer": "Blue"
+        "correctAnswer": "Blue",
+        "hint": "Think about colors that mix to create others.",
+        "explanation": "Blue is one of the three primary colors along with red and yellow. Green, orange, and purple are secondary colors created by mixing primaries.",
+        "difficulty": "easy",
+        "category": "Key Concept"
       },
       {
         "question": "What is 2 + 2?",
         "options": ["3", "4", "5", "6"],
-        "correctAnswer": "4"
+        "correctAnswer": "4",
+        "hint": "Add two pairs together.",
+        "explanation": "Adding two plus two gives four; the other numbers would result from incorrect addition.",
+        "difficulty": "easy",
+        "category": "Fundamentals"
       }
     ]
+
+    Ensure the final JSON array is valid and free of trailing commas or additional commentary.
     `;
 
     const response = await this.makeRequest(prompt);

@@ -478,7 +478,7 @@ export const ArticleWriter = () => {
         gridCols={{ mobile: 1, tablet: 1, desktop: 2 }}
         className={isMobile ? "gap-6" : "gap-8"}
       >
-        <Card>
+        <Card style={{ borderColor: 'hsl(265 60% 50% / 0.7)' }}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <PenTool className="h-5 w-5" />
@@ -590,7 +590,7 @@ export const ArticleWriter = () => {
           </CardContent>
         </Card>
 
-        <Card className="flex flex-col">
+        <Card className="flex flex-col" style={{ borderColor: 'hsl(265 60% 50% / 0.7)' }}>
           <CardHeader>
             <div className={`flex ${isMobile ? 'flex-col gap-3' : 'items-center justify-between'}`}>
               <CardTitle className="flex items-center gap-2 flex-wrap">
@@ -644,7 +644,7 @@ export const ArticleWriter = () => {
           <CardContent className="flex-1 flex flex-col">
             <div className="flex-1 relative">
               {previewMode === 'preview' ? (
-                <div className={`overflow-auto border rounded-md p-3 md:p-4 bg-white dark:bg-gray-900 ${isMobile ? 'h-64' : 'h-full'}`}>
+                <div className={`overflow-auto border-2 rounded-md p-3 md:p-4 bg-white dark:bg-gray-900 ${isMobile ? 'h-64' : 'h-full'}`} style={{ borderColor: 'hsl(265 60% 50% / 0.7)' }}>
                   <RichTextRenderer 
                     content={article || displayText} 
                     className="report-content prose prose-sm md:prose-base max-w-none dark:prose-invert"

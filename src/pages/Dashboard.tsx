@@ -131,7 +131,7 @@ const Index = () => {
       description: "presentationGeneratorDescription",
       icon: Presentation,
       image: "/card-images/presentation.jpeg",
-      category: "presentation",
+      category: "study",
       path: "/presentation-generator"
     },
     {
@@ -230,13 +230,12 @@ const Index = () => {
 
   const toolsByCategory: { [key: string]: AcademicTool[] } = {
     Writing: academicTools.filter(tool => ["writing", "editing"].includes(tool.category)),
-    Study: academicTools.filter(tool => ["study", "planning"].includes(tool.category) && tool.title !== 'taskPlanner' && tool.category !== 'presentation'),
+    Study: academicTools.filter(tool => ["study", "planning"].includes(tool.category) && tool.title !== 'taskPlanner'),
     Tools: academicTools.filter(tool => ["tools", "verification"].includes(tool.category)),
     General: academicTools.filter(tool => tool.title === 'taskPlanner'),
-    Presentation: academicTools.filter(tool => tool.category === 'presentation'),
   };
 
-  const categoryOrder = ["Writing", "Study", "Tools", "Presentation", "General"];
+  const categoryOrder = ["Writing", "Study", "Tools", "General"];
 
   // If a specific category is selected, show the tools within that category
  if (currentTool && toolsByCategory[currentTool]) {
@@ -289,7 +288,6 @@ const Index = () => {
         case 'Writing': return PenTool;
         case 'Study': return BookOpen;
         case 'Tools': return FileUp;
-        case 'Presentation': return Presentation;
         case 'General': return Calendar;
         default: return FileText;
       }
@@ -300,7 +298,6 @@ const Index = () => {
         case 'Writing': return '/card-images/writting.png';
         case 'Study': return '/card-images/study.jpeg';
         case 'Tools': return '/card-images/tools.jpeg';
-        case 'Presentation': return '/card-images/presentation.png';
         case 'General': return '/card-images/general.jpeg';
         default: return undefined;
       }
@@ -334,7 +331,7 @@ const Index = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {categoryCards}
         </div>
       </main>

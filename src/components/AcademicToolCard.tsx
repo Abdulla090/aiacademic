@@ -34,21 +34,16 @@ export const AcademicToolCard = ({
   const cardInnerContent = (
     <>
       <CardHeader className="p-4 border-b border-border">
-        <div className={`flex items-center gap-3`}>
-          <div className="p-2 bg-primary/10 rounded-lg transition-all duration-300 group-hover:bg-primary/20 flex-shrink-0">
-            <Icon className="h-5 w-5 text-primary transition-all duration-300" />
-          </div>
-          <div className={`flex-1 ${isRTL ? 'flex flex-col items-end' : ''}`}>
-            <CardTitle className={`text-base font-semibold text-foreground transition-colors duration-300 group-hover:text-primary ${isRTL ? 'text-right w-full' : 'text-left'}`}>{t(title)}</CardTitle>
-            {category && (
-              <Badge variant="secondary" className="text-xs mt-1 bg-secondary/10 text-primary border-secondary/20">
-                {t(category)}
-              </Badge>
-            )}
-          </div>
+        <div style={{ textAlign: isRTL ? 'right' : 'left', width: '100%' }}>
+          <CardTitle className="text-base font-semibold text-foreground transition-colors duration-300 group-hover:text-primary">{t(title)}</CardTitle>
+          {category && (
+            <Badge variant="secondary" className="text-xs mt-1 bg-secondary/10 text-primary border-secondary/20">
+              {t(category)}
+            </Badge>
+          )}
         </div>
       </CardHeader>
-      <CardContent className="flex-grow p-4">
+      <CardContent className="flex-grow p-4" style={{ textAlign: isRTL ? 'right' : 'left' }}>
         {image ? (
           <div className="mb-4 rounded-lg overflow-hidden aspect-video">
             <OptimizedImage
@@ -61,7 +56,7 @@ export const AcademicToolCard = ({
           </div>
         ) : null}
 
-        <p className={`text-sm text-muted-foreground leading-relaxed transition-colors duration-300 group-hover:text-foreground ${isRTL ? 'text-right' : 'text-left'}`}>{t(description)}</p>
+        <p className="text-sm text-muted-foreground leading-relaxed transition-colors duration-300 group-hover:text-foreground" style={{ textAlign: isRTL ? 'right' : 'left' }}>{t(description)}</p>
       </CardContent>
       <CardFooter className="p-4 bg-background-secondary border-t border-border">
         {isComingSoon ? (
@@ -82,10 +77,16 @@ export const AcademicToolCard = ({
     </>
   );
 
-  const cardWrapperClass = "h-full flex-col bg-card rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 border-b-4 border-primary-dark";
+  const cardWrapperClass = "h-full flex-col bg-card rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300";
 
   const AnimatedCard = ({ children }: { children: React.ReactNode }) => (
-    <Card className={`relative h-full overflow-hidden ${cardWrapperClass} animated-border-snake`}>
+    <Card 
+      className={`relative h-full overflow-hidden ${cardWrapperClass} animated-border-snake`}
+      style={{
+        borderColor: 'hsl(265 60% 50% / 0.7)',
+        borderWidth: '2px'
+      }}
+    >
       <span></span>
       <span></span>
       {children}

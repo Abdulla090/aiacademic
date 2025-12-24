@@ -393,11 +393,16 @@ suggestion,
 @layer components {
   /* Academic Card Variants */
   .card-academic {
-    @apply bg-card border border-card-border rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300;
+    @apply bg-card border-2 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300;
+    border-color: hsl(265 60% 50% / 0.7);
     width: 100%;
     max-width: 100%;
     overflow: hidden;
     box-sizing: border-box;
+  }
+  
+  .card-academic:hover {
+    border-color: hsl(265 60% 50% / 0.9);
   }
   
   .card-academic * {
@@ -406,11 +411,21 @@ suggestion,
   }
 
   .card-academic-primary {
-    @apply card-academic bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20;
+    @apply card-academic bg-gradient-to-br from-primary/5 to-primary/10;
+    border-color: hsl(265 60% 50% / 0.75);
+  }
+  
+  .card-academic-primary:hover {
+    border-color: hsl(265 60% 50% / 0.95);
   }
 
   .card-academic-secondary {
-    @apply card-academic bg-gradient-to-br from-secondary/5 to-secondary/10 border-secondary/20;
+    @apply card-academic bg-gradient-to-br from-secondary/5 to-secondary/10;
+    border-color: hsl(265 60% 50% / 0.75);
+  }
+  
+  .card-academic-secondary:hover {
+    border-color: hsl(265 60% 50% / 0.95);
   }
 
   /* Academic Buttons */
@@ -677,17 +692,19 @@ suggestion,
 
 /* Purple grid background */
 .bg-purple-grid {
+  background-color: rgba(139, 92, 246, 0.15);
   background-image:
-    linear-gradient(rgba(91, 33, 182, 0.4) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(91, 33, 182, 0.4) 1px, transparent 1px);
+    linear-gradient(rgba(139, 92, 246, 0.5) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.5) 2px, transparent 2px);
   background-size: 40px 40px;
 }
 
 /* Dark mode purple grid background */
 .dark .bg-purple-grid {
+  background-color: rgba(91, 33, 182, 0.1);
   background-image:
-    linear-gradient(rgba(91, 33, 182, 0.2) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(91, 33, 182, 0.2) 1px, transparent 1px);
+    linear-gradient(rgba(91, 33, 182, 0.35) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, rgba(91, 33, 182, 0.35) 1.5px, transparent 1.5px);
   background-size: 40px 40px;
 }
 @layer utilities {
